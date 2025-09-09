@@ -1,5 +1,6 @@
 <p align="center">
-<img src='https://media.tenor.com/-eVltmHz5ysAAAAM/cooking-pot-stir.gif' width='500'>
+![Idiot Sandwich](gordon-ramsay-idiot-sandwich.gif)
+
 </p>
 
 <h1 align="center">🍲 Simmer 🍲</h1>
