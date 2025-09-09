@@ -1,6 +1,5 @@
 <p align="center">
-![Idiot Sandwich](gordon-ramsay-idiot-sandwich.gif)
-
+  <img src="./gordon-ramsay-idiot-sandwich.gif" alt="Idiot Sandwich" width="400"/>
 </p>
 
 <h1 align="center">🍲 Simmer 🍲</h1>
