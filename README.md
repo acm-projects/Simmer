@@ -113,26 +113,26 @@ Simmer is a voice-guided cooking app that makes cooking hands-free, stress-free,
 Download: [Node.js LTS](https://nodejs.org/en/download/)  
 Tutorial: [Installing Node.js and npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)  
 
-Expo CLI (React Native Mobile Development):  
+* Expo CLI (React Native Mobile Development):  
 npm install -g expo-cli  
 Tutorial: [Get Started with Expo](https://docs.expo.dev/get-started/installation/)  
 
-VS Code:  
+* VS Code:  
 Download: [Visual Studio Code](https://code.visualstudio.com/download)  
 Tutorial: [VS Code Tips for React Native](https://code.visualstudio.com/docs/nodejs/reactjs-tutorial)  
 
-Expo Go (for Physical Device Testing):  
+* Expo Go (for Physical Device Testing):  
 Download: [Expo Go - iOS](https://apps.apple.com/app/expo-go/id982107779) | [Expo Go - Android](https://play.google.com/store/apps/details?id=host.exp.exponent)  
 
-Postman (API Testing):  
+* Postman (API Testing):  
 Download: [Postman](https://www.postman.com/downloads/)  
 Tutorial: [Postman API Testing for Beginners](https://www.guru99.com/postman-tutorial.html)  
 
-Git:  
+* Git:  
 Download: [Git](https://git-scm.com/downloads)  
 Tutorial: [Git Handbook](https://guides.github.com/introduction/git-handbook/)  
 
-Python:  
+* Python:  
 Download: [Python](https://www.python.org/downloads/)  
 Tutorial: [FastAPI Quickstart](https://fastapi.tiangolo.com/tutorial/) 
 
