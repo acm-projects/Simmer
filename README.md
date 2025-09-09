@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="./gordon-ramsay-idiot-sandwich.gif" alt="Idiot Sandwich" width="400"/>
+  <img src="./gordon-ramsay-idiot-sandwich.gif" alt="Idiot Sandwich" width="600"/>
 </p>
 
 <h1 align="center">🍲 Simmer 🍲</h1>
 
 <p align="center">
-Simmer is your hands-free, voice-guided sous-chef in the kitchen! By reading recipes aloud step-by-step with voice command navigation, built-in timers, and recipe management, Simmer makes cooking stress-free and fun. Keep your hands clean, stay focused on the process, and let Simmer guide you through every delicious step.
+Simmer is a voice-guided cooking app that makes cooking hands-free, stress-free, and fun by reading recipes aloud step-by-step while allowing voice command navigation, built-in timers, and recipe management. It serves as a friendly sous-chef guiding users through each step of cooking while they stay focused on enjoying the process.
 </p>
 
 ---
@@ -39,7 +39,10 @@ Simmer is your hands-free, voice-guided sous-chef in the kitchen! By reading rec
 * [React Native Docs](https://reactnative.dev/docs/getting-started)  
 * [Expo Documentation](https://docs.expo.dev/)  
 * [React Navigation](https://reactnavigation.org/)  
-* [NativeWind Docs](https://www.nativewind.dev/)  
+* [NativeWind Docs](https://www.nativewind.dev/)
+* [VIDEO: React Native Environment FULL Setup](https://m.youtube.com/watch?v=oorfevovPWw&t=1322s)
+* [VIDEO: The Ultimate React Native Installation Guide](https://www.youtube.com/watch?v=XV5LwKuk3zc)
+* [VIDEO: How to create your first Expo app](https://www.youtube.com/watch?v=m1-bc53EGh8)
 
 </details>
 
@@ -48,7 +51,11 @@ Simmer is your hands-free, voice-guided sous-chef in the kitchen! By reading rec
 
 * [FastAPI Documentation](https://fastapi.tiangolo.com/)  
 * [Express.js Guide](https://expressjs.com/)  
-* [Node.js Docs](https://nodejs.org/en/docs/)  
+* [Node.js Docs](https://nodejs.org/en/docs/)
+* [VIDEO: FastAPI Full Crash Course - Python's Fastest Web Framework](https://www.youtube.com/watch?v=rvFsGRvj9jo)
+* [VIDEO: FastAPI Tutorial - Building RESTful APIs with Python](https://www.youtube.com/watch?v=GN6ICac3OXY)
+* [VIDEO: Node.js Tutorial for Beginners: Learn Node in 1 Hour](https://www.youtube.com/watch?v=TlB_eWDSMt4)
+* [VIDEO: Introduction to Express JS | Express & Node.js Tutorials for Beginners](https://www.youtube.com/watch?v=jivyItmsu18&pp=0gcJCfwAo7VqN5tD)
 
 </details>
 
@@ -57,7 +64,11 @@ Simmer is your hands-free, voice-guided sous-chef in the kitchen! By reading rec
 
 * [Google OAuth with FastAPI](https://developers.google.com/identity/protocols/oauth2)  
 * [Passport.js](http://www.passportjs.org/)  
-* [Firebase Authentication](https://firebase.google.com/docs/auth)  
+* [Firebase Authentication](https://firebase.google.com/docs/auth)
+* [VIDEO: Code with Me: Learning FastAPI + Google OAuth2](https://www.youtube.com/watch?v=EIZTy4XyXjU)
+* [VIDEO: FastAPI Authentication Example With OAuth2, JSON Web Tokens and Tortoise ORM](https://www.youtube.com/watch?v=6hTRw_HK3Ts)
+* [VIDEO: Node.js Passport Login System Tutorial](https://www.youtube.com/watch?v=-RCnNyD0L-s)
+* [VIDEO: Express JS #15 - Passport.js Authentication](https://www.youtube.com/watch?v=_lZUq39FGv0)
 
 </details>
 
@@ -66,7 +77,10 @@ Simmer is your hands-free, voice-guided sous-chef in the kitchen! By reading rec
 
 * [Expo Speech](https://docs.expo.dev/versions/latest/sdk/speech/)  
 * [Google Cloud Speech-to-Text](https://cloud.google.com/speech-to-text)  
-* [OpenAI Whisper API](https://platform.openai.com/docs/guides/speech-to-text)  
+* [OpenAI Whisper API](https://platform.openai.com/docs/guides/speech-to-text)
+* [VIDEO: Convert Speech to Tect with Amazon Transcribe | Step by Step Tutorial](https://www.youtube.com/watch?v=WS4UXwA5l40)
+* [VIDEO: How to Conver Speech to Text in Expo React Native](https://www.youtube.com/watch?v=0D2Z2Opjpqk)
+* [VIDEO: Google Cloud Speech-To-Text API With Python For Beginners](https://www.youtube.com/watch?v=izdDHVLc_Z0)
 
 </details>
 
@@ -76,7 +90,10 @@ Simmer is your hands-free, voice-guided sous-chef in the kitchen! By reading rec
 * [Firebase Firestore](https://firebase.google.com/docs/firestore)  
 * [PostgreSQL Docs](https://www.postgresql.org/docs/)  
 * [Supabase](https://supabase.com/)  
-* [AWS S3](https://aws.amazon.com/s3/)  
+* [AWS S3](https://aws.amazon.com/s3/)
+* [VIDEO: Firebase Firestore Tutorial #1 - Introduction (full series)](https://www.youtube.com/watch?v=4d-gIPGzmK4)
+* [VIDEO: PostgreSQL Tutorial Full Course 2022](https://www.youtube.com/watch?v=85pG_pDkITY)
+* [VIDEO: AWS S3 Tutorial for Beginners 2023 | AWS S3 Overview | Cloud Computing](https://www.youtube.com/watch?v=HAuvciBEIMQ)
 
 </details>
 
@@ -84,17 +101,40 @@ Simmer is your hands-free, voice-guided sous-chef in the kitchen! By reading rec
 <summary>🎨 Design</summary>
 
 * [Figma](https://www.figma.com/)  
-* [LottieFiles](https://lottiefiles.com/)  
+* [LottieFiles](https://lottiefiles.com/)
+* [VIDEO: Figma Tutorial for Beginners](https://www.youtube.com/watch?v=ezldKx-jPag&pp=0gcJCfwAo7VqN5tD)
 
 </details>
 
 <details>
 <summary>🛠️ Dev Tools</summary>
 
-* [Git](https://git-scm.com/downloads)  
-* [VS Code](https://code.visualstudio.com/download)  
-* [Postman](https://www.postman.com/downloads/)  
-* [Expo Go](https://expo.dev/client)  
+* Node.js:  
+Download: [Node.js LTS](https://nodejs.org/en/download/)  
+Tutorial: [Installing Node.js and npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)  
+
+Expo CLI (React Native Mobile Development):  
+npm install -g expo-cli  
+Tutorial: [Get Started with Expo](https://docs.expo.dev/get-started/installation/)  
+
+VS Code:  
+Download: [Visual Studio Code](https://code.visualstudio.com/download)  
+Tutorial: [VS Code Tips for React Native](https://code.visualstudio.com/docs/nodejs/reactjs-tutorial)  
+
+Expo Go (for Physical Device Testing):  
+Download: [Expo Go - iOS](https://apps.apple.com/app/expo-go/id982107779) | [Expo Go - Android](https://play.google.com/store/apps/details?id=host.exp.exponent)  
+
+Postman (API Testing):  
+Download: [Postman](https://www.postman.com/downloads/)  
+Tutorial: [Postman API Testing for Beginners](https://www.guru99.com/postman-tutorial.html)  
+
+Git:  
+Download: [Git](https://git-scm.com/downloads)  
+Tutorial: [Git Handbook](https://guides.github.com/introduction/git-handbook/)  
+
+Python:  
+Download: [Python](https://www.python.org/downloads/)  
+Tutorial: [FastAPI Quickstart](https://fastapi.tiangolo.com/tutorial/) 
 
 </details>
 
