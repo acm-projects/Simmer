@@ -161,36 +161,35 @@ Simmer is your hands-free, voice-guided sous-chef in the kitchen! By reading rec
 
 ---
 
-## Competition ⚔️
-
-* **YouTube/Tasty** → Visually engaging, but not hands-free  
-* **Yummly/Paprika** → Recipe management, limited voice guidance  
-* **Google Home** → Voice navigation, but no recipe library/imports  
-* **Deglaze** → Recipe import, but no conversational voice steps  
-
-✅ **Simmer’s Advantage**: Combines **hands-free TTS guidance, voice command navigation, recipe storage/import, and LLM-powered Q&A** in a single lightweight app!  
-
----
-
-## Roadblocks & Solutions 🛠️
-* **STT Accuracy in noisy kitchens** → Use keyword detection, wake words, confirmation beeps/vibrations  
-* **Cross-Platform TTS/STT** → Expo Speech + Google Cloud for consistency  
-* **Video Parsing Complexity** → Whisper + LLM structured prompts + user confirmation  
-* **Device Constraints** → Cloud storage (S3/Firestore), async processing, caching  
-* **OAuth Debugging** → Expo AuthSession, Firebase Auth, Postman for testing  
-
----
-
 ## GitHub Cheat Sheet 💬
 
 | Command | Description |
 | ------ | ------ |
-| **git branch** | List branches |
-| **git checkout -b "branch"** | Create & switch to new branch |
-| **git add .** | Stage all changes |
-| **git commit -m "msg"** | Commit changes |
-| **git push origin branch** | Push changes |
-| **git pull origin branch** | Pull updates |
-| **git revert hash** | Undo a pushed commit |
-| **git reset --soft HEAD~** | Undo last commit, keep changes |
-| **git reset --hard hash** | Undo last commit, remove changes |
+| **cd <director>** | Change directories over to our repository |
+| **git branch** | Lists branches for you |
+| **git branch "branch name"** | Makes new branch |
+| **git checkout "branch name"** | Switch to branch |
+| **git checkout -b "branch name"** | Same as 2 previous commands together |
+| **git add .**| Finds all changed files |
+| **git commit -m "Testing123"** | Commit with message |
+| **git push origin "branch"** | Push to branch |
+| **git pull origin "branch"** | Pull updates from a specific branch |
+| get commit hash (find on github or in terminal run **git log --oneline** ) then **git revert 2f5451f --no-edit**| Undo a commit that has been pushed |
+| **git reset --soft HEAD~** | Undo commit (not pushed) but *keep* the changes |
+| get commit hash then **git reset --hard 2f5451f** | Undo commit (not pushed) and *remove*  changes |
+
+## The Team 🎉
+
+<div align="center">
+<h2>🎊Developers🎊</h2>
+<h3>Adrian Hautea</h3><br/>
+<h3>Keshav Taneja</h3><br/>
+<h3>Liana Forster</h3><br/>
+<h3>Hieu Tran</h3><br/>
+<h3>Patrick Enerio</h3><br/>
+<h2>🎊Project Manager🎊</h2>
+<h3>Suhani Rana</h3><br/>
+<h2>🎊Industry Mentor🎊</h2>
+<h3>Joanna Borba</h3><br/>
+<div />
+
