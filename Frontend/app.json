@@ -1,19 +1,15 @@
 {
   "expo": {
-    "name": "Simmer",
-    "slug": "Simmer",
+    "name": "Frontend",
+    "slug": "Frontend",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "simmer",
+    "scheme": "frontend",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.acm.simmer",
-      "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
-      }
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
@@ -43,18 +39,10 @@
           }
         }
       ]
-      
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    },
-    "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "7af8ce46-83db-4f1e-977a-eb780779e451"
-      }
     }
   }
 }
-
