@@ -2,38 +2,42 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, Button, SafeAreaView, TextInput } from 'react-native';
+import { Alert, Button, SafeAreaView, TextInput, Text } from 'react-native';
 import { useSupabase } from '../contexts/SupabaseContext';
+import { validateSignupInfo } from '../utils/validateSignupInfo';
 
 
 export default function Signup() {
   const router= useRouter();
-  type UserLoginInfoType={
+  type UserSignupInfoType={
     email:string;
     password:string;
   }
 
-  const [userLoginInfo,setUserLoginInfo]= useState<UserLoginInfoType>({email:'',password:''});
+  const [userSignupInfo,setUserSignupInfo]= useState<UserSignupInfoType>({email:'',password:''});
+  const [error, setError]= useState<string|null>(null)
   const supabase=useSupabase();
 
   
   async function signUpWithEmail() {
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.signUp({
-      email: userLoginInfo.email,
-      password: userLoginInfo.password,
-    })
-    if (error) Alert.alert(error.message)
-    if (!session) Alert.alert('Please check your inbox for email verification!')
+    if(validateSignupInfo(userSignupInfo, setError)){
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.signUp({
+        email: userSignupInfo.email,
+        password: userSignupInfo.password,
+      })
+      if (error) setError(error.message)
+    }
   }
 
   return (
     <SafeAreaView>
-      <TextInput placeholder='email' value={userLoginInfo.email} onChangeText={(email: string)=>setUserLoginInfo((currentUserLoginInfo)=>({...currentUserLoginInfo, email}))}/>
-      <TextInput placeholder='password' secureTextEntry={true} value={userLoginInfo.password} onChangeText={(password: string)=>setUserLoginInfo((currentUserLoginInfo)=>({...currentUserLoginInfo, password}))}/>
+      <TextInput placeholder='email' value={userSignupInfo.email} onChangeText={(email: string)=>setUserSignupInfo((currentUserSignupInfo)=>({...currentUserSignupInfo, email}))}/>
+      <TextInput placeholder='password' secureTextEntry={true} value={userSignupInfo.password} onChangeText={(password: string)=>setUserSignupInfo((currentUserSignupInfo)=>({...currentUserSignupInfo, password}))}/>
       <Button title='Create Account' onPress={signUpWithEmail} />
+      {error&&<Text>{error}</Text>}
       <Link href="/login">already have an account?</Link>
     </SafeAreaView>
   )

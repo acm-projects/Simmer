@@ -4,8 +4,8 @@ import React, { createContext, useContext, useState, useEffect , ReactNode } fro
 
 
 
-  const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.EXPO_PUBLIC_SUPBASE_KEY;
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.EXPO_PUBLIC_SUPBASE_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
   throw new Error("Supabase URL or Key is not defined in your .env file.");
