@@ -68,7 +68,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFD9C6',
+    backgroundColor: '#fce6dbff',
   },
   content:{
     padding: 1,
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     fontSize: 40,
     paddingLeft: 15,
     paddingTop: 15,
-    color: '#2E321E',
+    color: '#262e05ff',
   },
   text:{
     fontSize: 15,
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   },
   subtitle:{
     fontSize: 20,
-    color: '#2E321E',
+    color: '#262e05ff',
     paddingLeft: 15,
     paddingTop: 15,
   },  
