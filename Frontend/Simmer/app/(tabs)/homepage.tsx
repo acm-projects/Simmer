@@ -1,8 +1,9 @@
 import { Image } from 'expo-image';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, ScrollView } from 'react-native';
 
 import SmallCard from "@/components/smallCard";
+import LargeCard from "@/components/largeCard";
 import { HelloWave } from '@/components/hello-wave';
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
@@ -11,16 +12,27 @@ import { Link } from 'expo-router';
 
 export default function HomeScreen() {
   return (
+
+   <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <Text style={styles.title}>Hi! Dianne </Text>
+    <Text style={styles.text}>What are you cooking today?</Text>
+  
     <View style={styles.container}>
+      <Text style={styles.subtitle}>Recipe Suggestions</Text>
+      <LargeCard/>
       <View style={{margin: 20}}>
-      <View style={styles.grid}>
-        <View style={styles.gridItem}>
+      <View style={{backgroundColor: '#9BA760', borderRadius: 30, paddingBottom: 10, paddingLeft: 10, paddingRight: 10,}}>
+        <Text style={[styles.subtitle, {color: '#fff' }]}>Your Recipes</Text>
+        <View style={styles.grid}>
+                <View style={styles.gridItem}>
           <SmallCard/>
         </View>
         
          <View style={styles.gridItem}>
           <SmallCard/>
         </View>
+        </View>
+  
       </View>
 
    <View style={styles.grid}>
@@ -39,17 +51,20 @@ export default function HomeScreen() {
           <StatusBar style="auto" />
           
         </View>
+         </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#9BA760',
-    paddingTop: 200,
+    backgroundColor: '#FFD9C6',
   },
-    gridItem: {
-    width: '48%',
+  content:{
+    padding: 1,
+    top: 50,
+  },
+  gridItem: {
     flex: 1, // Ensures items take equal space in a row
 
     justifyContent: 'center',
@@ -61,4 +76,20 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     
   },
+  title:{
+    fontSize: 40,
+    paddingLeft: 15,
+    paddingTop: 15,
+    color: '#2E321E',
+  },
+  text:{
+    fontSize: 15,
+    paddingLeft: 15,
+  },
+  subtitle:{
+    fontSize: 20,
+    color: '#2E321E',
+    paddingLeft: 15,
+    paddingTop: 15,
+  },  
 });
