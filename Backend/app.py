@@ -67,5 +67,36 @@ def create_recipe():
     print('ERROR', e)
     return jsonify({'error' : 'Internal Server Error', 'details' : str(e)}), 500
 
+@app.route("/favorite_recipe", methods=["POST"])
+def favorite_recipe():
+  try:
+    data = request.get_json()
+    recipe_id = data.get('recipe_id')
+
+    if not recipe_id:
+      return jsonify({'error' : 'recipe_id is required'}), 400
+    
+    recipe_check = supabase.table('recipes').select('id').eq('id', recipe_id).execute()
+    if not recipe_check:
+      return jsonify({'error' : 'recipe_id does not exist'}), 404
+    
+    saved_check = supabase.table('user_saved_recipes').select('recipe_id').eq('user_id', TEST_USER_ID).eq('recipe_id', recipe_id).execute()
+    if not saved_check:
+      return jsonify({'error' : 'must save recipe before favoriting it'}), 403
+    
+    favorite = supabase.table('user_favorites').insert({
+      'user_id' : TEST_USER_ID,
+      'recipe_id' : recipe_id
+    }).execute()
+
+    if not favorite.data:
+      return jsonify({'error' : 'failed to favorite recipe'}), 400
+    
+    return jsonify({'message' : 'Recipe favorited!', 'recipe_id' : favorite.data[0]['recipe_id']})
+  
+  except Exception as e:
+    print('ERROR', e)
+    return jsonify({"error": "Internal Server Error", "details": str(e)}), 500 
+
 if __name__ == "__main__":
   app.run(host='0.0.0.0', port=5000, debug=True)
