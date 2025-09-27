@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import React, { useContext, useEffect, useState } from 'react';
 import { Alert, Button, SafeAreaView, TextInput ,Text} from 'react-native';
 import { useSupabase } from '../contexts/SupabaseContext';
-import { useRouter } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 
 export default function HomeScreen() {
   const supabase=useSupabase();
@@ -29,6 +29,7 @@ export default function HomeScreen() {
     <SafeAreaView>
      <Text>hi {user}</Text>
      <Button title='logout' onPress={logout}/>
+     <Link href='/homepage'>Temporary link to homepage</Link>
     </SafeAreaView>
     
   );
