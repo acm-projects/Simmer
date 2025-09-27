@@ -67,8 +67,8 @@ def create_recipe():
     print('ERROR', e)
     return jsonify({'error' : 'Internal Server Error', 'details' : str(e)}), 500
 
-@app.route("/favorite_recipe", methods=["POST"])
-def favorite_recipe():
+@app.route("/toggle_favorite", methods=["POST"])
+def toggle_favorite():
   try:
     data = request.get_json()
     recipe_id = data.get('recipe_id')
@@ -82,17 +82,23 @@ def favorite_recipe():
     
     saved_check = supabase.table('user_saved_recipes').select('recipe_id').eq('user_id', TEST_USER_ID).eq('recipe_id', recipe_id).execute()
     if not saved_check:
-      return jsonify({'error' : 'must save recipe before favoriting it'}), 403
+      return jsonify({'error' : 'must save recipe before toggling favorite'}), 403
     
-    favorite = supabase.table('user_favorites').insert({
-      'user_id' : TEST_USER_ID,
-      'recipe_id' : recipe_id
-    }).execute()
+    favorite_check = supabase.table('user_favorites').select('recipe_id').eq('user_id', TEST_USER_ID).eq('recipe_id', recipe_id).execute()
+    if favorite_check.data:
+      supabase.table('user_favorites').delete().eq('user_id', TEST_USER_ID).eq('recipe_id', recipe_id).execute()
+      return jsonify ({'message' : 'Recipe Unfavorited!'})
+    
+    else:
+      favorite = supabase.table('user_favorites').insert({
+        'user_id' : TEST_USER_ID,
+        'recipe_id' : recipe_id
+      }).execute()
 
-    if not favorite.data:
-      return jsonify({'error' : 'failed to favorite recipe'}), 400
-    
-    return jsonify({'message' : 'Recipe favorited!', 'recipe_id' : favorite.data[0]['recipe_id']})
+      if not favorite.data:
+        return jsonify({'error' : 'failed to favorite recipe'}), 400
+      
+      return jsonify({'message' : 'Recipe favorited!', 'recipe_id' : favorite.data[0]['recipe_id']})
   
   except Exception as e:
     print('ERROR', e)
