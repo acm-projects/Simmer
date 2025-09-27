@@ -4,6 +4,7 @@ import { StyleSheet, Text, View, ScrollView } from 'react-native';
 
 import SmallCard from "@/components/smallCard";
 import LargeCard from "@/components/largeCard";
+import CornerIcon from "@/components/cornerIcon";
 import { HelloWave } from '@/components/hello-wave';
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
@@ -14,7 +15,16 @@ export default function HomeScreen() {
   return (
 
    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-    <Text style={styles.title}>Hi! Dianne </Text>
+    <View style={styles.row}>
+      <Text style={styles.title}>Hi! Dianne </Text>
+      <View style={styles.icons}>
+        <CornerIcon icon="add"/>
+        <CornerIcon icon ="search-outline"/>
+        <CornerIcon icon ="menu-outline"/>
+      </View>
+      
+    </View>
+    
     <Text style={styles.text}>What are you cooking today?</Text>
   
     <View style={styles.container}>
@@ -92,4 +102,15 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     paddingTop: 15,
   },  
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between', // pushes left/right
+    width: '100%', // make sure it spans full width
+  },
+  icons: {
+    flexDirection: 'row',
+    margin: 5,
+    marginRight: 8,
+    marginTop: 15,
+  }
 });
