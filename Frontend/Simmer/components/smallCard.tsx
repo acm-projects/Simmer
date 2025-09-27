@@ -1,13 +1,18 @@
 import React from 'react'
 import { StyleSheet, Text, View, Image } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import FavoriteIcons from '@/components/favoriteIcon';
 
 const SmallCard = () => {
   return (
     <View style={styles.container}>
        
-      <View style={styles.imageCard}>
+      <View style={[styles.imageCard]}>
          <Image source={require('../assets/images/tacos.jpg')} style={styles.image}/>
+         <View style={[{zIndex: 2}, styles.icon]}>
+             <FavoriteIcons icon="heart-outline"/>
+         </View>
+        
       </View>
       <View style={styles.card}>
         <Text style={styles.title}> Chicken Tacos</Text> 
@@ -34,8 +39,6 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     bottom: -6,
     zIndex: 1,
-  
-
   },
   imageCard:{
     zIndex: 1,
@@ -79,6 +82,11 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     marginRight: 5,
   },
+  icon:{
+    position: 'absolute',
+    right: 5,
+    top: 10,
+  }
 });
 
 

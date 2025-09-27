@@ -13,7 +13,7 @@ const CornerIcon = ({icon}: {icon: keyof typeof Ionicons.glyphMap}) => {
 
 const styles = StyleSheet.create({
 container:{
-    backgroundColor: '#9BA760',
+    backgroundColor: '#2E321E',
     borderRadius: 100,
     padding: 4,
     margin: 2,
