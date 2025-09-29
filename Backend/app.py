@@ -2,12 +2,14 @@ import os
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 from supabase import create_client, Client
+from gotrue.errors import AuthApiError
 
 app = Flask(__name__)
 
 load_dotenv()
 supa_url: str = os.environ.get("SUPABASE_URL")
 supa_key: str = os.environ.get("SUPABASE_KEY")
+
 
 supabase: Client = create_client(supabase_url=supa_url, supabase_key=supa_key)
 
@@ -103,6 +105,61 @@ def toggle_favorite():
   except Exception as e:
     print('ERROR', e)
     return jsonify({"error": "Internal Server Error", "details": str(e)}), 500 
+
+@app.route("/create_user", methods=["POST"])
+def create_user():
+  data = request.get_json()
+  auth_header = request.headers.get('Authorization')
+  if not data or not all(key in data for key in ['id', 'first_name', 'last_name', 'diet_restriction','email']):
+    return jsonify({'message': 'Missing data: username, email, and password are required.'}), 400
+  # if not auth_header or not auth_header.startswith('Bearer '):
+  #   return jsonify({'message': 'Authorization header is missing or invalid.'}), 401
+  
+  # jwt_token = auth_header.split(' ')[1]
+
+  # try:
+  #     user_response = supabase.auth.get_user(jwt_token)
+  #     user = user_response.user
+      
+  #     if not user:
+  #           return jsonify({'message': 'Invalid or expired token.'}), 401
+
+  # except AuthApiError as e:
+  #     return jsonify({'message': 'Authentication failed.', 'error': e.message}), 401
+  # except Exception:
+  #     return jsonify({'message': 'Invalid token.'}), 401
+
+  first_name=data.get('first_name')
+  last_name=data.get('last_name')
+  id=data.get('id')
+  diet_restriction=data.get('diet_restriction')
+  email=data.get('email')
+
+  newUser={
+    'first_name':first_name,
+    'last_name': last_name,
+    'id': id,
+    'diet_restriction': diet_restriction,
+    'email':email
+  }
+
+  try:
+    response = (
+      supabase.table("users")
+      .insert(newUser)
+      .execute()
+    )
+
+    if response.data:
+      return jsonify({'message': 'User successfuly created','data':response.data[0]}), 200
+    else:
+      return jsonify({'message': 'failed to create user'}), 400
+
+      
+  except Exception as e:
+    print(str(e))
+    return jsonify({'message': 'An error occured trying to add a user'}), 500
+
 
 if __name__ == "__main__":
   app.run(host='0.0.0.0', port=5000, debug=True)
