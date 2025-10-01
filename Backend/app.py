@@ -122,22 +122,27 @@ def create_user():
   
   jwt_token = auth_header.split(' ')[1]
 
+  first_name=data.get('first_name')
+  last_name=data.get('last_name')
+  id=data.get('id')
+  email=data.get('email')
+
   try:
       user_response = supabase.auth.get_user(jwt_token)
       user = user_response.user
       
       if not user:
-            return jsonify({'message': 'Invalid or expired token.'}), 401
+        return jsonify({'message': 'Invalid or expired token.'}), 401
+      if user.id!=id:
+        return jsonify({'message':'UID does not match session'})
+
 
   except AuthApiError as e:
       return jsonify({'message': 'Authentication failed.', 'error': e.message}), 401
   except Exception:
       return jsonify({'message': 'Invalid token.'}), 401
 
-  first_name=data.get('first_name')
-  last_name=data.get('last_name')
-  id=data.get('id')
-  email=data.get('email')
+
 
   newUser={
     'first_name':first_name,
