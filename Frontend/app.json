@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Simmer",
-    "slug": "Simmer",
+    "name": "Frontend",
+    "slug": "Frontend",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "simmer",
+    "scheme": "frontend",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
