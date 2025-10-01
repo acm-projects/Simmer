@@ -2,8 +2,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, Button, SafeAreaView, TextInput, Text } from 'react-native';
+import { Alert, Button, TextInput, Text } from 'react-native';
 import { useSupabase } from '../contexts/SupabaseContext';
+import {SafeAreaView} from 'react-native-safe-area-context'
 
 
 export default function Login() {

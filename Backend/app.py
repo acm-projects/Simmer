@@ -3,8 +3,13 @@ from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 from supabase import create_client, Client
 from gotrue.errors import AuthApiError
+from flask_cors import CORS # Import the CORS extension
+
+
 
 app = Flask(__name__)
+
+CORS(app) 
 
 load_dotenv()
 supa_url: str = os.environ.get("SUPABASE_URL")
@@ -110,36 +115,34 @@ def toggle_favorite():
 def create_user():
   data = request.get_json()
   auth_header = request.headers.get('Authorization')
-  if not data or not all(key in data for key in ['id', 'first_name', 'last_name', 'diet_restriction','email']):
+  if not data or not all(key in data for key in ['id', 'first_name', 'last_name','email']):
     return jsonify({'message': 'Missing data: username, email, and password are required.'}), 400
-  # if not auth_header or not auth_header.startswith('Bearer '):
-  #   return jsonify({'message': 'Authorization header is missing or invalid.'}), 401
+  if not auth_header or not auth_header.startswith('Bearer '):
+    return jsonify({'message': 'Authorization header is missing or invalid.'}), 401
   
-  # jwt_token = auth_header.split(' ')[1]
+  jwt_token = auth_header.split(' ')[1]
 
-  # try:
-  #     user_response = supabase.auth.get_user(jwt_token)
-  #     user = user_response.user
+  try:
+      user_response = supabase.auth.get_user(jwt_token)
+      user = user_response.user
       
-  #     if not user:
-  #           return jsonify({'message': 'Invalid or expired token.'}), 401
+      if not user:
+            return jsonify({'message': 'Invalid or expired token.'}), 401
 
-  # except AuthApiError as e:
-  #     return jsonify({'message': 'Authentication failed.', 'error': e.message}), 401
-  # except Exception:
-  #     return jsonify({'message': 'Invalid token.'}), 401
+  except AuthApiError as e:
+      return jsonify({'message': 'Authentication failed.', 'error': e.message}), 401
+  except Exception:
+      return jsonify({'message': 'Invalid token.'}), 401
 
   first_name=data.get('first_name')
   last_name=data.get('last_name')
   id=data.get('id')
-  diet_restriction=data.get('diet_restriction')
   email=data.get('email')
 
   newUser={
     'first_name':first_name,
     'last_name': last_name,
     'id': id,
-    'diet_restriction': diet_restriction,
     'email':email
   }
 
