@@ -70,7 +70,7 @@ export default function Signup() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Signup</Text>
+        <Text style={styles.title}>Sign Up</Text>
       </View>
       <View style={styles.forum}>
         <InputField label="First Name" placeholder='First Name' secureTextEntry={false} value={userSignupInfo.first_name} onChangeText={(first_name: string)=>setUserSignupInfo((currentUserSignupInfo)=>({...currentUserSignupInfo, first_name}))}/>
