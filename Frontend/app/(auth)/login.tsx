@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, Button, TextInput, Text } from 'react-native';
+import { Alert, Button, View, TextInput, Text } from 'react-native';
 import { useSupabase } from '../contexts/SupabaseContext';
 import {SafeAreaView} from 'react-native-safe-area-context'
 
@@ -41,12 +41,12 @@ export default function Login() {
 
 
   return (
-    <SafeAreaView>
+    <View>
       <TextInput placeholder='email' value={userLoginInfo.email} onChangeText={(email: string)=>setUserLoginInfo((currentUserLoginInfo)=>({...currentUserLoginInfo, email}))}/>
       <TextInput placeholder='password' secureTextEntry={true}  value={userLoginInfo.password} onChangeText={(password: string)=>setUserLoginInfo((currentUserLoginInfo)=>({...currentUserLoginInfo, password}))}/>
       <Button title='login' onPress={signInWithEmail} />
       {error&&<Text>{error}</Text>}
       <Link href="/signup">{`don't have an account?`}</Link>
-    </SafeAreaView>
+    </View>
   )
 }
