@@ -4,6 +4,7 @@ import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, Button, View, TextInput, Text } from 'react-native';
 import { useSupabase } from '../contexts/SupabaseContext';
+import {SafeAreaView} from 'react-native-safe-area-context'
 
 
 export default function Login() {
