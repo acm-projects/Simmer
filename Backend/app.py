@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 from supabase import create_client, Client
-from gotrue.errors import AuthApiError
+from postgrest.exceptions import APIError as AuthApiError
 from flask_cors import CORS # Import the CORS extension
 
 
