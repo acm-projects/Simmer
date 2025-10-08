@@ -8,11 +8,20 @@ import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Link } from 'expo-router';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
-export default function HomeScreen() {
+export default function RecipeScreen() {
   return (
     <ScrollView style={styles.container}>
-    <Text style={[styles.title, {alignSelf: 'center'}]}>Recipes</Text>
+      <View style={{ justifyContent: 'center', alignItems: 'center'}}>
+     <Text style={styles.title}>Recipes</Text>
+     </View>
+
+
+     <View>
+     <FontAwesome6 name="arrow-left" size={20} style={styles.arrow}/>
+     </View>
+
             <View style={styles.grid}>
         <View style={styles.gridItem}>
           <SmallCard/>
@@ -59,10 +68,12 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+   container: {
     flex: 1,
-    backgroundColor: '#FFD9C6',
+    backgroundColor: '#fce6dbff',
     paddingTop: 50,
+    paddingLeft: 15,
+    paddingRight: 15,
   },
   content:{
     padding: 1,
@@ -81,10 +92,10 @@ const styles = StyleSheet.create({
     
   },
   title:{
-    fontSize: 30,
     paddingLeft: 15,
     paddingTop: 15,
-    color: '#2E321E',
+    fontSize: 25,
+    color: '#9BA760',
   },
   text:{
     fontSize: 15,
@@ -106,5 +117,11 @@ const styles = StyleSheet.create({
     margin: 5,
     marginRight: 8,
     marginTop: 15,
-  }
+  },
+   arrow: {
+   color: "#9BA760",
+   position: "absolute",
+   left: 25,
+   top: -25,
+ },
 });
