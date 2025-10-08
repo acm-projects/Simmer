@@ -177,6 +177,37 @@ def create_user():
   except Exception as e:
     print(str(e))
     return jsonify({'message': 'An error occured trying to add a user'}), 500
+@app.route('/set-preference', methods=['POST'])
+def set_preference():
+
+  data = request.get_json()
+  if not data or not all(key in data for key in ['diet_restriction','food_preference', 'id']):
+    return jsonify({'message': 'Missing preference data'}), 400
+  user_id = data.get('id')
+  dietary_restrictions = data.get('diet_restriction')
+  food_preferences = data.get('food_preference')
+  print(user_id)
+  print(dietary_restrictions)
+
+  get_current_user()
+
+  try:
+    update_data = {
+      'diet_restriction': dietary_restrictions,
+      'food_preference': food_preferences
+    }
+    response = supabase.table('users').update(update_data).eq('id', user_id).execute()
+    if not response.data:
+      return jsonify({"error": "User not found"}), 404
+
+    return jsonify({
+      "message": "User preferences updated successfully.",
+      "updated_data": response.data[0] 
+    }), 200
+  except Exception as e:
+    return jsonify({"error": "An error occurred while updating preferences.", "details": str(e)}), 500
+
+
 
 def get_current_user():
   auth_header = request.headers.get('Authorization')
