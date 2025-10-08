@@ -18,9 +18,16 @@ export default function HomeScreen() {
     <View style={styles.row}>
       <Text style={styles.title}>Hi! Dianne </Text>
       <View style={styles.icons}>
+
         <CornerIcon icon="add"/>
+
+        <Link href="/screens/search">
         <CornerIcon icon ="search-outline"/>
+        </Link>
+        <Link href="/screens/settings">
         <CornerIcon icon ="menu-outline"/>
+        </Link>
+        
       </View>
       
     </View>
