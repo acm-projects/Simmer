@@ -50,7 +50,10 @@ instructions=(
   "you will rinse and repeat this until the user has finished the recipe"
   "if the user wants to go back to the recipe, they will say to go back to a instructio number or describe the instruction"
   "then, you will find the step and reexplain the step in a conversational style"
-  "after that, you will ask the user if you want to go back to the current step")
+  "after that, you will ask the user if you want to go back to the current step" \
+  "Have an ability to repeat steps and provide ingredient alternatives"
+  "if the user needs help with a step, any clarifications, or they messedup, you will try to help them to the best of your ability"
+  "after that, instruct if the user wants to go back to the current step")
 model = init_chat_model("gemini-2.5-flash", model_provider="google_genai")
 # messages = [
 #     SystemMessage(content=instructions),
