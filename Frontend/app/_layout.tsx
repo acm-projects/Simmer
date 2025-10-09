@@ -26,7 +26,7 @@ export default function RootLayout() {
         router.navigate("/signup");
         return;
       } else {
-        router.navigate("/");
+        router.navigate("/userPreference");
       }
     }
 
@@ -35,7 +35,7 @@ export default function RootLayout() {
     if (event === 'INITIAL_SESSION') {
       authenticateUser()
     } else if (event === 'SIGNED_IN') {
-      router.navigate('/');
+      router.navigate('/userPreference');
     } else if (event === 'SIGNED_OUT') {
       router.navigate('/signup')
     } else if (event === 'PASSWORD_RECOVERY') {
