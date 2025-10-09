@@ -1,34 +1,37 @@
 import React from 'react'
-import { StyleSheet, Text, View, Image } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import { Link } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 const LargeCard = () => {
-  return (
-    <View style={styles.container}>
-       
-      <View style={styles.imageCard}>
-         <Image source={require('../assets/images/tacos.jpg')} style={styles.image}/>
-      </View>
-      <View style={styles.card}>
-        <View style={styles.row}>
-               <Text style={styles.title}> Chicken Tacos</Text> 
 
-                    <Ionicons name="alarm-outline" size ={20} color="#000" style={{paddingTop: 18, marginRight: -125}}/>
-                    <Text style={[styles.right, styles.text, {paddingTop: 20, paddingRight: 10}]} >15 min</Text>
+   const hardcodedHref = '/description'; 
 
+    return (
+        <Link 
+            href={hardcodedHref} 
+            asChild
+        >
+            <TouchableOpacity style={styles.container} activeOpacity={0.7}>
             
-               
+                <View style={styles.imageCard}>
+                    <Image source={require('../assets/images/tacos.jpg')} style={styles.image}/>
+                </View>
+                
+                <View style={styles.card}>
+                    <View style={styles.row}>
+                        <Text style={styles.title}> Chicken Tacos</Text> 
 
-        </View>
-     
-
-
-            <Text style={[styles.left, styles.text, {fontSize: 13}]} >Delicous and flavorful tacos</Text>
-    
-    
-       </View>
-    </View>
-  )
+                        <Ionicons name="alarm-outline" size ={20} color="#000" style={{paddingTop: 18, marginRight: -125}}/>
+                        <Text style={[styles.right, styles.text, {paddingTop: 20, paddingRight: 10}]} >15 min</Text>
+                    </View>
+                    
+                    <Text style={[styles.left, styles.text, {fontSize: 13}]} >Delicous and flavorful tacos</Text>
+                </View>
+                
+            </TouchableOpacity>
+        </Link>
+    )
 }
 
 const styles = StyleSheet.create({

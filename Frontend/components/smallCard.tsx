@@ -1,34 +1,44 @@
 import React from 'react'
-import { StyleSheet, Text, View, Image } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import { Link } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import FavoriteIcon from '@/components/favoriteIcon';
 
 const SmallCard = () => {
+
+    const hardcodedHref = '/description'; 
+
   return (
-    <View style={styles.container}>
-       
-      <View style={styles.imageCard}>
+    <Link 
+      href={hardcodedHref} 
+      style={styles.linkWrapper}
+      asChild>
         
-         <Image source={require('../assets/images/tacos.jpg')} style={styles.image}/>
-         <View style={styles.icon}>
-         <FavoriteIcon  icon="heart-outline" />
-         </View>
+      <TouchableOpacity style={styles.container} activeOpacity={0.7}>
         
-      </View>
-      <View style={styles.card}>
-        <Text style={styles.title}> Chicken Tacos</Text> 
-        <View style={[styles.text, styles.row]}>
-            <Text style={styles.left} >Spicy</Text>
-            <Ionicons name="alarm-outline" size ={18} color="#000" style={{marginRight: -15}}/>
-            <Text style={styles.right} >15 min</Text>
+        <View style={styles.imageCard}>
+          <Image source={require('../assets/images/tacos.jpg')} style={styles.image}/> 
+          <View style={styles.icon}>
+            <FavoriteIcon icon="heart-outline" />
+          </View>
         </View>
-    
-       </View>
-    </View>
+
+        <View style={styles.card}>
+          <Text style={styles.title}> Chicken Tacos</Text> 
+          <View style={[styles.text, styles.row]}>
+              <Text style={styles.left} >Spicy</Text>
+              <Ionicons name="alarm-outline" size ={18} color="#000" style={{marginRight: -15}}/>
+              <Text style={styles.right} >15 min</Text>
+          </View>
+        </View>
+        
+      </TouchableOpacity>
+    </Link>
   )
 }
 
 const styles = StyleSheet.create({
+  linkWrapper: {},
   container: {
     alignItems: 'center',
     margin: 10,

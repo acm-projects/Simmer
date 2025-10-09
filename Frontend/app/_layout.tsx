@@ -2,6 +2,12 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
+import { Tabs } from 'expo-router';
+import { HapticTab } from '@/components/haptic-tab';
+import Octicons from '@expo/vector-icons/Octicons';
+import { IconSymbol } from '@/components/ui/icon-symbol';
+import { Colors } from '@/constants/theme';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useEffect } from 'react';
@@ -26,7 +32,7 @@ export default function RootLayout() {
         router.navigate("/signup");
         return;
       } else {
-        router.navigate("/");
+        router.navigate("/(tabs)");
       }
     }
 
@@ -52,8 +58,9 @@ export default function RootLayout() {
 
   return (
     <SupabaseProvider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <ThemeProvider value={colorScheme === 'light' ? DarkTheme : DefaultTheme}>
         <Stack>
+          <Stack.Screen name="description" options={{ headerShown: false }} /> 
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
           <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
