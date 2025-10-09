@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
   },
   imageCard:{
     zIndex: 1,
-    shadowColor: "#000",
+    shadowColor: "#303030ff",
     shadowOffset:{width: 0, height: 5},
     shadowOpacity: 0.5,
     shadowRadius: 4,
