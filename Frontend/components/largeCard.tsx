@@ -1,6 +1,7 @@
 import React from 'react'
 import { StyleSheet, Text, View, Image } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import FavoriteIcon from '@/components/favoriteIcon';
+import { AlarmClock } from 'lucide-react-native'
 
 const LargeCard = () => {
   return (
@@ -9,23 +10,17 @@ const LargeCard = () => {
       <View style={styles.imageCard}>
          <Image source={require('../assets/images/tacos.jpg')} style={styles.image}/>
       </View>
+      <View style={styles.icon}>
+         <FavoriteIcon/>
+         </View>
       <View style={styles.card}>
-        <View style={styles.row}>
+        <View style={[styles.row, styles.text]}>
                <Text style={styles.title}> Chicken Tacos</Text> 
 
-                    <Ionicons name="alarm-outline" size ={20} color="#000" style={{paddingTop: 18, marginRight: -125}}/>
+                    <AlarmClock size ={20} color="#000" style={ {marginRight: -15, }}/>
                     <Text style={[styles.right, styles.text, {paddingTop: 20, paddingRight: 10}]} >15 min</Text>
-
-            
-               
-
         </View>
-     
-
-
             <Text style={[styles.left, styles.text, {fontSize: 13}]} >Delicous and flavorful tacos</Text>
-    
-    
        </View>
     </View>
   )
@@ -87,6 +82,12 @@ const styles = StyleSheet.create({
   right: {
     textAlign: 'right',
     marginRight: 5,
+  },
+    icon:{
+    position: 'absolute',
+    top: 10,
+    right: 15,
+    zIndex: 2
   },
 });
 

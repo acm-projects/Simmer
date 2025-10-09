@@ -5,8 +5,8 @@ import { HapticTab } from '@/components/haptic-tab';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import Octicons from '@expo/vector-icons/Octicons';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { Heart } from 'lucide-react-native';
+import { Layers } from 'lucide-react-native';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -39,7 +39,7 @@ export default function TabLayout() {
         options={{
           title: '',
           tabBarIconStyle: {marginTop: 5},
-          tabBarIcon: ({ color }) => <Octicons name="stack" size={24} color={color} />,
+          tabBarIcon: ({ color }) => <Layers size={24} color={color} />,
         }}
       />
 
@@ -48,7 +48,7 @@ export default function TabLayout() {
         options={{
           title: '',
           tabBarIconStyle: {marginTop: 5},
-          tabBarIcon: ({ color }) => <FontAwesome name="heart-o" size={24} color={color} />,
+          tabBarIcon: ({ color }) => <Heart size={24} color={color} />,
         }}
       />
     </Tabs>

@@ -10,6 +10,7 @@ import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Link } from 'expo-router';
+import { Menu } from 'lucide-react-native';
 
 export default function HomeScreen() {
   return (
@@ -19,15 +20,7 @@ export default function HomeScreen() {
       <Text style={styles.title}>Hi! Dianne </Text>
       <View style={styles.icons}>
 
-        <CornerIcon icon="add"/>
-
-        <Link href="/screens/search">
-        <CornerIcon icon ="search-outline"/>
-        </Link>
-        <Link href="/screens/settings">
-        <CornerIcon icon ="menu-outline"/>
-        </Link>
-        
+        <CornerIcon />  
       </View>
       
     </View>
@@ -40,15 +33,19 @@ export default function HomeScreen() {
       <View style={{margin: 20}}>
       <View style={{backgroundColor: '#9BA760', borderRadius: 30, paddingBottom: 10, paddingLeft: 10, paddingRight: 10,}}>
         <Text style={[styles.subtitle, {color: '#fff' }]}>Your Recipes</Text>
+        <Link href='/screens/cookingMode'>
+        
         <View style={styles.grid}>
                 <View style={styles.gridItem}>
           <SmallCard/>
         </View>
         
+        
          <View style={styles.gridItem}>
           <SmallCard/>
         </View>
         </View>
+        </Link>
   
       </View>
 

@@ -14,6 +14,7 @@ import { Fonts } from '@/constants/theme';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 
+
 export default function FavoritesScreen() {
  return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>

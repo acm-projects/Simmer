@@ -1,11 +1,12 @@
 import React from 'react'
 import { StyleSheet, Text, View, Image } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { Heart } from 'lucide-react-native';
 
-const CornerIcon = ({icon}: {icon: keyof typeof Ionicons.glyphMap}) => {
+
+const CornerIcon = () => {
   return (
       <View style={styles.container}>
-        <Ionicons name={icon} size={22} color="white"/>
+        <Heart size={22} color="white"/>
       </View>
    
   )
