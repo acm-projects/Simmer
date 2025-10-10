@@ -1,13 +1,17 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { ArrowLeft } from 'lucide-react-native';
 
 
 export default function SearchScreen() {
   return (
 <ScrollView style={styles.container}>
     <View>
-    <View style={styles.greenBox}>
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+    <ArrowLeft size={20} style={{margin: 5}}/>
+    <View style={[styles.greenBox, {width: '85%'}]}>
         <Text style={styles.text}>Search</Text>
+    </View>
     </View>
 
 <Text style={styles.subtitle}>Time</Text>
@@ -164,7 +168,7 @@ const styles = StyleSheet.create({
    container: {
     flex: 1,
     backgroundColor: '#fce6dbff',
-    paddingTop: 20,
+    paddingTop: 70,
     paddingLeft: 15,
     paddingRight: 15,
     

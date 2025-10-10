@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { StyleSheet, Text, View, Image } from 'react-native';
 import { Link } from 'expo-router';
 import { Menu } from 'lucide-react-native';

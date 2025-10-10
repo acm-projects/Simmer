@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, ActivityIndicator } from 'react-native';
 import { ArrowLeft } from 'lucide-react-native';
 import { useFonts, Orbitron_400Regular, Orbitron_700Bold} from '@expo-google-fonts/orbitron'
 
@@ -8,7 +8,13 @@ export default function SettingScreen() {
         Orbitron_400Regular,
         Orbitron_700Bold // Add all desired font styles here
       });
-
+ if (!fontsLoaded) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#9BA760' }}>
+        <ActivityIndicator size="large" color="#262e05ff" />
+      </View>
+    );
+  }
   return (
     <ScrollView style={styles.container}>
   <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -64,7 +70,7 @@ const styles = StyleSheet.create({
     color: 'red'
   },
     arrow: {
-        color: "#fff",
+        color: "#ffffff",
     },
      title:{
     paddingLeft: 15,

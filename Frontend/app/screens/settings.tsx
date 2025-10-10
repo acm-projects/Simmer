@@ -1,20 +1,24 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import { ArrowLeft } from 'lucide-react-native';
+
 
 
 export default function SettingScreen() {
   return (
 <ScrollView style={styles.container}>
   <View>
-     <View style={{ justifyContent: 'center', alignItems: 'center'}}>
-     <Text style={styles.title}>Settings</Text>
-     </View>
+    <View style={{ justifyContent: 'center', alignItems: 'center'}}>
+        <Text style={styles.title}>Recipes</Text>
+        </View>
+   
+   
+        <View>
+        <ArrowLeft size={20} style={styles.arrow}/>
+        </View>
 
 
-     <View>
-     <FontAwesome6 name="arrow-left" size={20} style={styles.arrow}/>
-     </View>
+    
      <Text style={styles.text}>Profile</Text>
      <Text style={styles.info}>Name</Text>
      <Text style={styles.info}>Email</Text>
@@ -31,7 +35,7 @@ const styles = StyleSheet.create({
    container: {
     flex: 1,
     backgroundColor: '#fce6dbff',
-    paddingTop: 20,
+    paddingTop: 70,
     paddingLeft: 15,
     paddingRight: 15,
     
