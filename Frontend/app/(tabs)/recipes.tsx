@@ -8,7 +8,8 @@ import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Link } from 'expo-router';
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import { ArrowLeft } from 'lucide-react-native';
+
 
 export default function RecipeScreen() {
   return (
@@ -19,7 +20,7 @@ export default function RecipeScreen() {
 
 
      <View>
-     <FontAwesome6 name="arrow-left" size={20} style={styles.arrow}/>
+     <ArrowLeft size={20} style={styles.arrow}/>
      </View>
 
             <View style={styles.grid}>

@@ -1,12 +1,32 @@
-import React from 'react'
-import { StyleSheet, Text, View, Image } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
 
-const CornerIcon = ({icon}: {icon: keyof typeof Ionicons.glyphMap}) => {
+import { StyleSheet, Text, View, Image } from 'react-native';
+import { Link } from 'expo-router';
+import { Menu } from 'lucide-react-native';
+import { Search } from 'lucide-react-native';
+import { Plus } from 'lucide-react-native';
+
+const CornerIcon = () => {
   return (
+    <View style={{flexDirection: "row"}}>
+        <View style={styles.container}>
+       
+               <Link href="/screens/search">
+                <Plus color='white'/>
+               </Link>
+        </View>
       <View style={styles.container}>
-        <Ionicons name={icon} size={22} color="white"/>
+       
+               <Link href="/screens/search">
+                <Search color='white'/>
+               </Link>
+        </View>
+        <View style={styles.container}>
+               <Link href="/screens/settings">
+                   <Menu color='white'/>
+               </Link>
+          </View>
       </View>
+    
    
   )
 }

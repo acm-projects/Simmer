@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Alert, Button, View, TextInput, Text, TouchableOpacity , StyleSheet} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context'
-import { useSupabase } from '../contexts/SupabaseContext';
+import { useSupabase } from '../app/contexts/SupabaseContext';
 
 const DEFAULT_DIET_RESTRICTIONS = [
   'Vegetarian',
