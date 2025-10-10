@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Alert, Button, View, TextInput, Text, TouchableOpacity , StyleSheet} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context'
 import { useSupabase } from '../app/contexts/SupabaseContext';
+import { Link } from 'expo-router';
 
 const DEFAULT_DIET_RESTRICTIONS = [
   'Vegetarian',
@@ -142,6 +143,7 @@ export default function UserPreference() {
 
   return (
     <SafeAreaView style={styles.container}>
+       <Link href='/homepage'>Temporary link to homepage</Link>
       <Text style={styles.title}>Dietary Restriction</Text>
       <Text style={styles.label}>Select Options</Text>
       <View style={styles.tagContainer}>

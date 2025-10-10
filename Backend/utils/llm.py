@@ -26,17 +26,17 @@ app = workflow.compile(checkpointer=memory)
 
 config = {"configurable": {"thread_id": "abc123"}}
 ##############################################
-recipe_file_path = 'recipe.json'
-try:
-    with open(recipe_file_path, 'r') as file:
-        recipe_data = json.load(file)
-    print("Successfully loaded recipe JSON object.")
-except FileNotFoundError:
-    print(f"Json could not be found")
-    exit()
-except json.JSONDecodeError:
-    print(f"File is not a valid json file")
-    exit()
+# recipe_file_path = 'recipe.json'
+# try:
+#     with open(recipe_file_path, 'r') as file:
+#         recipe_data = json.load(file)
+#     print("Successfully loaded recipe JSON object.")
+# except FileNotFoundError:
+#     print(f"Json could not be found")
+#     exit()
+# except json.JSONDecodeError:
+#     print(f"File is not a valid json file")
+#     exit()
 ##############################################
 instructions=(
   f"For the following recipe in json... {recipe_data}, analyze it"
@@ -77,7 +77,8 @@ initial_messages = [
     HumanMessage(content="Hi! Please start teaching me the recipe.")
 ]
 first_response = app.invoke({"messages": initial_messages}, config)
-first_response["messages"][-1].pretty_print()
+print(first_response["messages"][-1].content)
+# first_response["messages"][-1].pretty_print()
 
 while True:
     try:
