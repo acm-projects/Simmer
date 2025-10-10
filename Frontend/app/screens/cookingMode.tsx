@@ -1,27 +1,34 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
 import { ArrowLeft } from 'lucide-react-native';
-
+import { useFonts, Orbitron_400Regular, Orbitron_700Bold} from '@expo-google-fonts/orbitron'
 
 export default function SettingScreen() {
+    let [fontsLoaded] = useFonts({
+        Orbitron_400Regular,
+        Orbitron_700Bold // Add all desired font styles here
+      });
+
   return (
-<ScrollView style={styles.container}>
-  <View>
-     <View style={{ justifyContent: 'center', alignItems: 'center'}}>
-     <Text style={styles.title}>Settings</Text>
+    <ScrollView style={styles.container}>
+  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+
+     
+     <ArrowLeft size={20} style={{margin: 5}}/>
+     
+
+     <View style={{backgroundColor: '#ffff', borderRadius: 100, width: '80%', marginLeft: 10, }}>
+        <View style={{backgroundColor: '#262e05ff', width: '30%', borderRadius: 100,}}>
+            <Text> </Text>
+        </View>
      </View>
 
-
-     <View>
-     <ArrowLeft size={20} style={styles.arrow}/>
-     </View>
-     <Text style={styles.text}>Profile</Text>
-     <Text style={styles.info}>Name</Text>
-     <Text style={styles.info}>Email</Text>
-     <Text style={styles.info}>Allergens</Text>
-     <Text style={styles.text}>Log Out</Text>
-     <Text style={styles.delete}>Delete Account</Text>
+    
+    
   </View>
+   <View style={{alignItems: 'center',  bottom: -400}}>
+        <Text style={styles.customText}>2:59</Text>
+    </View>
 </ScrollView>
   )
 
@@ -30,8 +37,8 @@ export default function SettingScreen() {
 const styles = StyleSheet.create({
    container: {
     flex: 1,
-    backgroundColor: '#fce6dbff',
-    paddingTop: 20,
+    backgroundColor: '#9BA760',
+    paddingTop: 50,
     paddingLeft: 15,
     paddingRight: 15,
     
@@ -57,10 +64,7 @@ const styles = StyleSheet.create({
     color: 'red'
   },
     arrow: {
-        color: "#9BA760",
-        position: "absolute",
-        left: 25,
-        top: -25,
+        color: "#fff",
     },
      title:{
     paddingLeft: 15,
@@ -68,4 +72,8 @@ const styles = StyleSheet.create({
     fontSize: 25,
     color: '#9BA760',
   },
+  customText:{
+    fontFamily: 'Orbitron_400Regular',
+    fontSize: 80,
+  }
 });
