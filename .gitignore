@@ -49,3 +49,4 @@ app-example
 
 venv
 recipe.json
+__pycache__
