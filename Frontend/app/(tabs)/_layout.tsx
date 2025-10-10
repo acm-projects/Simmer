@@ -8,8 +8,12 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Heart } from 'lucide-react-native';
 import { Layers } from 'lucide-react-native';
 
+
+
+
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+
 
   return (
     <Tabs
