@@ -50,3 +50,6 @@ app-example
 venv
 recipe.json
 __pycache__
+conversations.db
+conversations.db-shm
+conversations.db-wal
