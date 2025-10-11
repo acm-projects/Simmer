@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
    arrow: {
-   color: "#9BA760",
+   color: "#ffff",
    position: "absolute",
    left: 25,
    top: -25,
