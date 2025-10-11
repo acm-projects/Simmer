@@ -8,19 +8,14 @@ export default function SettingScreen() {
         Orbitron_400Regular,
         Orbitron_700Bold // Add all desired font styles here
       });
- if (!fontsLoaded) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#9BA760' }}>
-        <ActivityIndicator size="large" color="#262e05ff" />
-      </View>
-    );
-  }
+ 
+  
   return (
     <ScrollView style={styles.container}>
   <View style={{flexDirection: 'row', alignItems: 'center'}}>
 
      
-     <ArrowLeft size={20} style={{margin: 5}}/>
+     <ArrowLeft  size={20} style={{margin: 5, }}/>
      
 
      <View style={{backgroundColor: '#ffff', borderRadius: 100, width: '80%', marginLeft: 10, }}>
@@ -32,7 +27,7 @@ export default function SettingScreen() {
     
     
   </View>
-   <View style={{alignItems: 'center',  bottom: -400}}>
+   <View style={{alignItems: 'center',  bottom: -440}}>
         <Text style={styles.customText}>2:59</Text>
     </View>
 </ScrollView>
@@ -44,7 +39,7 @@ const styles = StyleSheet.create({
    container: {
     flex: 1,
     backgroundColor: '#9BA760',
-    paddingTop: 50,
+    paddingTop: 70,
     paddingLeft: 15,
     paddingRight: 15,
     
