@@ -143,7 +143,7 @@ export default function UserPreference() {
 
   return (
     <SafeAreaView style={styles.container}>
-       <Link href='/homepage'>Temporary link to homepage</Link>
+       <Link href='/voiceAssistant'>Temporary link to homepage</Link>
       <Text style={styles.title}>Dietary Restriction</Text>
       <Text style={styles.label}>Select Options</Text>
       <View style={styles.tagContainer}>

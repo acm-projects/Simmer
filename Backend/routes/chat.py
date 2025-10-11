@@ -5,9 +5,9 @@ from langchain_core.messages import HumanMessage, SystemMessage
 # from langgraph.checkpoint.memory import MemorySaver
 from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.graph import START, MessagesState, StateGraph
-from langchain.chat_models import init_chat_model
+from langchain_google_genai import ChatGoogleGenerativeAI
 import sqlite3
-from flask import Blueprint, request, jsonify, send_file
+from flask import Blueprint, request, jsonify, send_file, Response,current_app
 from gtts import gTTS
 import io
 import json
@@ -17,12 +17,14 @@ if not os.environ.get("GOOGLE_API_KEY"):
   os.environ["GOOGLE_API_KEY"] = getpass.getpass("Enter API key for Google Gemini: ")
 
 chat_bp = Blueprint('chat', __name__)
-model = init_chat_model("gemini-2.5-flash", model_provider="google_genai")
+model = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.7)
 workflow = StateGraph(state_schema=MessagesState)
+
 
 def call_model(state: MessagesState):
   response = model.invoke(state["messages"])
   return {"messages": response}
+
 workflow.add_edge(START, "model")
 workflow.add_node("model", call_model)
 
@@ -61,6 +63,7 @@ def create_chat():
       SystemMessage(content=instructions),
       HumanMessage(content="Hi! Please start teaching me the recipe.")
   ]
+
   first_response = app.invoke({"messages": initial_messages}, config)
   mp3_fp = io.BytesIO()
   try:
@@ -77,6 +80,8 @@ def create_chat():
     as_attachment=True,
     download_name='intro.mp3'
   ), 200
+
+
 
 
 @chat_bp.route("/chat", methods=["POST"])
@@ -105,3 +110,28 @@ def chat():
     as_attachment=True,
     download_name='response.mp3'
   ), 200
+
+@chat_bp.route('/upload',methods=['POST'])
+def upload_file():
+  if 'audio' not in request.files:
+    return jsonify({'error':'no audio file'}), 400
+  file=request.files['audio']
+
+  if file.filename=='':
+    return jsonify({'error':'no audio file selected'}), 400
+  
+  if file:
+    print(file.filename)
+    print('fdaojsifioasdif')
+    save_path= os.path.join(current_app.config['UPLOAD_FOLDER'],file.filename)
+    try:
+      file.save(save_path)
+
+      return jsonify({
+        'message': 'File uploaded successfully',
+        'filename': file.filename
+      }), 200
+    except Exception as e:
+        return jsonify({'error': f'Failed to save file: {str(e)}'}), 500
+
+  return jsonify({'error': 'Unknown error'}), 500
