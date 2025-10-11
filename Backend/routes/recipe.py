@@ -1,16 +1,16 @@
 from flask import Blueprint, request, jsonify
 from utils.supabase import supabase
+from utils.auth import authorize_user
 recipe_bp = Blueprint('recipe', __name__)
 
-TEST_USER_ID = 'c3b1c891-b753-4351-8f24-7e1396911c3c'
 
 @recipe_bp.route("/create_recipe", methods=["POST"])
 def create_recipe():
   try:
 
-    #user_id, error_response, status_code = get_current_user()
-    #if error_response:
-    #  return error_response, status_code
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
     
     data = request.get_json()
 
@@ -32,7 +32,7 @@ def create_recipe():
       'prep_time' : prep_time,
       'cook_time' : cook_time,
       'dietary_tags' : dietary_tags,
-      'created_by' : TEST_USER_ID
+      'created_by' : user_id
     }).execute()
 
     if not recipe.data:
@@ -63,9 +63,9 @@ def create_recipe():
 def toggle_favorite():
   try:
 
-    #user_id, error_response, status_code = get_current_user()
-    #if error_response:
-    #  return error_response, status_code
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
 
     data = request.get_json()
     recipe_id = data.get('recipe_id')
@@ -77,18 +77,18 @@ def toggle_favorite():
     if not recipe_check:
       return jsonify({'error' : 'recipe_id does not exist'}), 404
     
-    saved_check = supabase.table('user_saved_recipes').select('recipe_id').eq('user_id', TEST_USER_ID).eq('recipe_id', recipe_id).execute()
+    saved_check = supabase.table('user_saved_recipes').select('recipe_id').eq('user_id', user_id).eq('recipe_id', recipe_id).execute()
     if not saved_check:
       return jsonify({'error' : 'must save recipe before toggling favorite'}), 403
     
-    favorite_check = supabase.table('user_favorites').select('recipe_id').eq('user_id', TEST_USER_ID).eq('recipe_id', recipe_id).execute()
+    favorite_check = supabase.table('user_favorites').select('recipe_id').eq('user_id', user_id).eq('recipe_id', recipe_id).execute()
     if favorite_check.data:
-      supabase.table('user_favorites').delete().eq('user_id', TEST_USER_ID).eq('recipe_id', recipe_id).execute()
+      supabase.table('user_favorites').delete().eq('user_id', user_id).eq('recipe_id', recipe_id).execute()
       return jsonify ({'message' : 'Recipe Unfavorited!'})
     
     else:
       favorite = supabase.table('user_favorites').insert({
-        'user_id' : TEST_USER_ID,
+        'user_id' : user_id,
         'recipe_id' : recipe_id
       }).execute()
 

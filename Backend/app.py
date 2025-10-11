@@ -4,7 +4,6 @@ from flask_cors import CORS # Import the CORS extension
 from utils.supabase import supabase
 import os
 
-
 app = Flask(__name__)
 UPLOAD_FOLDER = os.path.join(app.root_path, '..', 'uploads')
 
@@ -15,8 +14,6 @@ if not os.path.exists(UPLOAD_FOLDER):
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 CORS(app) 
-
-
 
 
 @app.route("/")
