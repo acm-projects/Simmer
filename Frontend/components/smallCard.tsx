@@ -1,7 +1,8 @@
-import React from 'react'
+
 import { StyleSheet, Text, View, Image } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import FavoriteIcon from '@/components/favoriteIcon';
+import { AlarmClock } from 'lucide-react-native'
+
 
 const SmallCard = () => {
   return (
@@ -11,7 +12,7 @@ const SmallCard = () => {
         
          <Image source={require('../assets/images/tacos.jpg')} style={styles.image}/>
          <View style={styles.icon}>
-         <FavoriteIcon  icon="heart-outline" />
+         <FavoriteIcon/>
          </View>
         
       </View>
@@ -19,7 +20,7 @@ const SmallCard = () => {
         <Text style={styles.title}> Chicken Tacos</Text> 
         <View style={[styles.text, styles.row]}>
             <Text style={styles.left} >Spicy</Text>
-            <Ionicons name="alarm-outline" size ={18} color="#000" style={{marginRight: -15}}/>
+            <AlarmClock size ={18} color="#000" style={{marginRight: -15}}/>
             <Text style={styles.right} >15 min</Text>
         </View>
     
@@ -43,7 +44,7 @@ const styles = StyleSheet.create({
   },
   imageCard:{
     zIndex: 1,
-    shadowColor: "#000",
+    shadowColor: "#303030ff",
     shadowOffset:{width: 0, height: 5},
     shadowOpacity: 0.5,
     shadowRadius: 4,

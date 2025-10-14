@@ -11,7 +11,9 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Fonts } from '@/constants/theme';
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import { ArrowLeft } from 'lucide-react-native';
+
+
 
 
 export default function FavoritesScreen() {
@@ -23,7 +25,7 @@ export default function FavoritesScreen() {
 
 
      <View>
-     <FontAwesome6 name="arrow-left" size={20} style={styles.arrow}/>
+     <ArrowLeft  size={20} style={styles.arrow}/>
      </View>
 
 
