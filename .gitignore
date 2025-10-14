@@ -54,3 +54,4 @@ conversations.db
 conversations.db-shm
 conversations.db-wal
 uploads
+sttKey.json
