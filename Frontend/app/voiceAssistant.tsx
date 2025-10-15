@@ -91,12 +91,11 @@ export default function VoiceAssistant() {
       const { sound } = await Audio.Sound.createAsync(
         { uri: recordingUri }
       );
-      setSound(sound); // Save the sound object to state
+      setSound(sound);
 
       console.log('Playing Sound');
       await sound.playAsync();
-      // The sound will play until it's finished.
-      // The useEffect hook will handle unloading it.
+
     } catch (error) {
         console.error("Failed to play sound", error);
     }

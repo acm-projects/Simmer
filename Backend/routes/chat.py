@@ -9,8 +9,10 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 import sqlite3
 from flask import Blueprint, request, jsonify, send_file, Response,current_app
 from gtts import gTTS
+from utils.voice import stt
 import io
 import json
+from pydub import AudioSegment
 load_dotenv()
 
 if not os.environ.get("GOOGLE_API_KEY"):
@@ -86,11 +88,29 @@ def create_chat():
 
 @chat_bp.route("/chat", methods=["POST"])
 def chat():
-  data = request.get_json()
-  if not data or not all(key in data for key in ['cid', 'userMessage']):
-    return jsonify({'message': 'Missing data: recipe, cid'}), 400
-  cid = data.get('cid')
-  userMessage = data.get('userMessage')
+
+
+  cid = request.form.get('cid')
+  if 'audio' not in request.files or not cid:
+    return jsonify({'message': 'Missing data: audio file or cid'}), 400
+  file=request.files['audio']
+
+
+  try:
+    userAudio = AudioSegment.from_file(file)
+    userAudio = userAudio.set_frame_rate(16000)
+    userAudio = userAudio.set_channels(1)
+    buffer = io.BytesIO()
+    userAudio.export(buffer, format="raw")
+    userAudioBytes = buffer.getvalue()
+
+
+  except Exception as e:
+      return jsonify({'message': 'Could not process audio file.'}), 500
+
+  userMessage = stt(userAudioBytes)
+
+
 
   config = {"configurable": {"thread_id": cid}}
   
@@ -110,6 +130,7 @@ def chat():
     as_attachment=True,
     download_name='response.mp3'
   ), 200
+  
 
 @chat_bp.route('/upload',methods=['POST'])
 def upload_file():
