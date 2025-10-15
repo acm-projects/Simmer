@@ -32,7 +32,7 @@ export default function ImportRecipe(){
 const styles = StyleSheet.create({
    container: {
     flex: 1,
-    backgroundColor: '#fce6dbff',
+    backgroundColor: '#f1e2dbff',
     paddingTop: 70,
     paddingLeft: 15,
     paddingRight: 15,

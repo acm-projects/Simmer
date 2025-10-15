@@ -33,19 +33,24 @@ export default function HomeScreen() {
       <View style={{margin: 20}}>
       <View style={{backgroundColor: '#9BA760', borderRadius: 30, paddingBottom: 10, paddingLeft: 10, paddingRight: 10,}}>
         <Text style={[styles.subtitle, {color: '#fff' }]}>Your Recipes</Text>
-        <Link href='/screens/cookingMode'>
+        
         
         <View style={styles.grid}>
+          <Link href='/screens/cookingMode'>
                 <View style={styles.gridItem}>
           <SmallCard/>
         </View>
+         </Link>
         
-        
+   
          <View style={styles.gridItem}>
+               <Link href='/screens/description'>
           <SmallCard/>
+          </Link>
         </View>
+        
         </View>
-        </Link>
+       
   
       </View>
 
@@ -72,7 +77,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fce6dbff',
+    backgroundColor: '#f1e2dbff',
   },
   content:{
     padding: 1,

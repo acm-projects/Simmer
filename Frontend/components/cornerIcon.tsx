@@ -9,7 +9,7 @@ const CornerIcon = () => {
   return (
     <View style={{flexDirection: "row"}}>
         <View style={styles.container}>
-       
+
                <Link href="/screens/importRecipe">
                 <Plus color='white'/>
                </Link>

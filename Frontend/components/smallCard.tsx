@@ -1,7 +1,6 @@
 
 import { StyleSheet, Text, View, Image } from 'react-native';
 import FavoriteIcon from '@/components/favoriteIcon';
-import { AlarmClock } from 'lucide-react-native'
 
 
 const SmallCard = () => {
@@ -18,12 +17,6 @@ const SmallCard = () => {
       </View>
       <View style={styles.card}>
         <Text style={styles.title}> Chicken Tacos</Text> 
-        <View style={[styles.text, styles.row]}>
-            <Text style={styles.left} >Spicy</Text>
-            <AlarmClock size ={18} color="#000" style={{marginRight: -15}}/>
-            <Text style={styles.right} >15 min</Text>
-        </View>
-    
        </View>
     </View>
   )
