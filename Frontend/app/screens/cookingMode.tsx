@@ -1,15 +1,20 @@
+import React, { useState, useEffect} from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, ScrollView, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
 import { ArrowLeft } from 'lucide-react-native';
 import { useFonts, Orbitron_400Regular, Orbitron_700Bold} from '@expo-google-fonts/orbitron'
+import {Timer} from 'react-native-flip-timer-fixed';
+import { Plus } from 'lucide-react-native';
 
 export default function SettingScreen() {
     let [fontsLoaded] = useFonts({
         Orbitron_400Regular,
         Orbitron_700Bold // Add all desired font styles here
       });
- 
-  
+      const [play, setPlay] = useState(true);
+      const [seconds, setSeconds] = useState(120);
+      
+
   return (
     <ScrollView style={styles.container}>
   <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -23,13 +28,31 @@ export default function SettingScreen() {
             <Text> </Text>
         </View>
      </View>
-
-    
-    
   </View>
-   <View style={{alignItems: 'center',  bottom: -440}}>
-        <Text style={styles.customText}>2:59</Text>
-    </View>
+  
+  <View style={{position: 'relative', top: 400}}>
+  <TouchableOpacity 
+  onPress={() => setSeconds((prev) => prev + 60)} 
+  style={{backgroundColor: '#262e05ff', borderRadius: 100, width: 30, height: 30, alignItems: 'center', justifyContent: 'center', marginBottom: 10}}>
+     <Plus color='white'/>
+    </TouchableOpacity>
+
+  <Timer
+  time={seconds}
+  play={play}
+  wrapperStyle={{ 
+    flexDirection: 'row', 
+    backgroundColor: 'transparent',
+  }}
+  showCircles={true}
+  flipNumberProps={{
+          numberStyle: { color: '#ffffff', fontSize: 36 },
+          flipCardStyle: {backgroundColor: '#262e05ff', },
+          cardStyle: {backgroundColor: '#262e05ff', borderRadius: 0}
+          
+  }}
+/>
+  </View>
 </ScrollView>
   )
 
