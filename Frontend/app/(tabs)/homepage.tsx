@@ -22,14 +22,11 @@ export default function HomeScreen() {
     </View>
     
     <Text style={styles.text}>What are you cooking today?</Text>
-  
-  <View style={{marginTop: 10,}}>
-<LargeCard/>
-  </View>
-      
 
+      
+<Text style={styles.subtitle}>Favorites</Text>
       <View style={styles.greenBox}>
-        <Text style={styles.subtitle}>Favorites</Text>
+        
         
         <View style={styles.grid}>
           <View style={styles.gridItem}>
@@ -57,6 +54,9 @@ export default function HomeScreen() {
       <LargeCard/>
 
       <LargeCard/>
+      <LargeCard/>
+      <LargeCard/>
+
 
   
 
@@ -100,8 +100,8 @@ const styles = StyleSheet.create({
   subtitle:{
     fontSize: 25,
     paddingLeft: 30,
-    paddingBottom: 2,
-    color: 'white',
+    paddingTop: 15,
+    color: 'black',
     alignSelf:'flex-start',
   },  
   row: {
@@ -117,13 +117,14 @@ const styles = StyleSheet.create({
   },
   greenBox:{
     backgroundColor: '#9BA760', 
-    borderRadius: 45, 
+    borderRadius: 0, 
     paddingBottom: 15,
     paddingTop: 10,
   
     alignItems: 'center',
     justifyContent: 'center',
-    marginVertical: 10,
+    marginBottom: 10,
+    marginTop: 5,
     paddingHorizontal: 20,
 
   }
