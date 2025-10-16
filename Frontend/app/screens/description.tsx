@@ -9,7 +9,7 @@ export default function Description(){
     const steps = ['step 1', 'step 2', 'step 3'];
 
     return(
-        <ScrollView style={styles.container}>st
+        <ScrollView style={styles.container}>
         <View style={{ justifyContent: 'center', alignItems: 'center'}}>
          <Text style={styles.title1}>Recipe</Text>
          </View>

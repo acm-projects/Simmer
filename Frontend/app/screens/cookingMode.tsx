@@ -20,7 +20,7 @@ export default function SettingScreen() {
   <View style={{flexDirection: 'row', alignItems: 'center'}}>
 
      
-     <ArrowLeft  size={20} style={{margin: 5, }}/>
+     <ArrowLeft  size={20} style={styles.arrow}/>
      
 
      <View style={{backgroundColor: '#ffff', borderRadius: 100, width: '80%', marginLeft: 10, }}>
@@ -88,7 +88,8 @@ const styles = StyleSheet.create({
     color: 'red'
   },
     arrow: {
-        color: "#ffffff",
+        color: "#fff",
+        margin: 5,
     },
      title:{
     paddingLeft: 15,

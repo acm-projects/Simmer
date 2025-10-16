@@ -1,22 +1,18 @@
 
 import { StyleSheet, Text, View, Image } from 'react-native';
 import FavoriteIcon from '@/components/favoriteIcon';
+import { Heart } from 'lucide-react-native';
 
 
 const SmallCard = () => {
   return (
     <View style={styles.container}>
-       
-      <View style={styles.imageCard}>
-        
-         <Image source={require('../assets/images/tacos.jpg')} style={styles.image}/>
-         <View style={styles.icon}>
-         <FavoriteIcon/>
+       <View style={styles.icon}>
+         <Heart size={22} color="black"/>
          </View>
-        
-      </View>
+         <Image source={require('../assets/images/tacos.jpg')} style={styles.image}/>
       <View style={styles.card}>
-        <Text style={styles.title}> Chicken Tacos</Text> 
+        <Text style={styles.title}>Chicken Tacos</Text> 
        </View>
     </View>
   )
@@ -26,61 +22,39 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     margin: 10,
+    shadowColor: '#000000ff',
+    shadowOffset:{width: 0, height: 0},
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
   },
   image:{
-    backgroundColor: 'white',
     width: 150,
-    height: 150,
+    height: 160,
     borderRadius: 15,
-    bottom: -6,
-    zIndex: 1,
-  },
-  imageCard:{
-    zIndex: 1,
-    shadowColor: "#303030ff",
-    shadowOffset:{width: 0, height: 5},
-    shadowOpacity: 0.5,
-    shadowRadius: 4,
-
-    elevation: 4,
-    alignItems: 'center',
+    bottom: 0
+   
   },
   card: {
-    width: 147,
-    height: 65,
+    width: 150,
+    height: 60,
     backgroundColor: 'white',
-    borderRadius: 15,
-  },
+    borderBottomLeftRadius: 15,
+    borderBottomRightRadius: 15,
+    zIndex: 1,
+    position: 'absolute',
+    bottom: 0,
+    padding: 10,
+    alignItems: 'flex-start'
+    },
   title:{
-      fontSize: 16,
-      color: '#06402B',
-      paddingTop: 12,
-      marginLeft: 3,
-  },
-  text: {
-    marginTop: 1,
-    fontSize: 12,
-    color: '#333',
-    padding: 4,
-  },
-
-    row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between', // pushes left/right
-    width: '100%', // make sure it spans full width
-  },
-  left: {
-    textAlign: 'left',
-    marginLeft: 5,
-  },
-  right: {
-    textAlign: 'right',
-    marginRight: 5,
+      fontSize: 15,
+      color: '#000',
+      width: 70,
   },
   icon:{
     position: 'absolute',
-    top: 10,
-    right: 5,
+    bottom: 30,
+    right: 10,
     zIndex: 2
   },
 });

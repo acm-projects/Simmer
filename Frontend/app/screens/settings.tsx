@@ -44,7 +44,7 @@ export default function SettingScreen() {
 const styles = StyleSheet.create({
    container: {
     flex: 1,
-    backgroundColor: '#f1e2dbff',
+    backgroundColor: '#f5ebe6ff',
     paddingTop: 70,
     paddingLeft: 15,
     paddingRight: 15,

@@ -5,12 +5,8 @@ import { StyleSheet, Text, View, ScrollView } from 'react-native';
 import SmallCard from "@/components/smallCard";
 import LargeCard from "@/components/largeCard";
 import CornerIcon from "@/components/cornerIcon";
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { Link } from 'expo-router';
-import { Menu } from 'lucide-react-native';
+
 
 export default function HomeScreen() {
   return (
@@ -27,24 +23,26 @@ export default function HomeScreen() {
     
     <Text style={styles.text}>What are you cooking today?</Text>
   
-    <View style={styles.container}>
-      <Text style={styles.subtitle}>Recipe Suggestions</Text>
-      <LargeCard/>
-      <View style={{margin: 20}}>
-      <View style={{backgroundColor: '#9BA760', borderRadius: 30, paddingBottom: 10, paddingLeft: 10, paddingRight: 10,}}>
-        <Text style={[styles.subtitle, {color: '#fff' }]}>Your Recipes</Text>
-        
+  <View style={{marginTop: 10,}}>
+<LargeCard/>
+  </View>
+      
+
+      <View style={styles.greenBox}>
+        <Text style={styles.subtitle}>Favorites</Text>
         
         <View style={styles.grid}>
+          <View style={styles.gridItem}>
           <Link href='/screens/cookingMode'>
-                <View style={styles.gridItem}>
+          
           <SmallCard/>
-        </View>
+          
          </Link>
+         </View>
         
    
          <View style={styles.gridItem}>
-               <Link href='/screens/description'>
+          <Link href='/screens/description'>
           <SmallCard/>
           </Link>
         </View>
@@ -54,22 +52,16 @@ export default function HomeScreen() {
   
       </View>
 
-   <View style={styles.grid}>
-        <View style={styles.gridItem}>
-          <SmallCard/>
-        </View>
-        
-         <View style={styles.gridItem}>
-          <SmallCard/>
-        </View>
-      </View>
-      </View>
+      <LargeCard/>
 
+      <LargeCard/>
 
+      <LargeCard/>
+
+  
 
           <StatusBar style="auto" />
           
-        </View>
          </ScrollView>
   );
 }
@@ -77,22 +69,20 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f1e2dbff',
+    backgroundColor: '#f5ebe6ff',
+   
   },
   content:{
-    padding: 1,
     top: 50,
   },
   gridItem: {
     flex: 1, // Ensures items take equal space in a row
-
-    justifyContent: 'center',
     alignItems: 'center',
   },
   grid:{
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly'
     
   },
   title:{
@@ -104,12 +94,15 @@ const styles = StyleSheet.create({
   text:{
     fontSize: 15,
     paddingLeft: 15,
+    color: 'black',
+  
   },
   subtitle:{
-    fontSize: 20,
-    color: '#262e05ff',
-    paddingLeft: 15,
-    paddingTop: 15,
+    fontSize: 25,
+    paddingLeft: 30,
+    paddingBottom: 2,
+    color: 'white',
+    alignSelf:'flex-start',
   },  
   row: {
     flexDirection: 'row',
@@ -121,5 +114,17 @@ const styles = StyleSheet.create({
     margin: 5,
     marginRight: 8,
     marginTop: 15,
+  },
+  greenBox:{
+    backgroundColor: '#9BA760', 
+    borderRadius: 45, 
+    paddingBottom: 15,
+    paddingTop: 10,
+  
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 10,
+    paddingHorizontal: 20,
+
   }
 });
