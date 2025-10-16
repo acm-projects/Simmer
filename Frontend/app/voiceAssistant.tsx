@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, Button, View, TextInput, Text, TouchableOpacity , StyleSheet} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context'
 import { Audio } from 'expo-av';
+import { AudioPlayer, useAudioPlayer, createAudioPlayer,setAudioModeAsync } from 'expo-audio';
+// import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
+
 
 
 const recordingOptions = {
@@ -17,7 +21,6 @@ const recordingOptions = {
   ios: {
     extension: '.wav',
     audioQuality: Audio.IOSAudioQuality.MAX,
-    // The output format for uncompressed WAV audio
     outputFormat: Audio.IOSOutputFormat.LINEARPCM, 
     sampleRate: 44100,
     numberOfChannels: 2,
@@ -32,11 +35,32 @@ const recordingOptions = {
   },
 };
 export default function VoiceAssistant() {
+
   const [recordingStatus, setRecordingStatus]=useState('start')
   const [recording, setRecording] = useState<Audio.Recording | undefined>();
   const [permissionResponse, requestPermission] = Audio.usePermissions();
   const [recordingUri, setRecordingUri] = useState<string | null>(null);
-   const [sound, setSound] = useState<Audio.Sound | undefined>();
+  const [sound, setSound] = useState<Audio.Sound | undefined>();
+  const player: AudioPlayer = useAudioPlayer();
+
+  useEffect(()=>{
+    const setAudioMode= async()=>{
+      try {
+        await setAudioModeAsync({
+          playsInSilentMode: true,
+          shouldPlayInBackground: true,
+          interruptionModeAndroid: 'duckOthers',
+          interruptionMode: 'mixWithOthers',
+          allowsRecording: true,
+
+        });
+      } catch (e) {
+        console.error("Failed to set audio mode", e);
+      }
+    }
+    setAudioMode();
+  },[])
+
 
   async function startRecording() {
     if(!permissionResponse){
@@ -86,14 +110,13 @@ export default function VoiceAssistant() {
       return;
     }
 
-    console.log('Loading Sound');
+
     try {
       const { sound } = await Audio.Sound.createAsync(
         { uri: recordingUri }
       );
       setSound(sound);
 
-      console.log('Playing Sound');
       await sound.playAsync();
 
     } catch (error) {
@@ -117,24 +140,66 @@ export default function VoiceAssistant() {
 
 
     formData.append('audio', file as any);
+    formData.append('cid', 'test12345');
 
-
-    formData.append('userId', '12345');
 
     try {
-      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}upload`, {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}chat`, {
         method: 'POST',
         body: formData,
 
       });
 
-      const responseJson = await response.json();
 
-      if (response.ok) {
-        Alert.alert("Success", responseJson.message);
-      } else {
-        throw new Error(responseJson.error || "Unknown error occurred");
-      }
+      const responseBlob = await response.blob();
+      const reader = new FileReader();
+      reader.readAsDataURL(responseBlob);
+      
+      const base64Data:string = await new Promise((resolve, reject) => {
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+      });
+      const base64Content = base64Data.split(',')[1];
+      
+
+
+  
+      const fileUri = `${FileSystem.cacheDirectory}response-audio.wav`;
+      await FileSystem.writeAsStringAsync(fileUri, base64Content, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+      const file2 = {
+        uri: fileUri,
+        name: `recording-${Date.now()}2.wav`, 
+        type: 'audio/wav', 
+      };
+      const formData2 = new FormData();
+      formData2.append('audio', file2 as any);
+
+
+      try {
+        const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}upload`, {
+          method: 'POST',
+          body: formData2,
+
+      });
+      } catch (error) {
+      console.error("Error uploading audio:", error);
+      Alert.alert("Error", `Failed to upload audio: ${error.message}`);
+    } 
+      
+      
+      console.log(fileUri)
+
+      const player = createAudioPlayer({uri:fileUri});
+
+      player.play();
+
+
+
+      console.log(file.uri)
+
+      
 
     } catch (error) {
       console.error("Error uploading audio:", error);

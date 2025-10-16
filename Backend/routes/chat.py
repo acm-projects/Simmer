@@ -115,20 +115,20 @@ def chat():
   config = {"configurable": {"thread_id": cid}}
   
   response = app.invoke({"messages": [HumanMessage(content=userMessage)]}, config)
-  mp3_fp = io.BytesIO()
+  wav_fp = io.BytesIO()
   try:
     tts = gTTS(response["messages"][-1].content, lang='en')
-    tts.write_to_fp(mp3_fp)
+    tts.write_to_fp(wav_fp)
   except Exception as e:
     return jsonify({"message":"Speech could not be generated"}), 500
   
-  mp3_fp.seek(0)
+  wav_fp.seek(0)
   
   return send_file(
-    mp3_fp,
-    mimetype='audio/mpeg',
+    wav_fp,
+    mimetype='audio/wav',
     as_attachment=True,
-    download_name='response.mp3'
+    download_name='response.wav'
   ), 200
   
 
@@ -143,7 +143,6 @@ def upload_file():
   
   if file:
     print(file.filename)
-    print('fdaojsifioasdif')
     save_path= os.path.join(current_app.config['UPLOAD_FOLDER'],file.filename)
     try:
       file.save(save_path)
