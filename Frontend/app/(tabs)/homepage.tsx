@@ -6,6 +6,7 @@ import SmallCard from "@/components/smallCard";
 import LargeCard from "@/components/largeCard";
 import CornerIcon from "@/components/cornerIcon";
 import { Link } from 'expo-router';
+import MyCarousel from "@/components/carousel";
 
 
 export default function HomeScreen() {
@@ -29,20 +30,7 @@ export default function HomeScreen() {
         
         
         <View style={styles.grid}>
-          <View style={styles.gridItem}>
-          <Link href='/screens/cookingMode'>
-          
-          <SmallCard/>
-          
-         </Link>
-         </View>
-        
-   
-         <View style={styles.gridItem}>
-          <Link href='/screens/description'>
-          <SmallCard/>
-          </Link>
-        </View>
+          <MyCarousel />
         
         </View>
        
