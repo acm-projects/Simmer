@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify
 from utils.supabase import supabase
 from utils.auth import authorize_user
+from utils.createRecipe import createRecipe
+import json
 recipe_bp = Blueprint('recipe', __name__)
 
 
@@ -58,7 +60,17 @@ def create_recipe():
     print('ERROR', e)
     return jsonify({'error' : 'Internal Server Error', 'details' : str(e)}), 500
   
+@recipe_bp.route("/ai_create_recipe", methods=["POST"])
+def ai_create_recipe():
+  data = request.get_json()
+  if not data or not all(key in data for key in ['content']):
+    return jsonify({'message': 'Missing data: content.'}), 400
+  content=data.get('content')
+  recipeStr=createRecipe(content)
+  recipeJson=json.loads(recipeStr)
+  return jsonify({'message': recipeJson}), 200
 
+    
 @recipe_bp.route("/toggle_favorite", methods=["POST"])
 def toggle_favorite():
   try:

@@ -59,6 +59,7 @@ def generate_recipe_from_tiktok(video_url):
             {{"name": "", "quantity": "", "unit": "", "is_allergen": false}}
           ]
         }}
+        
         """
         gemini_response = model.generate_content(prompt)
         recipe_text = gemini_response.text.strip()
