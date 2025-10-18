@@ -2,6 +2,7 @@ import React from "react";
 import { View, Dimensions } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import SmallCard from "../components/smallCard";
+import LargeCard from "../components/largeCard";
 import { ImageSourcePropType } from "react-native";
 
 const { width } = Dimensions.get("window");

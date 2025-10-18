@@ -29,10 +29,8 @@ export default function HomeScreen() {
       <View style={styles.greenBox}>
         
         
-        <View style={styles.grid}>
           <MyCarousel />
         
-        </View>
        
   
       </View>
