@@ -1,18 +1,22 @@
 
-import { StyleSheet, Text, View, Image } from 'react-native';
+import { StyleSheet, Text, View, Image, ImageSourcePropType } from 'react-native';
 import FavoriteIcon from '@/components/favoriteIcon';
 import { Heart } from 'lucide-react-native';
 
+interface Props{
+  title: string;
+  image: ImageSourcePropType; 
+}
+const SmallCard: React.FC<Props>= ({title, image }) => {
 
-const SmallCard = () => {
   return (
     <View style={styles.container}>
        <View style={styles.icon}>
          <Heart size={22} color="black"/>
          </View>
-         <Image source={require('../assets/images/tacos.jpg')} style={styles.image}/>
+         <Image source={image} style={styles.image}/>
       <View style={styles.card}>
-        <Text style={styles.title}>Chicken Tacos</Text> 
+        <Text style={styles.title}>{title}</Text> 
        </View>
     </View>
   )
@@ -52,9 +56,9 @@ const styles = StyleSheet.create({
       width: 70,
   },
   icon:{
-    position: 'absolute',
-    bottom: 30,
-    right: 10,
+    position: 'relative',
+    top: 133,
+    left: 50,
     zIndex: 2
   },
 });

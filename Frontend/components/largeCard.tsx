@@ -1,23 +1,30 @@
 
-import { StyleSheet, Text, View, Image } from 'react-native';
+import { StyleSheet, Text, View, Image, ImageSourcePropType, } from 'react-native';
 import FavoriteIcon from '@/components/favoriteIcon';
 import { AlarmClock } from 'lucide-react-native'
 import { Heart } from 'lucide-react-native';
+import { Link } from 'expo-router';
 
-const LargeCard = () => {
+interface Props{
+  title: string;
+  image: ImageSourcePropType; 
+}
+
+const LargeCard: React.FC<Props>= ({title, image}) => {
   return (
     <View style={styles.container}>
-       
+       <Link href='/screens/description'>
    
-    <Image source={require('../assets/images/tacos.jpg')} style={styles.image}/>
+    <Image source={image} style={styles.image}/>
    
    <View style={styles.icon}>
          <Heart size={22} color="black"/>
          </View>
       <View style={styles.card}>
         
-               <Text style={styles.title}>Chicken Tacos with Radish and Cilantro</Text> 
+               <Text style={styles.title}>{title}</Text> 
        </View>
+       </Link>
     </View>
   )
 }

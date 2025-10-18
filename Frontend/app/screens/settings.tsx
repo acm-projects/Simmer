@@ -1,9 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity} from 'react-native';
 import { ArrowLeft } from 'lucide-react-native';
 import { User } from 'lucide-react-native';
 import { LogOut } from 'lucide-react-native';
 import { ChevronRight } from 'lucide-react-native';
+import { router } from 'expo-router';
 
 
 
@@ -16,9 +17,9 @@ export default function SettingScreen() {
         </View>
    
    
-        <View>
+        <TouchableOpacity onPress={() => router.back()}>
         <ArrowLeft size={20} style={styles.arrow}/>
-        </View>
+        </TouchableOpacity>
 
 <View style={{paddingTop: 50}}>
     <View style={styles.info}>

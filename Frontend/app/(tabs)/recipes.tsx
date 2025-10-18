@@ -18,24 +18,19 @@ export default function RecipeScreen() {
      <Text style={styles.title}>Recipes</Text>
      </View>
 
-
-     <View>
-     <ArrowLeft size={20} style={styles.arrow}/>
-     </View>
 <View style ={{marginTop: 30}}>
 <Text style={styles.text}>11 Recipes</Text>
 
-        <LargeCard/>
-        <LargeCard/>
-        <LargeCard/>
-        <LargeCard/>
-        <LargeCard/>
-        <LargeCard/>
-        <LargeCard/>
-        <LargeCard/>
-        <LargeCard/>
-        <LargeCard/>
-        <LargeCard/>
+  <LargeCard title="Chicken Tacos" image={require('../assets/images/tacos.jpg')} />
+<LargeCard title="Chicken Tacos" image={require('../assets/images/tacos.jpg')} />
+<LargeCard title="Chicken Tacos" image={require('../assets/images/tacos.jpg')} />
+<LargeCard title="Chicken Tacos" image={require('../assets/images/tacos.jpg')} />
+<LargeCard title="Chicken Tacos" image={require('../assets/images/tacos.jpg')} />
+<LargeCard title="Chicken Tacos" image={require('../assets/images/tacos.jpg')} />
+<LargeCard title="Chicken Tacos" image={require('../assets/images/tacos.jpg')} />
+<LargeCard title="Chicken Tacos" image={require('../assets/images/tacos.jpg')} />
+<LargeCard title="Chicken Tacos" image={require('../assets/images/tacos.jpg')} />
+
 </View>
 
           <StatusBar style="auto" />

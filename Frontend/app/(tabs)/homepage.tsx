@@ -36,14 +36,21 @@ export default function HomeScreen() {
        
   
       </View>
+   
+<LargeCard title="Chicken Tacos" image={require('../assets/images/tacos.jpg')} />
 
-      <LargeCard/>
+  
+     
 
-      <LargeCard/>
+    <LargeCard title="Chicken Tacos" image={require('../assets/images/tacos.jpg')} />
 
-      <LargeCard/>
-      <LargeCard/>
-      <LargeCard/>
+
+    <LargeCard title="Chicken Tacos" image={require('../assets/images/tacos.jpg')} />
+
+    <LargeCard title="Chicken Tacos" image={require('../assets/images/tacos.jpg')} />
+
+<LargeCard title="Chicken Tacos" image={require('../assets/images/tacos.jpg')} />
+
 
 
   

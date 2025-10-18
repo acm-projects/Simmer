@@ -6,6 +6,7 @@ import { useFonts, Orbitron_400Regular, Orbitron_700Bold} from '@expo-google-fon
 import TabLayout from '../(tabs)/_layout';
 import { Plus } from 'lucide-react-native';
 import LinkPopup from '@/components/linkPopup'
+import { router } from 'expo-router';
 
 
 export default function ImportRecipe(){
@@ -27,9 +28,9 @@ export default function ImportRecipe(){
          </View>
     
     
-         <View>
+        <TouchableOpacity onPress={() => router.back()}>
          <ArrowLeft size={20} style={styles.arrow}/>
-         </View>
+         </TouchableOpacity>
             
             <View style={{position: 'relative' , top: 20}}>
             <View style={styles.greenBox}>

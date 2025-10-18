@@ -1,7 +1,8 @@
 
-import { StyleSheet, Text, View, ScrollView, Image } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { ArrowLeft } from 'lucide-react-native';
 import { Heart } from 'lucide-react-native';
+import { router } from 'expo-router';
 
 
 export default function Description(){
@@ -15,9 +16,9 @@ export default function Description(){
          </View>
     
     
-         <View>
+         <TouchableOpacity onPress={() => router.back()}>
          <ArrowLeft size={20} style={styles.arrow}/>
-         </View>
+         </TouchableOpacity>
 
         <View>
             <View style={styles.card}>

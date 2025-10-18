@@ -5,6 +5,7 @@ import { ArrowLeft } from 'lucide-react-native';
 import { useFonts, Orbitron_400Regular, Orbitron_700Bold} from '@expo-google-fonts/orbitron'
 import {Timer} from 'react-native-flip-timer-fixed';
 import { Plus } from 'lucide-react-native';
+import { router } from 'expo-router';
 
 export default function SettingScreen() {
     let [fontsLoaded] = useFonts({
@@ -19,8 +20,9 @@ export default function SettingScreen() {
     <ScrollView style={styles.container}>
   <View style={{flexDirection: 'row', alignItems: 'center'}}>
 
-     
+     <TouchableOpacity onPress={() => router.back()}>
      <ArrowLeft  size={20} style={styles.arrow}/>
+     </TouchableOpacity>
      
 
      <View style={{backgroundColor: '#ffff', borderRadius: 100, width: '80%', marginLeft: 10, }}>

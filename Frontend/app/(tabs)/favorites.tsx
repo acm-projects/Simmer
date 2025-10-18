@@ -24,11 +24,6 @@ export default function FavoritesScreen() {
      </View>
 
 
-     <View>
-     <ArrowLeft  size={20} style={styles.arrow}/>
-     </View>
-
-
      <View style={{ justifyContent: 'center', alignItems: 'center'}}>
        <CollectionCard />
        <CollectionCard />
