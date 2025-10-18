@@ -12,8 +12,9 @@ interface Props{
 
 const LargeCard: React.FC<Props>= ({title, image}) => {
   return (
+    <Link href='/screens/description'>
     <View style={styles.container}>
-       <Link href='/screens/description'>
+       
    
     <Image source={image} style={styles.image}/>
    
@@ -24,14 +25,15 @@ const LargeCard: React.FC<Props>= ({title, image}) => {
         
                <Text style={styles.title}>{title}</Text> 
        </View>
-       </Link>
+       
     </View>
+    </Link>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    margin: 3,
+    margin: 5,
     marginHorizontal: 10,
     backgroundColor: 'white',
     borderRadius: 20,

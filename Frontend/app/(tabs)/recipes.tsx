@@ -21,15 +21,16 @@ export default function RecipeScreen() {
 <View style ={{marginTop: 30}}>
 <Text style={styles.text}>11 Recipes</Text>
 
-  <LargeCard title="Chicken Tacos" image={require('../assets/images/tacos.jpg')} />
-<LargeCard title="Chicken Tacos" image={require('../assets/images/tacos.jpg')} />
-<LargeCard title="Chicken Tacos" image={require('../assets/images/tacos.jpg')} />
-<LargeCard title="Chicken Tacos" image={require('../assets/images/tacos.jpg')} />
-<LargeCard title="Chicken Tacos" image={require('../assets/images/tacos.jpg')} />
-<LargeCard title="Chicken Tacos" image={require('../assets/images/tacos.jpg')} />
-<LargeCard title="Chicken Tacos" image={require('../assets/images/tacos.jpg')} />
-<LargeCard title="Chicken Tacos" image={require('../assets/images/tacos.jpg')} />
-<LargeCard title="Chicken Tacos" image={require('../assets/images/tacos.jpg')} />
+ <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+ <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+ <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+ <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+ <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+ <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+ <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+ <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+ <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+ 
 
 </View>
 
