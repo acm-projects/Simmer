@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify
 from utils.auth import authorize_user
 from utils.supabase import supabase
+from postgrest.exceptions import APIError as AuthApiError
+
 user_bp = Blueprint('main', __name__)
 @user_bp.route("/create_user", methods=["POST"])
 def create_user():
@@ -32,7 +34,6 @@ def create_user():
       return jsonify({'message': 'Authentication failed.', 'error': e.message}), 401
   except Exception:
       return jsonify({'message': 'Invalid token.'}), 401
-
 
 
   newUser={

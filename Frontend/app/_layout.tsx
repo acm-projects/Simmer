@@ -60,6 +60,7 @@ export default function RootLayout() {
           <Stack.Screen name="screens/importRecipe" options={{ headerShown: false }} />
           <Stack.Screen name="screens/description" options={{ headerShown: false }} />
           <Stack.Screen name="userPreference" options={{ headerShown: false }} />
+          <Stack.Screen name="voiceAssistant" options={{ headerShown: false }} />
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
