@@ -4,13 +4,15 @@ from youtube_transcript_api import YouTubeTranscriptApi, NoTranscriptFound
 from google.oauth2 import service_account
 from google.cloud import speech
 
-credentials = service_account.Credentials.from_service_account_file("PathToKeyFile")
+current_dir = os.path.dirname(os.path.abspath(__file__))
+key_path = os.path.join(current_dir, '..', 'sttKey.json')
+credentials = service_account.Credentials.from_service_account_file(key_path)
 client = speech.SpeechClient(credentials=credentials)
 
 #fileName= path to recording file (will switch for streaming later)
-def stt(fileName):
-    with open(fileName,"rb") as file:
-        audio_data = file.read()
+def stt(audio_data):
+    # with open(fileName,"rb") as file:
+    #     audio_data = file.read()
     
     audio = speech.RecognitionAudio(content=audio_data)
     config = speech.RecognitionConfig(

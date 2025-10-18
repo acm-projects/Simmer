@@ -9,8 +9,10 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 import sqlite3
 from flask import Blueprint, request, jsonify, send_file, Response,current_app
 from gtts import gTTS
+from utils.voice import stt
 import io
 import json
+from pydub import AudioSegment
 load_dotenv()
 
 if not os.environ.get("GOOGLE_API_KEY"):
@@ -86,30 +88,49 @@ def create_chat():
 
 @chat_bp.route("/chat", methods=["POST"])
 def chat():
-  data = request.get_json()
-  if not data or not all(key in data for key in ['cid', 'userMessage']):
-    return jsonify({'message': 'Missing data: recipe, cid'}), 400
-  cid = data.get('cid')
-  userMessage = data.get('userMessage')
+
+
+  cid = request.form.get('cid')
+  if 'audio' not in request.files or not cid:
+    return jsonify({'message': 'Missing data: audio file or cid'}), 400
+  file=request.files['audio']
+
+
+  try:
+    userAudio = AudioSegment.from_file(file)
+    userAudio = userAudio.set_frame_rate(16000)
+    userAudio = userAudio.set_channels(1)
+    buffer = io.BytesIO()
+    userAudio.export(buffer, format="raw")
+    userAudioBytes = buffer.getvalue()
+
+
+  except Exception as e:
+      return jsonify({'message': 'Could not process audio file.'}), 500
+
+  userMessage = stt(userAudioBytes)
+
+
 
   config = {"configurable": {"thread_id": cid}}
   
   response = app.invoke({"messages": [HumanMessage(content=userMessage)]}, config)
-  mp3_fp = io.BytesIO()
+  wav_fp = io.BytesIO()
   try:
     tts = gTTS(response["messages"][-1].content, lang='en')
-    tts.write_to_fp(mp3_fp)
+    tts.write_to_fp(wav_fp)
   except Exception as e:
     return jsonify({"message":"Speech could not be generated"}), 500
   
-  mp3_fp.seek(0)
+  wav_fp.seek(0)
   
   return send_file(
-    mp3_fp,
-    mimetype='audio/mpeg',
+    wav_fp,
+    mimetype='audio/wav',
     as_attachment=True,
-    download_name='response.mp3'
+    download_name='response.wav'
   ), 200
+  
 
 @chat_bp.route('/upload',methods=['POST'])
 def upload_file():
@@ -122,7 +143,6 @@ def upload_file():
   
   if file:
     print(file.filename)
-    print('fdaojsifioasdif')
     save_path= os.path.join(current_app.config['UPLOAD_FOLDER'],file.filename)
     try:
       file.save(save_path)
