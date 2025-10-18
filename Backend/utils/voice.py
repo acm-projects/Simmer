@@ -1,6 +1,6 @@
+import os
 from gtts import gTTS
 from youtube_transcript_api import YouTubeTranscriptApi, NoTranscriptFound
-import os
 from google.oauth2 import service_account
 from google.cloud import speech
 
