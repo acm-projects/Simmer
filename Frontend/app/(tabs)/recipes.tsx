@@ -3,7 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
 
 import { HelloWave } from '@/components/hello-wave';
-import SmallCard from '@/components/smallCard'
+import LargeCard from "@/components/largeCard";
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -18,50 +18,21 @@ export default function RecipeScreen() {
      <Text style={styles.title}>Recipes</Text>
      </View>
 
+<View style ={{marginTop: 30}}>
+<Text style={styles.text}>11 Recipes</Text>
 
-     <View>
-     <ArrowLeft size={20} style={styles.arrow}/>
-     </View>
+ <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+ <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+ <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+ <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+ <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+ <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+ <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+ <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+ <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+ 
 
-            <View style={styles.grid}>
-        <View style={styles.gridItem}>
-          <SmallCard/>
-        </View>
-        
-         <View style={styles.gridItem}>
-          <SmallCard/>
-        </View>
-      </View>
-
-       <View style={styles.grid}>
-        <View style={styles.gridItem}>
-          <SmallCard/>
-        </View>
-        
-         <View style={styles.gridItem}>
-          <SmallCard/>
-        </View>
-      </View>
-
-       <View style={styles.grid}>
-        <View style={styles.gridItem}>
-          <SmallCard/>
-        </View>
-        
-         <View style={styles.gridItem}>
-          <SmallCard/>
-        </View>
-      </View>
-
-       <View style={styles.grid}>
-        <View style={styles.gridItem}>
-          <SmallCard/>
-        </View>
-        
-         <View style={styles.gridItem}>
-          <SmallCard/>
-        </View>
-      </View>
+</View>
 
           <StatusBar style="auto" />
         </ScrollView>
@@ -71,10 +42,8 @@ export default function RecipeScreen() {
 const styles = StyleSheet.create({
    container: {
     flex: 1,
-    backgroundColor: '#fce6dbff',
+    backgroundColor: '#f5ebe6ff',
     paddingTop: 50,
-    paddingLeft: 15,
-    paddingRight: 15,
   },
   content:{
     padding: 1,
@@ -99,8 +68,9 @@ const styles = StyleSheet.create({
     color: '#9BA760',
   },
   text:{
-    fontSize: 15,
-    paddingLeft: 15,
+    fontSize: 16,
+    paddingLeft: 25,
+    paddingBottom: 5,
   },
   subtitle:{
     fontSize: 20,
