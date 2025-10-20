@@ -12,8 +12,8 @@ interface Props{
 
 const LargeCard: React.FC<Props>= ({title, image}) => {
   return (
-    <Link href='/screens/description'>
-    <View style={styles.container}>
+    <Link href="../screens/description" style={styles.container}>
+    <View style={styles.content}>
        
    
     <Image source={image} style={styles.image}/>
@@ -34,17 +34,20 @@ const LargeCard: React.FC<Props>= ({title, image}) => {
 const styles = StyleSheet.create({
   container: {
     margin: 5,
+    borderRadius: 20,
     marginHorizontal: 10,
     backgroundColor: 'white',
-    borderRadius: 20,
-    flexDirection: 'row',
-    height: 110,
-    alignItems: 'center',
-    padding: 10,
     shadowColor: "#303030ff",
     shadowOffset:{width: 0, height: 0},
     shadowOpacity: 0.2,
     shadowRadius: 2,
+  },
+  content:{
+        
+    flexDirection: 'row',
+    height: 110,
+    alignItems: 'center',
+    padding: 10,
   },
   image:{
   
