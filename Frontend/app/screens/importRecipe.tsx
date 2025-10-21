@@ -10,15 +10,76 @@ import { router } from 'expo-router';
 
 
 export default function ImportRecipe(){
-
-  const [title, setTitle] = useState('');
+   const [title, setTitle] = useState('');
   const [prepMin, setPrepMin] = useState('');
   const [cookMin, setCookMin] = useState('');
-  const [ingredient, setIngredient] = useState('');
-  const [step, setStep] = useState('');
-  const [amount, setAmount] = useState('');
-
+  const [step, setStep] = useState(['']);
   const[isVisible, setIsVisible] = useState(false);
+  const [ingredient, setIngredient] = useState([{name: '', quantity: '', unit: ''}]);
+  const [userToken, setUserToken] = useState("YOUR_JWT_TOKEN_HERE");
+  
+
+  const updateIngredient = (index: number, field: number, value: string) => {
+  const updated = [...ingredient];
+  updated[index][field] = value;
+  setIngredient(updated);
+};
+
+    const addIngredient = () => {
+    setIngredient([...ingredient, { name: '', quantity: '', unit: '' }]);
+  };
+
+  // --- Step handlers ---
+  const updateStep = (index: number, value: string) => {
+    const updated = [...step];
+    updated[index] = value;
+    setStep(updated);
+  };
+
+  const addStep = () => {
+    setStep([...step, '']);
+  };
+
+ const handleCreateRecipe = async () => {
+  // Create recipe data object from state
+  const recipeData = {
+    title: title,
+    instructions: step,
+    prep_time: parseInt(prepMin) || 0,
+    cook_time: parseInt(cookMin) || 0,
+    dietary_tags: [],
+    ingredients: ingredient,
+  };
+
+  try {
+    const response = await fetch("http://10.0.2.2:5000/create_recipe", {  // IP Address
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${userToken}`
+      },
+      body: JSON.stringify(recipeData)
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert(`Recipe created successfully! ID: ${data.recipe_id}`);
+      setTitle('');
+      setPrepMin('');
+      setCookMin('');
+      setIngredient([{ name: '', quantity: '', unit: '' }]);
+      setStep(['']);
+    } else {
+      alert(`Error: ${data.error || 'Failed to create recipe'}`);
+    }
+  } catch (err) {
+    console.error("Error creating recipe:", err);
+    alert("Could not connect to server");
+  }
+};
+  
+ 
 
     return(
         <ScrollView style={styles.container}>
@@ -60,7 +121,7 @@ export default function ImportRecipe(){
              <View>
                          <View style={styles.card}>
                             <View style={styles.image}>
-                            <Plus size={40} style={{color: '#9BA760'}}/>
+                            <Plus size={40} color={'#9BA760'}/>
                             </View>
                              <View style={styles.titleBox}>
                                  <TextInput 
@@ -89,49 +150,69 @@ export default function ImportRecipe(){
                              
                              </View>
                          </View>
+                         </View>
+             
+        <View style={styles.desBox}>
+        <Text style={styles.title1}>Ingredients</Text>
+        {ingredient.map((ing, index) => (
+          <View
+            key={index}
+            style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 20 }}
+          >
+            <Text style={styles.bullet}>{'\u2022'}</Text>
+            <TextInput
+              style={[styles.recipe, { paddingLeft: 2 }]}
+              placeholder="#"
+              value={ing.quantity}
+              onChangeText={(text) => updateIngredient(index, 0, text)}
+            />
+            <TextInput
+              style={[styles.recipe, { paddingLeft: 2 }]}
+              placeholder="unit"
+              value={ing.unit}
+              onChangeText={(text) => updateIngredient(index,  1, text)}
+            />
+            <TextInput
+              style={[styles.recipe, { paddingLeft: 2 }]}
+              placeholder="ingredient"
+              value={ing.name}
+              onChangeText={(text) => updateIngredient(index, 2, text)}
+            />
+          </View>
+        ))}
+        <TouchableOpacity onPress={addIngredient} style={[styles.smallGreenBox, { width: 120 }]}>
+          <Text style={styles.time}>Add Ingredient</Text>
+        </TouchableOpacity>
+      </View>
              
                          <View style={styles.desBox}>
-                             <Text style={styles.title1}>Ingredients</Text>
-                               <View style={{flexDirection: 'row', alignItems: 'center', paddingLeft: 20}}>
-                                <Text style={styles.bullet}>{'\u2022'}</Text>
-                                  <TextInput 
-                                 style={[styles.recipe,{paddingLeft: 2, paddingRight: 2,}]}
-                                 placeholder="__ "
-                                 value={amount}
-                                 onChangeText={setAmount}
-                                 />
-                                   <TextInput 
-                                 style={[styles.recipe,{paddingLeft: 2}]}
-                                 placeholder="ingredient"
-                                 value={ingredient}
-                                 onChangeText={setIngredient}
-                                 />
-                              
-                              </View>
-
-                              
-                             <View style={[styles.smallGreenBox,{width: 120}]}>
-                              <Text style={styles.time}>Add Ingredient</Text></View> 
-                         </View>
-             
-                          <View style={styles.desBox}>
-                             <Text style={styles.title1}>Steps</Text>
-                             <View style={{flexDirection: 'row', alignItems: 'flex-end', paddingLeft: 20}}>
-                                <Text style={styles.bullet}>1.</Text>
-                                 <TextInput 
-                                 style={[styles.recipe,{paddingLeft: 2}]}
-                                 placeholder="steps"
-                                 value={step}
-                                 onChangeText={setStep}
-                                 />
-                              </View>
-                            
-                                 <View style={styles.smallGreenBox}>
-                              <Text style={styles.time}>Add Step</Text></View> 
-                            
-                              
-                         </View>
+        <Text style={styles.title1}>Steps</Text>
+        {step.map((stepText, index) => (
+          <View
+            key={index}
+            style={{ flexDirection: 'row', alignItems: 'flex-end', paddingLeft: 20 }}
+          >
+            <Text style={styles.bullet}>{index + 1}.</Text>
+            <TextInput
+              style={[styles.recipe, { paddingLeft: 2, flex: 1 }]}
+              placeholder="Step"
+              value={stepText}
+              onChangeText={(text) => updateStep(index, text)}
+            />
+          </View>
+        ))}
+        <TouchableOpacity onPress={addStep} style={[styles.smallGreenBox, { width: 100 }]}>
+          <Text style={styles.time}>Add Step</Text>
+        </TouchableOpacity>
+      </View>
+                     <View style={{alignItems: 'center', marginTop: 20}}>
+                      <TouchableOpacity
+                      style={[styles.greenBox, {width: 180}]}
+                      onPress={handleCreateRecipe}>
+                        <Text style={styles.text}>Done</Text>
+                      </TouchableOpacity>
                      </View>
+                     
         </ScrollView>
     )}
 
@@ -195,7 +276,7 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     marginHorizontal: 15,
     backgroundColor: '#9BA760',
-    padding: 0,
+    padding: 2,
     alignItems: 'center',
     margin: 5,
 
