@@ -1,6 +1,6 @@
 import React, { useState, useEffect} from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { ArrowLeft } from 'lucide-react-native';
 import { useFonts, Orbitron_400Regular, Orbitron_700Bold} from '@expo-google-fonts/orbitron'
 import {Timer} from 'react-native-flip-timer-fixed';
@@ -18,46 +18,44 @@ export default function SettingScreen() {
 
   return (
     <ScrollView style={styles.container}>
-  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-
-     <TouchableOpacity onPress={() => router.back()}>
-     <ArrowLeft  size={20} style={styles.arrow}/>
-     </TouchableOpacity>
-     
-
-     <View style={{backgroundColor: '#ffff', borderRadius: 100, width: '80%', marginLeft: 10, }}>
-        <View style={{backgroundColor: '#262e05ff', width: '30%', borderRadius: 100,}}>
+      <View style={{flexDirection: 'row', alignItems: 'center'}}>
+        <TouchableOpacity onPress={() => router.back()}>
+          <ArrowLeft  size={20} style={styles.arrow}/>
+        </TouchableOpacity>
+        
+        <View style={{backgroundColor: '#ffff', borderRadius: 100, width: '80%', marginLeft: 10, }}>
+          <View style={{backgroundColor: '#262e05ff', width: '30%', borderRadius: 100,}}>
             <Text> </Text>
+          </View>
         </View>
-     </View>
-  </View>
+      </View>
   
-  <View style={{position: 'relative', top: 400}}>
-  <TouchableOpacity 
-  onPress={() => setSeconds((prev) => prev + 60)} 
-  style={{backgroundColor: '#262e05ff', borderRadius: 100, width: 30, height: 30, alignItems: 'center', justifyContent: 'center', marginBottom: 10}}>
-     <Plus color='white'/>
-    </TouchableOpacity>
+      <View style={{alignItems: 'center', marginTop: 20}}>
+        <Image source={require('../../assets/images/Simmer_Mascot.png')} style={styles.mascot}/>
+        
+        <TouchableOpacity 
+          onPress={() => setSeconds((prev) => prev + 60)} 
+          style={{backgroundColor: '#262e05ff', borderRadius: 100, width: 30, height: 30, alignItems: 'center', justifyContent: 'center', marginBottom: 10, marginTop: 10}}>
+          <Plus color='white'/>
+        </TouchableOpacity>
 
-  <Timer
-  time={seconds}
-  play={play}
-  wrapperStyle={{ 
-    flexDirection: 'row', 
-    backgroundColor: 'transparent',
-  }}
-  showCircles={true}
-  flipNumberProps={{
-          numberStyle: { color: '#ffffff', fontSize: 36 },
-          flipCardStyle: {backgroundColor: '#262e05ff', },
-          cardStyle: {backgroundColor: '#262e05ff', borderRadius: 0}
-          
-  }}
-/>
-  </View>
-</ScrollView>
+        <Timer
+          time={seconds}
+          play={play}
+          wrapperStyle={{ 
+            flexDirection: 'row', 
+            backgroundColor: 'transparent',
+          }}
+          showCircles={true}
+          flipNumberProps={{
+            numberStyle: { color: '#ffffff', fontSize: 36 },
+            flipCardStyle: {backgroundColor: '#262e05ff', },
+            cardStyle: {backgroundColor: '#262e05ff', borderRadius: 0}
+          }}
+        />
+      </View>
+    </ScrollView>
   )
-
 }
 
 const styles = StyleSheet.create({
@@ -102,5 +100,9 @@ const styles = StyleSheet.create({
   customText:{
     fontFamily: 'Orbitron_400Regular',
     fontSize: 80,
+  },
+  mascot: {
+      height: 400,
+      width: 400,
   }
 });

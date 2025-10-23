@@ -1,13 +1,17 @@
 
-import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity, Pressable } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { ArrowLeft } from 'lucide-react-native';
 import { Heart } from 'lucide-react-native';
 import { router } from 'expo-router';
 
 
+
 export default function Description(){
     const items = ['Item 1', 'Item 2', 'Item 3'];
     const steps = ['step 1', 'step 2', 'step 3'];
+
+    const navigation = useNavigation();
 
     return(
         <ScrollView style={styles.container}>
@@ -43,6 +47,7 @@ export default function Description(){
                     ))}
             </View>
 
+
              <View style={styles.desBox}>
                 <Text style={styles.title1}>Steps</Text>
                 {steps.map((steps, index) => (
@@ -53,6 +58,12 @@ export default function Description(){
                     ))}
             </View>
         </View>
+
+    <Pressable onPress={() => router.push('../screens/cookingMode')}>
+      <View style={styles.bubble}>
+          <Text style={styles.bubbleText}> Voice Mode </Text>
+      </View>
+    </Pressable>
 
 
              
@@ -142,5 +153,19 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 12,
     height: 225,
     width: "100%",
-  }
+  },
+  bubble: {
+   backgroundColor: '#9BA760',
+   padding: 12,
+   borderRadius: 16,
+   maxWidth: "100%",
+   marginVertical: 10,
+   alignSelf: "center",
+   width: 300,
+ },
+ bubbleText: {
+   fontSize: 16,
+   color: "white",
+   textAlign: "center",
+ },
 });

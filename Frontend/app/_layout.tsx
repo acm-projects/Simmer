@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SupabaseProvider, useSupabase } from './contexts/SupabaseContext';
+import CookingModePage from './screens/cookingMode';
 
 export const unstable_settings = {
   anchor: '(tabs)',
