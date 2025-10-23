@@ -111,8 +111,8 @@ const styles = StyleSheet.create({
   greenBox:{
     backgroundColor: '#9BA760', 
     borderRadius: 0, 
-    paddingBottom: 15,
-    paddingTop: 10,
+    paddingBottom: 1,
+    paddingTop: 1,
   
     alignItems: 'center',
     justifyContent: 'center',
