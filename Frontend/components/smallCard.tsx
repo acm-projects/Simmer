@@ -2,6 +2,7 @@
 import { StyleSheet, Text, View, Image, ImageSourcePropType } from 'react-native';
 import FavoriteIcon from '@/components/favoriteIcon';
 import { Heart } from 'lucide-react-native';
+import { Link } from 'expo-router';
 
 interface Props{
   title: string;
@@ -10,7 +11,8 @@ interface Props{
 const SmallCard: React.FC<Props>= ({title, image }) => {
 
   return (
-    <View style={styles.container}>
+    <Link href="../screens/description" style={styles.container}>
+         <View style={styles.container}>
        <View style={styles.icon}>
          <Heart size={22} color="black"/>
          </View>
@@ -19,6 +21,7 @@ const SmallCard: React.FC<Props>= ({title, image }) => {
         <Text style={styles.title}>{title}</Text> 
        </View>
     </View>
+    </Link>
   )
 }
 
