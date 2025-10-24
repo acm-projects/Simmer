@@ -4,6 +4,8 @@ import FavoriteIcon from '@/components/favoriteIcon';
 import { AlarmClock } from 'lucide-react-native'
 import { Heart } from 'lucide-react-native';
 import { Link } from 'expo-router';
+import { useFonts } from '@expo-google-fonts/nunito/useFonts';
+import { Nunito_400Regular } from '@expo-google-fonts/nunito/400Regular';
 
 interface Props{
   title: string;
@@ -11,6 +13,11 @@ interface Props{
 }
 
 const LargeCard: React.FC<Props>= ({title, image}) => {
+
+   let [fontsLoaded] = useFonts({
+    Nunito_400Regular,
+  });
+
   return (
     <Link href="../screens/description" style={styles.container}>
     <View style={styles.content}>
@@ -24,6 +31,10 @@ const LargeCard: React.FC<Props>= ({title, image}) => {
       <View style={styles.card}>
         
                <Text style={styles.title}>{title}</Text> 
+                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                         <Text style={styles.time}>Time: 30 min </Text>       
+                    </View>
+              
        </View>
        
     </View>
@@ -53,7 +64,7 @@ const styles = StyleSheet.create({
   
     width: 90,
     height: 90,
-    borderRadius: 20,
+    borderRadius: 15,
   
 
   },
@@ -61,13 +72,15 @@ const styles = StyleSheet.create({
     height: 70,
     width: 347,
     borderRadius: 15,
+    alignItems: 'flex-start'
   },
   title:{
-      fontSize: 20,
+      fontSize: 25,
       color: '#06402B',
-      paddingTop: 15,
+      paddingTop: 5,
       marginLeft: 10,
       width: '60%',
+      fontFamily: 'Nunito_400Regular',
   },
     icon:{
     position: 'absolute',
@@ -75,6 +88,11 @@ const styles = StyleSheet.create({
     right: 15,
     zIndex: 2
   },
+  time:{
+    fontSize: 13,
+    marginLeft: 15,
+    fontFamily: 'Nunito_400Regular'
+  }
 });
 
 
