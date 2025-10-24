@@ -11,7 +11,11 @@
     "lint": "expo lint"
   },
   "dependencies": {
+    "@expo-google-fonts/caladea": "^0.4.1",
+    "@expo-google-fonts/dev": "^0.4.35",
+    "@expo-google-fonts/nunito": "^0.4.2",
     "@expo-google-fonts/orbitron": "^0.4.2",
+    "@expo-google-fonts/roboto": "^0.4.1",
     "@expo/metro-runtime": "~6.1.2",
     "@expo/vector-icons": "^15.0.2",
     "@icon/ionicons": "^5.4.0-alpha.0",
@@ -46,6 +50,7 @@
     "react-native-flip-countdown-timer": "^0.0.3",
     "react-native-flip-timer-fixed": "^1.0.33",
     "react-native-gesture-handler": "~2.28.0",
+    "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-reanimated": "~4.1.1",
     "react-native-reanimated-carousel": "^4.0.3",
     "react-native-safe-area-context": "~5.6.0",

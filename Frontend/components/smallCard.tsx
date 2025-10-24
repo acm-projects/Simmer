@@ -2,6 +2,8 @@
 import { StyleSheet, Text, View, Image, ImageSourcePropType } from 'react-native';
 import FavoriteIcon from '@/components/favoriteIcon';
 import { Heart } from 'lucide-react-native';
+import { Nunito_400Regular } from '@expo-google-fonts/nunito/400Regular';
+
 
 interface Props{
   title: string;
@@ -16,7 +18,10 @@ const SmallCard: React.FC<Props>= ({title, image }) => {
          </View>
          <Image source={image} style={styles.image}/>
       <View style={styles.card}>
-        <Text style={styles.title}>{title}</Text> 
+       
+          <Text style={styles.title}>{title}</Text> 
+  
+        
        </View>
     </View>
   )
@@ -40,7 +45,6 @@ const styles = StyleSheet.create({
   },
   card: {
     width: 150,
-    height: 60,
     backgroundColor: 'white',
     borderBottomLeftRadius: 15,
     borderBottomRightRadius: 15,
@@ -49,11 +53,14 @@ const styles = StyleSheet.create({
     bottom: 0,
     padding: 10,
     alignItems: 'flex-start'
+    
     },
   title:{
-      fontSize: 15,
+      fontSize: 18,
       color: '#000',
+      fontFamily: 'Nunito_400Regular',
       width: 70,
+      flexWrap: 'wrap'
   },
   icon:{
     position: 'relative',

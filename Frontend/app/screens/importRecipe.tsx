@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, ScrollView, ActivityIndicator, Image, Button, TextInput, Modal, TouchableOpacity} from 'react-native';
+import { StyleSheet, Text, View, ScrollView, Image, Button, TextInput, Modal, TouchableOpacity, KeyboardAvoidingView, Platform} from 'react-native';
 import { ArrowLeft } from 'lucide-react-native';
 import { useFonts, Orbitron_400Regular, Orbitron_700Bold} from '@expo-google-fonts/orbitron'
 import TabLayout from '../(tabs)/_layout';
@@ -19,9 +19,9 @@ export default function ImportRecipe(){
   const [userToken, setUserToken] = useState("YOUR_JWT_TOKEN_HERE");
   
 
-  const updateIngredient = (index: number, field: number, value: string) => {
+ const updateIngredient = (index: number, field: "quantity" | "unit" | "name", value: string) => {
   const updated = [...ingredient];
-  updated[index][field] = value;
+  updated[index] = { ...updated[index], [field]: value };
   setIngredient(updated);
 };
 
@@ -52,7 +52,7 @@ export default function ImportRecipe(){
   };
 
   try {
-    const response = await fetch("http://10.0.2.2:5000/create_recipe", {  // IP Address
+    const response =  await fetch(`${process.env.EXPO_PUBLIC_API_URL}create_recipe`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -82,8 +82,14 @@ export default function ImportRecipe(){
  
 
     return(
-        <ScrollView style={styles.container}>
-     
+   
+    <View style={styles.container}>
+      <KeyboardAvoidingView 
+      style={{flex: 1}}
+      behavior={Platform.OS === "ios" ? "padding": undefined}
+      keyboardVerticalOffset={0}
+      >
+        <ScrollView>
      <View style={{ justifyContent: 'center', alignItems: 'center'}}>
          <Text style={styles.title}>Recipes</Text>
          </View>
@@ -119,39 +125,45 @@ export default function ImportRecipe(){
              
 
              <View>
-                         <View style={styles.card}>
-                            <View style={styles.image}>
-                            <Plus size={40} color={'#9BA760'}/>
-                            </View>
-                             <View style={styles.titleBox}>
-                                 <TextInput 
-                                 style={styles.title2}
-                                 placeholder="Title"
-                                 value={title}
-                                 onChangeText={setTitle}
-                                 />
-                                 <View>
-                                     <Text style={styles.time}>Prep:  
-                                  <TextInput 
-                                 style={styles.time}
-                                 placeholder="__"
-                                 value={prepMin}
-                                 onChangeText={setPrepMin}
-                                 />min</Text>
+            <View style={styles.card}>
+              <View style={styles.image}>
+              <Plus size={40} color={'#9BA760'}/>
+              </View>
+                <View style={styles.titleBox}>
+                    <TextInput 
+                    style={styles.title2}
+                    placeholder="Title"
+                    value={title}
+                    onChangeText={setTitle}
+                    />
+                    <View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Text style={styles.time}>Prep: </Text>
+                    <TextInput
+                      style={[styles.time, ]}
+                      placeholder="__"
+                      value={prepMin}
+                      onChangeText={setPrepMin}
+                    />
+                    <Text style={styles.time}> min</Text>
+                  </View>
 
-                                      <Text style={styles.time}>Cook:  
-                                  <TextInput 
-                                 style={styles.time}
-                                 placeholder="__"
-                                 value={cookMin}
-                                 onChangeText={setCookMin}
-                                 />min</Text>
-                                 </View>
-                             
-                             </View>
-                         </View>
-                         </View>
-             
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Text style={styles.time}>Cook: </Text>
+                    <TextInput
+                      style={[styles.time, ]}
+                      placeholder="__"
+                      value={cookMin}
+                      onChangeText={setCookMin}
+                    />
+                    <Text style={styles.time}> min</Text>
+                  </View>
+                    </View>
+                
+                </View>
+            </View>
+            </View>
+
         <View style={styles.desBox}>
         <Text style={styles.title1}>Ingredients</Text>
         {ingredient.map((ing, index) => (
@@ -164,19 +176,19 @@ export default function ImportRecipe(){
               style={[styles.recipe, { paddingLeft: 2 }]}
               placeholder="#"
               value={ing.quantity}
-              onChangeText={(text) => updateIngredient(index, 0, text)}
+              onChangeText={(text) => updateIngredient(index, "quantity", text)}
             />
             <TextInput
               style={[styles.recipe, { paddingLeft: 2 }]}
               placeholder="unit"
               value={ing.unit}
-              onChangeText={(text) => updateIngredient(index,  1, text)}
+              onChangeText={(text) => updateIngredient(index, "unit", text)}
             />
             <TextInput
               style={[styles.recipe, { paddingLeft: 2 }]}
               placeholder="ingredient"
               value={ing.name}
-              onChangeText={(text) => updateIngredient(index, 2, text)}
+              onChangeText={(text) => updateIngredient(index, "name", text)}
             />
           </View>
         ))}
@@ -212,8 +224,10 @@ export default function ImportRecipe(){
                         <Text style={styles.text}>Done</Text>
                       </TouchableOpacity>
                      </View>
-                     
-        </ScrollView>
+                     </ScrollView>
+                    </KeyboardAvoidingView> 
+        </View>
+     
     )}
 
 const styles = StyleSheet.create({
@@ -223,6 +237,7 @@ const styles = StyleSheet.create({
     paddingTop: 70,
     paddingLeft: 15,
     paddingRight: 15,
+    paddingBottom: 10,
     
   },
   content:{
