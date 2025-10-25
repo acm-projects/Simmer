@@ -59,7 +59,7 @@ def create_user():
   except Exception as e:
     print(str(e))
     return jsonify({'message': 'An error occured trying to add a user'}), 500
-  
+
 @user_bp.route('/set-preference', methods=['POST'])
 def set_preference():
 
@@ -89,3 +89,76 @@ def set_preference():
     }), 200
   except Exception as e:
     return jsonify({"error": "An error occurred while updating preferences.", "details": str(e)}), 500
+  
+@user_bp.route('/user/dietary-restrictions', methods=['PUT'])
+def update_dietary_restrictions():
+  try: 
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
+    
+    data = request.get_json()
+    new_restrictions = data.get('dietary_restrictions')
+
+    if not isinstance(new_restrictions, list):
+      return jsonify({'error' : 'dietary_restrictions must be an array of strings.'}), 400
+    
+    user_response = (
+      supabase.table('users')
+      .select('dietary_restrictions')
+      .eq('id', user_id)
+      .single()
+      .execute()
+    )
+
+    cur_restrictions = user_response.data.get('dietary_restrictions') or []
+    updated_restrictions = list(set(cur_restrictions + new_restrictions))
+
+    supabase.table('users').update({
+      'dietary_restrictions' : updated_restrictions
+    }).eq('id', user_id).execute()
+
+    return jsonify ({
+      'message' : 'Dietary restrictions updated successfully.',
+      'updated_restrictions' : new_restrictions
+    }), 200
+  
+  except Exception as e:
+    print('Error updating dietary restrictions', e)
+    return jsonify({
+      'error' : 'Internal server error',
+      'details' : str(e)
+    }), 500
+  
+@user_bp.route('/user/dietary-restrictions', methods=['GET'])
+def get_dietary_restrictions():
+
+  try:
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
+    
+    response = (
+      supabase.table('users')
+      .select('dietary_restrictions')
+      .eq('id', user_id)
+      .single()
+      .execute()
+    )
+
+    if not response.data:
+      return jsonify({'message' : 'User not found.'}), 404
+    
+    restrictions = response.data.get('dietary_restrictions') or []
+
+    return jsonify({
+      'user_id' : user_id,
+      'dietary_restrictions' : restrictions
+    }), 200
+  
+  except Exception as e:
+      print('Error fetching dietary restrictions: ', e)
+      return jsonify({
+        'error' : 'Internal Server Error',
+        'details' : str(e)
+      })

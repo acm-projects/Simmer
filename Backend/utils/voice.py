@@ -17,7 +17,6 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 key_path = os.path.join(current_dir, '..', 'sttKey.json')
 credentials = service_account.Credentials.from_service_account_file(key_path)
 client = speech.SpeechClient(credentials=credentials)
-
 #fileName= path to recording file (will switch for streaming later)
 def stt(audio_data):
     # with open(fileName,"rb") as file:
