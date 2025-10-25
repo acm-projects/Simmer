@@ -40,8 +40,7 @@ def speak(words):
     tts = gTTS(words)
     tts.save("recipe.mp3")
 
-def generateYoutubeRecipe():
-    url = input("Youtube Video Link: ")
+def generateYoutubeRecipe(url):
     if "v=" in url:
         videoId = url.split("v=")[-1]
     elif "shorts/" in url:
@@ -56,10 +55,7 @@ def generateYoutubeRecipe():
         transcript = ""
         for snippet in fetchedTranscript:
             transcript=transcript + snippet.text + "\n"
-        
-        # with open("recipe.txt","w") as file:
-        #     file.write(transcript)
-        #     # speak(text)
+        return transcript
     except NoTranscriptFound:
         print("No Transcripts")
     except Exception as e:
@@ -85,6 +81,4 @@ def generateInstaRecipe(url):
             if dataTranscript[f"{i}"]["text"]!=None:
                 transcript[f"Recipe{i}"] = dataTranscript[f"{i}"]["text"]
     transcript["Description"] = dataDescription["data"]["xdt_shortcode_media"]["edge_media_to_caption"]["edges"][0]["node"]["text"]
-    transcript["Thumbnail1"] = dataDescription["data"]["xdt_shortcode_media"]["thumbnail_src"]
-    transcript["Thumbnail2"] = dataDescription["data"]["xdt_shortcode_media"]["display_url"]
     return transcript
