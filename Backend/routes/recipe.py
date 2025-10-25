@@ -20,10 +20,10 @@ def create_recipe():
     cook_time = data.get('cook_time', 0)
     dietary_tags = data.get('dietary_tags', [])
     ingredients = data.get('ingredients', [])
-    image_url = data.get('image_url')
+    image_url = data.get('image_url', '')
 
-    if not title or not instructions or not image_url:
-      return jsonify({'error' : 'title, instructions, and image_url are requried'}), 400
+    if not title or not instructions:
+      return jsonify({'error' : 'title and instructions are requried'}), 400
 
     recipe = supabase.table('recipes').insert({
       'title' : title,
