@@ -7,9 +7,11 @@ from dotenv import load_dotenv
 import requests
 import json
 import urllib
+from googleapiclient.discovery import build
 
 load_dotenv()
 SCRAPECREATORS_API_KEY : str = os.environ.get("SCRAPECREATORS_KEY")
+YOUTUBE_API_KEY: str = os.environ.get("YOUTUBE_API_KEY")
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 key_path = os.path.join(current_dir, '..', 'sttKey.json')
@@ -23,13 +25,13 @@ def stt(audio_data):
     audio = speech.RecognitionAudio(content=audio_data)
     config = speech.RecognitionConfig(
         encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
-        sample_rate_hertz=16000,
+        sample_rate_hertz=41000,
         language_code="en-US"
     )
 
     response = client.recognize(config=config, audio=audio)
-
-    transcript = " ".join([result.alternatives[0].transcript for result in response.results])
+    transcript = ""
+    transcript += " ".join([result.alternatives[0].transcript for result in response.results])
     return transcript
 
 
@@ -48,17 +50,33 @@ def generateYoutubeRecipe(url):
     videoId = videoId.split("&")[0]
     print(videoId)
 
+    youtube = build("youtube", "v3", developerKey=YOUTUBE_API_KEY)
+
     try:
         transcriptMachine = YouTubeTranscriptApi()
         fetchedTranscript = transcriptMachine.fetch(video_id=videoId)
         transcript = ""
         for snippet in fetchedTranscript:
             transcript=transcript + snippet.text + "\n"
-        return transcript
+        video_response = youtube.videos().list(
+            part="snippet",
+            id=videoId
+        ).execute()
+        description = ""
+        if "items" in video_response and len(video_response["items"]) > 0:
+            snippet = video_response["items"][0]["snippet"]
+            description = snippet.get("description", "")
+        else:
+            print("No video details found.")
+        return {
+            "description": description,
+            "transcript": transcript
+        }
     except NoTranscriptFound:
         print("No Transcripts")
     except Exception as e:
         print("Error:")
+
 
 def generateInstaRecipe(url):
     encodedString = urllib.parse.quote(url,safe="")
