@@ -63,8 +63,19 @@ def generate_recipe_from_tiktok(video_url: str):
         if not caption:
             print('No caption found.')
         if not transcript:
-            print('No transcript found in API Response.')
-            return
+            print('Finding Transcript')
+            api_url = f'https://api.scrapecreators.com/v1/tiktok/video/transcript?url={encoded_url}'
+            transcript_response = requests.get(api_url, headers=headers)
+
+            if transcript_response.status_code != 200:
+                print('Transcript fetch failed: ', transcript_response.text)
+
+            transcript_data = transcript_response.json()
+            transcript = transcript_data.get('transcript', "")
+
+            if not transcript_data:
+                print('No transcript found in API Response.')
+                return
 
         prompt = ChatPromptTemplate.from_template('''
             You are a cooking assistant. Given the following TikTok transcript and caption,
@@ -100,4 +111,4 @@ def generate_recipe_from_tiktok(video_url: str):
         return None
 
 if __name__ == "__main__":
-    generate_recipe_from_tiktok("https://www.tiktok.com/t/ZTMx2HWLf/")
+    generate_recipe_from_tiktok("https://www.tiktok.com/t/ZTMaanTGB/")
