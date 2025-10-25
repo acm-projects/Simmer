@@ -90,7 +90,7 @@ def set_preference():
   except Exception as e:
     return jsonify({"error": "An error occurred while updating preferences.", "details": str(e)}), 500
   
-@user_bp.route('/user/update_diet', methods=['PUT'])
+@user_bp.route('/user/dietary-restrictions', methods=['PUT'])
 def update_dietary_restrictions():
   try: 
     user_id, error_response, status_code = authorize_user()
@@ -130,7 +130,7 @@ def update_dietary_restrictions():
       'details' : str(e)
     }), 500
   
-@user_bp.route('/user/dietary_restrictions', methods=['GET'])
+@user_bp.route('/user/dietary-restrictions', methods=['GET'])
 def get_dietary_restrictions():
 
   try:
