@@ -120,13 +120,27 @@ def get_saved_recipes():
     
     recipe_ids = [r['recipe_id'] for r in saved_recipes_response.data]
 
-    recipes = (
+    favorites_response = (
+      supabase.table('user_favorites')
+      .select('recipe_id')
+      .eq('user_id', user_id)
+      .execute()
+    )
+
+    favorited_ids = {f['recipe_id'] for f in favorites_response.data}
+
+    recipes_response = (
       supabase.table('recipes')
-      .select('id, title, description, instructions, prep_time, cook_time, dietary_tags, created_at, ingredients(*)')
+      .select('id, title, description, instructions, prep_time, cook_time, dietary_tags, created_at, image_url, ingredients(*)')
       .in_('id', recipe_ids)
       .execute()
     )
-    return jsonify({'saved_recipes' : recipes.data}), 200
+
+    recipes = recipes_response.data
+    for r in recipes:
+      r['is_favorited'] = r['id'] in favorited_ids
+  
+    return jsonify({'saved_recipes' : recipes}), 200
   
   except Exception as e:
     print('ERROR', e)
