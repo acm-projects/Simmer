@@ -67,9 +67,47 @@ def ai_create_recipe():
     return jsonify({'message': 'Missing data: content.'}), 400
   content=data.get('content')
   recipeStr=createRecipe(content)
+  print(recipeStr)
   recipeJson=json.loads(recipeStr)
-  return jsonify({'message': recipeJson}), 200
+  ingredients=recipeJson['ingredients']
+  recipeJson.pop('ingredients')
 
+  title = recipeJson.get('title')
+  description = recipeJson.get('description', '')
+  instructions = recipeJson.get('instructions')
+  ai_instructions = recipeJson.get('ai_instructions')
+  prep_time = recipeJson.get('prep_time', 0)
+  cook_time = recipeJson.get('cook_time', 0)
+  dietary_tags = recipeJson.get('dietary_tags', [])
+
+  recipe = supabase.table('recipes').insert({
+      'title' : title,
+      'description' : description,
+      'instructions' : instructions,
+      'ai_instructions': ai_instructions,
+      'prep_time' : prep_time,
+      'cook_time' : cook_time,
+      'dietary_tags' : dietary_tags,
+      'created_by' : '5bf7dcc0-0f2b-4d9f-a601-d3d92b72d02d' #temporoary id
+  }).execute()
+
+  if not recipe.data:
+    return jsonify({'error': 'Failed to create recipe'}), 400
+    
+  recipe_id = recipe.data[0]['id']
+  
+  for ing in ingredients:
+    supabase.table('ingredients').insert({
+      'recipe_id' : recipe_id,
+      'name' : ing.get('name'),
+      'quantity' : ing.get('quantity'),
+      'unit' : ing.get('unit'),
+      'is_allergen' : ing.get('is_allergen', False)
+    }).execute()
+
+
+  return jsonify({'message': recipeJson}), 200
+    
     
 @recipe_bp.route("/toggle_favorite", methods=["POST"])
 def toggle_favorite():

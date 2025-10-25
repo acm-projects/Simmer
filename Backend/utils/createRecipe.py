@@ -16,16 +16,21 @@ def createRecipe(content):
   the content could range from a webscrapted content from a blog and a video transcript
   Make reasonable assumptions about prep and cook time if not stated.
   Infer the ingredients list based on the context and instructions provided in the transcript.
-  for the instructios, please humanize them were the sound conversational.
+  for the ai_instructios, please humanize them were the sound conversational but leave instructions verbatim.
 
   Transcript:
 
-  Strictly output *only* the recipe JSON is this format (no markdown, no extra text):
+  Strictly output *only* the recipe JSON is this format (no markdown, no extra text) so i can json.loads your output in python:
 
   {{
     "title": "",
     "description": "",
     "instructions": {{
+      "steps": [
+        {{"step": 1, "description": ""}}
+      ]
+    }},
+    "ai_instructions": {{
       "steps": [
         {{"step": 1, "description": ""}}
       ]
