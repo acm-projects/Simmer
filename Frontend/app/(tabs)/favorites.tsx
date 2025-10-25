@@ -18,14 +18,9 @@ import { ArrowLeft } from 'lucide-react-native';
 
 export default function FavoritesScreen() {
  return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView style={styles.container}>
      <View style={{ justifyContent: 'center', alignItems: 'center'}}>
      <Text style={styles.text}>Favorites</Text>
-     </View>
-
-
-     <View>
-     <ArrowLeft  size={20} style={styles.arrow}/>
      </View>
 
 
@@ -50,11 +45,8 @@ export default function FavoritesScreen() {
 const styles = StyleSheet.create({
   container: {
    flex: 1,
-   backgroundColor: '#fce6dbff',
- },
- content: {
-   padding: 1,
-   top: 50,
+   backgroundColor: '#f5ebe6ff',
+   paddingTop: 65,
  },
  text: {
    fontSize: 25,

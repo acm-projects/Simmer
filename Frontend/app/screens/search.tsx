@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
 import { ArrowLeft } from 'lucide-react-native';
+import { router } from 'expo-router';
 
 
 export default function SearchScreen() {
@@ -8,7 +9,9 @@ export default function SearchScreen() {
 <ScrollView style={styles.container}>
     <View>
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <TouchableOpacity onPress={() => router.back()}>
     <ArrowLeft size={20} style={{margin: 5}}/>
+    </TouchableOpacity>
     <View style={[styles.greenBox, {width: '85%'}]}>
         <Text style={styles.text}>Search</Text>
     </View>
@@ -167,7 +170,7 @@ export default function SearchScreen() {
 const styles = StyleSheet.create({
    container: {
     flex: 1,
-    backgroundColor: '#fce6dbff',
+    backgroundColor: '#f5ebe6ff',
     paddingTop: 70,
     paddingLeft: 15,
     paddingRight: 15,

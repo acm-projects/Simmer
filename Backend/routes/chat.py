@@ -83,9 +83,6 @@ def create_chat():
     download_name='intro.mp3'
   ), 200
 
-
-
-
 @chat_bp.route("/chat", methods=["POST"])
 def chat():
 

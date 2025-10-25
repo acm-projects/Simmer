@@ -5,12 +5,9 @@ import { StyleSheet, Text, View, ScrollView } from 'react-native';
 import SmallCard from "@/components/smallCard";
 import LargeCard from "@/components/largeCard";
 import CornerIcon from "@/components/cornerIcon";
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { Link } from 'expo-router';
-import { Menu } from 'lucide-react-native';
+import MyCarousel from "@/components/carousel";
+
 
 export default function HomeScreen() {
   return (
@@ -26,45 +23,40 @@ export default function HomeScreen() {
     </View>
     
     <Text style={styles.text}>What are you cooking today?</Text>
-  
-    <View style={styles.container}>
-      <Text style={styles.subtitle}>Recipe Suggestions</Text>
-      <LargeCard/>
-      <View style={{margin: 20}}>
-      <View style={{backgroundColor: '#9BA760', borderRadius: 30, paddingBottom: 10, paddingLeft: 10, paddingRight: 10,}}>
-        <Text style={[styles.subtitle, {color: '#fff' }]}>Your Recipes</Text>
-        <Link href='/screens/cookingMode'>
+
+      
+<Text style={styles.subtitle}>Favorites</Text>
+      <View style={styles.greenBox}>
+        
         
         <View style={styles.grid}>
-                <View style={styles.gridItem}>
-          <SmallCard/>
-        </View>
+          <MyCarousel />
         
-        
-         <View style={styles.gridItem}>
-          <SmallCard/>
         </View>
-        </View>
-        </Link>
+       
   
       </View>
+   
+<LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
 
-   <View style={styles.grid}>
-        <View style={styles.gridItem}>
-          <SmallCard/>
-        </View>
-        
-         <View style={styles.gridItem}>
-          <SmallCard/>
-        </View>
-      </View>
-      </View>
+  
+     
+
+    <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
 
 
+    <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+
+    <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+
+<LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+
+
+
+  
 
           <StatusBar style="auto" />
           
-        </View>
          </ScrollView>
   );
 }
@@ -72,22 +64,20 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fce6dbff',
+    backgroundColor: '#f5ebe6ff',
+   
   },
   content:{
-    padding: 1,
     top: 50,
   },
   gridItem: {
     flex: 1, // Ensures items take equal space in a row
-
-    justifyContent: 'center',
     alignItems: 'center',
   },
   grid:{
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly'
     
   },
   title:{
@@ -99,12 +89,15 @@ const styles = StyleSheet.create({
   text:{
     fontSize: 15,
     paddingLeft: 15,
+    color: 'black',
+  
   },
   subtitle:{
-    fontSize: 20,
-    color: '#262e05ff',
-    paddingLeft: 15,
+    fontSize: 25,
+    paddingLeft: 30,
     paddingTop: 15,
+    color: 'black',
+    alignSelf:'flex-start',
   },  
   row: {
     flexDirection: 'row',
@@ -116,5 +109,18 @@ const styles = StyleSheet.create({
     margin: 5,
     marginRight: 8,
     marginTop: 15,
+  },
+  greenBox:{
+    backgroundColor: '#9BA760', 
+    borderRadius: 0, 
+    paddingBottom: 15,
+    paddingTop: 10,
+  
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+    marginTop: 5,
+    paddingHorizontal: 20,
+
   }
 });

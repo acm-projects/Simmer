@@ -5,7 +5,6 @@ from utils.createRecipe import createRecipe
 import json
 recipe_bp = Blueprint('recipe', __name__)
 
-
 @recipe_bp.route("/create_recipe", methods=["POST"])
 def create_recipe():
   try:
@@ -23,6 +22,7 @@ def create_recipe():
     cook_time = data.get('cook_time', 0)
     dietary_tags = data.get('dietary_tags', [])
     ingredients = data.get('ingredients', [])
+    image_url = data.get('image_url', '')
 
     if not title or not instructions:
       return jsonify({'error' : 'title and instructions are requried'}), 400
@@ -34,6 +34,7 @@ def create_recipe():
       'prep_time' : prep_time,
       'cook_time' : cook_time,
       'dietary_tags' : dietary_tags,
+      'image_url' : image_url,
       'created_by' : user_id
     }).execute()
 
@@ -149,4 +150,80 @@ def toggle_favorite():
   
   except Exception as e:
     print('ERROR', e)
-    return jsonify({"error": "Internal Server Error", "details": str(e)}), 500 
+    return jsonify({"error": "Internal Server Error", "details": str(e)}), 500
+  
+@recipe_bp.route("/user/saved_recipes", methods=["GET"])
+def get_saved_recipes():
+  try:
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
+    
+    saved_recipes_response = (
+      supabase.table('user_saved_recipes')
+      .select('recipe_id')
+      .eq('user_id', user_id)
+      .execute()
+    )
+
+    if not saved_recipes_response.data:
+      return jsonify({'message' : 'No saved recipes found.', 'recipes' : [] }), 200
+    
+    recipe_ids = [r['recipe_id'] for r in saved_recipes_response.data]
+
+    favorites_response = (
+      supabase.table('user_favorites')
+      .select('recipe_id')
+      .eq('user_id', user_id)
+      .execute()
+    )
+
+    favorited_ids = {f['recipe_id'] for f in favorites_response.data}
+
+    recipes_response = (
+      supabase.table('recipes')
+      .select('id, title, description, instructions, prep_time, cook_time, dietary_tags, created_at, image_url, ingredients(*)')
+      .in_('id', recipe_ids)
+      .execute()
+    )
+
+    recipes = recipes_response.data
+    for r in recipes:
+      r['is_favorited'] = r['id'] in favorited_ids
+  
+    return jsonify({'saved_recipes' : recipes}), 200
+  
+  except Exception as e:
+    print('ERROR', e)
+    return jsonify({'error' : 'Internal Server Error', 'details' : str(e)}), 500
+
+@recipe_bp.route("/user/favorited_recipes", methods=["GET"])
+def get_favorited_recipes():
+  try:
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
+    
+    favorited_recipes_response = (
+      supabase.table('user_favorites')
+      .select('recipe_id')
+      .eq('user_id', user_id)
+      .execute()
+    )
+
+    if not favorited_recipes_response.data:
+      return jsonify({'message' : 'No favorited recipes found.', 'recipes' : [] }), 200
+    
+    recipe_ids = [r['recipe_id'] for r in favorited_recipes_response.data]
+
+    recipes = (
+      supabase.table('recipes')
+      .select('id, title, description, instructions, prep_time, cook_time, dietary_tags, created_at, ingredients(*)')
+      .in_('id', recipe_ids)
+      .execute()
+    )
+    return jsonify({'favorited_recipes' : recipes.data}), 200
+  
+  except Exception as e:
+    print('ERROR', e)
+    return jsonify({'error' : 'Internal Server Error', 'details' : str(e)}), 500

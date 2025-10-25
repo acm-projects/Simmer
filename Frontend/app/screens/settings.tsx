@@ -1,6 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity} from 'react-native';
 import { ArrowLeft } from 'lucide-react-native';
+import { User } from 'lucide-react-native';
+import { LogOut } from 'lucide-react-native';
+import { ChevronRight } from 'lucide-react-native';
+import { router } from 'expo-router';
 
 
 
@@ -9,22 +13,29 @@ export default function SettingScreen() {
 <ScrollView style={styles.container}>
   <View>
     <View style={{ justifyContent: 'center', alignItems: 'center'}}>
-        <Text style={styles.title}>Recipes</Text>
+        <Text style={styles.title}>Settings</Text>
         </View>
    
    
-        <View>
+        <TouchableOpacity onPress={() => router.back()}>
         <ArrowLeft size={20} style={styles.arrow}/>
-        </View>
+        </TouchableOpacity>
 
-
-    
+<View style={{paddingTop: 50}}>
+    <View style={styles.info}>
+      
+      <User />
      <Text style={styles.text}>Profile</Text>
-     <Text style={styles.info}>Name</Text>
-     <Text style={styles.info}>Email</Text>
-     <Text style={styles.info}>Allergens</Text>
+     <ChevronRight style={{position: 'absolute', right: 20}}/>
+     </View>
+     <View style={styles.info}>
+     <LogOut/>
      <Text style={styles.text}>Log Out</Text>
+     <ChevronRight style={{position: 'absolute', right: 20}}/>
+      </View>
      <Text style={styles.delete}>Delete Account</Text>
+    </View>
+     
   </View>
 </ScrollView>
   )
@@ -34,7 +45,7 @@ export default function SettingScreen() {
 const styles = StyleSheet.create({
    container: {
     flex: 1,
-    backgroundColor: '#fce6dbff',
+    backgroundColor: '#f5ebe6ff',
     paddingTop: 70,
     paddingLeft: 15,
     paddingRight: 15,
@@ -52,12 +63,13 @@ const styles = StyleSheet.create({
     info:{
     fontSize: 18,
     paddingLeft: 25,
-    padding: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
      delete:{
     fontSize: 15,
-    paddingLeft: 15,
-    padding: 8,
+    paddingLeft: 25,
+    padding: 10,
     color: 'red'
   },
     arrow: {

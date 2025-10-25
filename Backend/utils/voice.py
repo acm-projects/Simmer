@@ -3,12 +3,18 @@ from gtts import gTTS
 from youtube_transcript_api import YouTubeTranscriptApi, NoTranscriptFound
 from google.oauth2 import service_account
 from google.cloud import speech
+from dotenv import load_dotenv
+import requests
+import json
+import urllib
+
+load_dotenv()
+SCRAPECREATORS_API_KEY : str = os.environ.get("SCRAPECREATORS_KEY")
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 key_path = os.path.join(current_dir, '..', 'sttKey.json')
 credentials = service_account.Credentials.from_service_account_file(key_path)
 client = speech.SpeechClient(credentials=credentials)
-
 #fileName= path to recording file (will switch for streaming later)
 def stt(audio_data):
     # with open(fileName,"rb") as file:
@@ -33,8 +39,7 @@ def speak(words):
     tts = gTTS(words)
     tts.save("recipe.mp3")
 
-def generateRecipe():
-    url = input("Youtube Video Link: ")
+def generateYoutubeRecipe(url):
     if "v=" in url:
         videoId = url.split("v=")[-1]
     elif "shorts/" in url:
@@ -49,16 +54,30 @@ def generateRecipe():
         transcript = ""
         for snippet in fetchedTranscript:
             transcript=transcript + snippet.text + "\n"
-        with open("recipe.txt","w") as file:
-            file.write(transcript)
-            # speak(text)
-        with open("recipe.txt", "r") as file:
-            text = file.read()
-            speak(text)
-        # os.remove("recipe.txt")
+        return transcript
     except NoTranscriptFound:
         print("No Transcripts")
     except Exception as e:
         print("Error:")
 
-    print(transcript)
+def generateInstaRecipe(url):
+    encodedString = urllib.parse.quote(url,safe="")
+    urlTranscript = f"https://api.scrapecreators.com/v2/instagram/media/transcript?url={encodedString}"
+    headers = {
+        "x-api-key": SCRAPECREATORS_API_KEY
+    }
+
+    urlDescription = f"https://api.scrapecreators.com/v1/instagram/post?url={encodedString}"
+    responseTranscript = requests.get(urlTranscript, headers=headers)
+    responseDescription = requests.get(urlDescription, headers=headers)
+    dataTranscript = responseTranscript.json()
+    dataDescription = responseDescription.json()
+    transcript = {}
+    if ("transcripts" in dataTranscript.keys()):
+        transcript["Recipe: "] = dataTranscript["transcripts"][0]["text"]
+    else:
+        for i in range(0,len(dataTranscript.keys())-2):
+            if dataTranscript[f"{i}"]["text"]!=None:
+                transcript[f"Recipe{i}"] = dataTranscript[f"{i}"]["text"]
+    transcript["Description"] = dataDescription["data"]["xdt_shortcode_media"]["edge_media_to_caption"]["edges"][0]["node"]["text"]
+    return transcript
