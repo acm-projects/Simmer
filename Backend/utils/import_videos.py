@@ -3,22 +3,52 @@ import json
 import requests
 import urllib.parse
 from dotenv import load_dotenv
-import google.generativeai as genai
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import PydanticOutputParser
+from langchain_core.messages import HumanMessage
+from pydantic import BaseModel, Field
+from typing import List
 
 load_dotenv()
-GEMINI_API_KEY : str = os.environ.get("GOOGLE_API_KEY")
-SCRAPECREATORS_API_KEY : str = os.environ.get("SCRAPECREATORS_KEY")
+GEMINI_API_KEY: str = os.environ.get("GOOGLE_API_KEY")
+SCRAPECREATORS_API_KEY: str = os.environ.get("SCRAPECREATORS_KEY")
 
-genai.configure(api_key=GEMINI_API_KEY)      
+class InstructionStep(BaseModel):
+    step: int
+    description: str
 
-def generate_recipe_from_tiktok(video_url):
+class Instructions(BaseModel):
+    steps: List[InstructionStep]
+
+class Ingredient(BaseModel):
+    name: str
+    quantity: str
+    unit: str
+    is_allergen: bool
+
+class Recipe(BaseModel):
+    title: str
+    description: str
+    instructions: Instructions
+    prep_time: int
+    cook_time: int
+    dietary_tags: List[str]
+    ingredients: List[Ingredient]
+
+llm = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash",
+    temperature=0.2,
+    google_api_key=GEMINI_API_KEY
+)
+
+parser = PydanticOutputParser(pydantic_object=Recipe)
+
+def generate_recipe_from_tiktok(video_url: str):
     try:
-
         encoded_url = urllib.parse.quote(video_url, safe="")
         api_url = f'https://api.scrapecreators.com/v2/tiktok/video?url={encoded_url}&get_transcript=true'
-        headers = {
-            'x-api-key' : SCRAPECREATORS_API_KEY
-        }
+        headers = {'x-api-key': SCRAPECREATORS_API_KEY}
         response = requests.get(api_url, headers=headers)
 
         if response.status_code != 200:
@@ -32,62 +62,42 @@ def generate_recipe_from_tiktok(video_url):
 
         if not caption:
             print('No caption found.')
-
         if not transcript:
             print('No transcript found in API Response.')
             return
+
+        prompt = ChatPromptTemplate.from_template('''
+            You are a cooking assistant. Given the following TikTok transcript and caption,
+            generate a structured recipe object in strict JSON format matching this schema:
+            {format_instructions}
+                                                  
+            Fill out the ingredients in the JSON solele based on the caption. Make sure the quantity and unit fields match what is in the caption, but infer is_allergen attributes.
+            If caption is empty and/or doesn't list ingredients, infer ingredient list based on context of the transcript.
+            Ingredient quantities MUST be strictly numerical, so if quantity is not explicity stated in the caption, infer the quantity and respective unit.
+
+            Transcript:
+            {transcript}
+
+            Caption:
+            {caption}
+
+            Include reasonable prep_time and cook_time estimates and steps.
+            ''')
         
-        model = genai.GenerativeModel('gemini-2.5-flash')
+        final_prompt = prompt.format_messages(
+            transcript = transcript,
+            caption = caption,
+            format_instructions = parser.get_format_instructions()
+        )
 
-        prompt = f'''
-        You are a cooking assistant. Analyze this cooking transcript and respective caption from a TikTok video and turn it into a structure recipe JSON ONLY.
-        Make reasonable assumptions about prep and cook time if not stated.
-        Fill out the ingredients in the JSON based on the caption. Make sure the quantity and unit fields match what is in the caption.
-        If caption is empty and/or doesn't list ingredients, infer ingredient list based on context of the transcript.
-
-        Transcript:
-        {transcript}
-
-        Caption:
-        {caption}
-
-        Strictly output *only* the recipe JSON is this format (no markdown, no extra text):
-
-        {{
-          "title": "",
-          "description": "",
-          "instructions": {{
-            "steps": [
-              {{"step": 1, "description": ""}}
-            ]
-          }},
-          "prep_time": 0,
-          "cook_time": 0,
-          "dietary_tags": [],
-          "ingredients": [
-            {{"name": "", "quantity": "", "unit": "", "is_allergen": false}}
-          ]
-        }}
-        '''
-
-        gemini_response = model.generate_content(prompt)
-        recipe_text = gemini_response.text.strip()
-
-        try:
-            if recipe_text.startswith('```'):
-                recipe_text = recipe_text.strip('` \n').replace('json\n', '')
-
-            recipe_json = json.loads(recipe_text)
-            print(json.dumps(recipe_json, indent=2))
-            return recipe_json
-
-        except json.JSONDecodeError:
-            print('Could not parse JSON, showing raw Gemini output instead:\n')
-            print(recipe_text)
-            return recipe_text
+        response = llm.invoke(final_prompt)
+        recipe = parser.parse(response.content)
+        print(json.dumps(recipe.model_dump(), indent=2))
+        return recipe.model_dump()
 
     except Exception as e:
-        print('Error: ', e)
+        print("Error:", e)
+        return None
 
 if __name__ == "__main__":
-    generate_recipe_from_tiktok("https://www.tiktok.com/t/ZTMaanTGB/")
+    generate_recipe_from_tiktok("https://www.tiktok.com/t/ZTMx2HWLf/")
