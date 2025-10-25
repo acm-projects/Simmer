@@ -1,9 +1,10 @@
 import {useState } from 'react'
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { ArrowLeft } from 'lucide-react-native';
 import { router } from 'expo-router';
 import CollapsibleSection from '@/components/collapsibleSection'
+import { Plus } from 'lucide-react-native';
 
 export default function SearchScreen() {
     const [search, setSearch] = useState('');
@@ -30,11 +31,17 @@ const [showTime, setShowTime] = useState(false);
 const [showProtein, setShowProtein] = useState(false);
 const [showType, setShowType] = useState(false);
 const [showAllergen, setShowAllergen] = useState(false);
+const [newAllergen, setNewAllergen] = useState('');
 
 
   return (
-<ScrollView style={styles.container}>
-    
+<View style={styles.container}>
+      <KeyboardAvoidingView 
+          style={{flex: 1}}
+          behavior={Platform.OS === "ios" ? "padding": undefined}
+          keyboardVerticalOffset={0}
+          >
+    <ScrollView>
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <TouchableOpacity onPress={() => router.back()}>
     <ArrowLeft size={20} style={{margin: 5}}/>
@@ -150,10 +157,18 @@ const [showAllergen, setShowAllergen] = useState(false);
     );
   })}
 
-    
+<View style={{flexDirection: 'row', alignItems: 'center', width: '90%'}}>
+    <Plus color={'white'} size={22}style={styles.plus}/>
     <View style={[styles.greenBox, {width: '90%', marginTop: 10,}]}>
         
-        <Text style={styles.text}>+    Add Other</Text>
+        <TextInput 
+        style={styles.text}
+        placeholder='Add Other'
+        value={newAllergen}
+        onChangeText={setNewAllergen}
+        ></TextInput>
+      
+    </View>
     </View>
     </View>
     </CollapsibleSection>
@@ -163,9 +178,10 @@ const [showAllergen, setShowAllergen] = useState(false);
     </TouchableOpacity>
     </View>
     </View> 
-   
+    </ScrollView>
+   </KeyboardAvoidingView>
     
-</ScrollView>
+</View>
   )
 
 }
@@ -190,7 +206,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginRight: 10,
     borderRadius: 100,
-
   },
   gridItem: {
     flex: 1, // Ensures items take equal space in a row
@@ -247,6 +262,13 @@ const styles = StyleSheet.create({
     right: 5, 
     fontSize: 15
 
+  },
+  plus:{
+    backgroundColor: '#262e05ff', 
+    borderRadius: 100,  
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    marginTop: 10,
   }
 
  

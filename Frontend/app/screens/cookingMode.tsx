@@ -4,7 +4,7 @@ import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from 'rea
 import { ArrowLeft } from 'lucide-react-native';
 import { useFonts, Orbitron_400Regular, Orbitron_700Bold} from '@expo-google-fonts/orbitron'
 import {Timer} from 'react-native-flip-timer-fixed';
-import { Plus } from 'lucide-react-native';
+import { Plus, Minus, Play, Pause } from 'lucide-react-native';
 import { router } from 'expo-router';
 
 export default function SettingScreen() {
@@ -14,6 +14,7 @@ export default function SettingScreen() {
       });
       const [play, setPlay] = useState(true);
       const [seconds, setSeconds] = useState(120);
+      const [isVisible, setVisible] = useState(false);
       
 
   return (
@@ -30,14 +31,50 @@ export default function SettingScreen() {
         </View>
       </View>
   
-      <View style={{alignItems: 'center', marginTop: 20}}>
+      <View style={{ marginTop: 20}}>
         <Image source={require('../../assets/images/Simmer_Mascot.png')} style={styles.mascot}/>
-        
-        <TouchableOpacity 
+        <View style={{flexDirection: 'row', width: '100%' }}>
+        {isVisible && (
+          <TouchableOpacity 
           onPress={() => setSeconds((prev) => prev + 60)} 
-          style={{backgroundColor: '#262e05ff', borderRadius: 100, width: 30, height: 30, alignItems: 'center', justifyContent: 'center', marginBottom: 10, marginTop: 10}}>
+          style={[styles.timerButton,{ position: 'relative', left: '46%' }]}>
           <Plus color='white'/>
-        </TouchableOpacity>
+        </TouchableOpacity> )}
+          {isVisible && (
+          <TouchableOpacity 
+          onPress={() => setSeconds((prev) => prev + 3600)} 
+          style={[styles.timerButton, {position: 'relative', left: 11}]}>
+          <Plus color='white'/>
+        </TouchableOpacity> )}
+      
+
+          {isVisible && (  <TouchableOpacity 
+          style={[styles.editButton, {position: 'relative', left: '66%'}]}
+          onPress={() => {setVisible(false); setPlay(true)}}>
+        <Text style={styles.text}>Done</Text>
+          </TouchableOpacity>)}
+
+        </View>
+<View style={{flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 4}}>
+      {!play && !isVisible && (  <TouchableOpacity
+        style={styles.timerButton}
+        onPress={() => setPlay(true)}>
+          <Play color={'white'} size={18}/>
+        </TouchableOpacity>)}
+        {play && !isVisible && (
+         <TouchableOpacity
+        style={styles.timerButton}
+        onPress={() => setPlay(false)}>
+          <Pause color={'white'} size={18}/>
+        </TouchableOpacity>)}
+          {!isVisible && (  <TouchableOpacity 
+          style={[styles.editButton,]}
+          onPress={() => {setVisible(true);setPlay(false);}}>
+        <Text style={styles.text}>Edit</Text>
+          </TouchableOpacity>)}
+          </View>
+    
+       
 
         <Timer
           time={seconds}
@@ -53,6 +90,22 @@ export default function SettingScreen() {
             cardStyle: {backgroundColor: '#262e05ff', borderRadius: 0}
           }}
         />
+      <View style={{flexDirection: 'row'}}>
+         {isVisible && ( <TouchableOpacity 
+          onPress={() => setSeconds((prev) => prev - 60)} 
+          style={[styles.timerButton, { position: 'relative', left: '46%' }]}>
+          <Minus color='white'/>
+        </TouchableOpacity>)}
+
+        
+          {isVisible && (
+          <TouchableOpacity 
+          onPress={() => setSeconds((prev) => prev - 3600)} 
+          style={[styles.timerButton, {position: 'relative', left: 11}]}>
+          <Minus color='white'/>
+        </TouchableOpacity>)}
+
+         </View>
       </View>
     </ScrollView>
   )
@@ -73,8 +126,7 @@ const styles = StyleSheet.create({
   },
     text:{
     fontSize: 18,
-    paddingLeft: 15,
-    padding: 10,
+    color: 'white'
   },
     info:{
     fontSize: 18,
@@ -104,5 +156,25 @@ const styles = StyleSheet.create({
   mascot: {
       height: 400,
       width: 400,
+  },
+  timerButton:{
+    backgroundColor: '#262e05ff', 
+    borderRadius: 100, 
+    width: 30, 
+    height: 30, 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    marginBottom: 10, 
+    marginTop: 10
+  },
+  editButton:{
+    backgroundColor: '#262e05ff', 
+    borderRadius: 100, 
+    width: 60, 
+    height: 30,
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    marginBottom: 10, 
+    marginTop: 10
   }
 });
