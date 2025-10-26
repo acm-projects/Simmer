@@ -77,9 +77,9 @@ def add_recipe():
 @recipe_bp.route("/import-recipe", methods=["POST"])
 def import_recipe():
   try:
-    user_id, error_response, status_code = authorize_user()
-    if error_response:
-      return error_response, status_code
+    # user_id, error_response, status_code = authorize_user()
+    # if error_response:
+    #   return error_response, status_code
     
     data = request.get_json()
     if not data or not all(key in data for key in ['content']):

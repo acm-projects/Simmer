@@ -224,3 +224,46 @@ def categorize_protein_types(ingredients):
   except Exception as e:
       print("Error parsing protein categories:", e)
       return None
+  
+def generate_blog_transcript_and_caption(title: str, text: str) -> dict:
+  try:
+    llm = ChatGoogleGenerativeAI(
+        model='gemini-2.5-flash',
+        temperature=0.7,
+        google_api_key=GEMINI_API_KEY
+    )
+
+    system_msg = SystemMessage(
+        content=(
+            'You are a helpful recipe assistant that summarizes blog posts. '
+            'Given a long blog post about a recipe, generate:\n'
+            '1. A pseudo transcript: a step-by-step narrative as if spoken aloud.\n'
+            '2. A caption: a short, catchy one-liner summarizing the recipe.\n'
+            'Output only valid JSON with double quotes.'
+        )
+    )
+
+    human_msg = HumanMessage(
+        content=(
+            f"Blog Title: {title}\n\n"
+            f"Full Text:\n{text[:8000]}\n\n"
+            "Return JSON in this format:\n"
+            "{\n"
+            '  "transcript": "A detailed but natural-sounding summary...",\n'
+            '  "caption": "A short catchy line about the recipe."\n'
+            "}"
+        )
+    )
+
+    response = llm.invoke([system_msg, human_msg])
+    ai_output = response.content.strip()
+
+    if ai_output.startswith("```"):
+      ai_output = ai_output.split("```")[1]
+      ai_output = ai_output.replace("json", "").strip()
+
+    return json.loads(ai_output)
+
+  except Exception as e:
+      print(f'Error generating blog transcript: {e}')
+      return None
