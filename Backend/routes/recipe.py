@@ -74,12 +74,12 @@ def add_recipe():
     print('ERROR', e)
     return jsonify({'error' : 'Internal Server Error', 'details' : str(e)}), 500
 
-@recipe_bp.route("/import-recipe", methods=["POST"])
+@recipe_bp.route('/import-recipe', methods=['POST'])
 def import_recipe():
   try:
-    # user_id, error_response, status_code = authorize_user()
-    # if error_response:
-    #   return error_response, status_code
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
     
     data = request.get_json()
     if not data or not all(key in data for key in ['content']):
@@ -102,7 +102,7 @@ def import_recipe():
     print('ERROR', e)
     return jsonify({'error' : 'Internal Server Error', 'details' : str(e)}), 500
     
-@recipe_bp.route("/toggle-favorite", methods=["POST"])
+@recipe_bp.route('/toggle-favorite', methods=['POST'])
 def toggle_favorite():
   try:
 
@@ -144,7 +144,7 @@ def toggle_favorite():
     print('ERROR', e)
     return jsonify({"error": "Internal Server Error", "details": str(e)}), 500
   
-@recipe_bp.route("/saved-recipes", methods=["GET"])
+@recipe_bp.route('/saved-recipes', methods=['GET'])
 def get_saved_recipes():
   try:
     user_id, error_response, status_code = authorize_user()
@@ -189,7 +189,7 @@ def get_saved_recipes():
     print('ERROR', e)
     return jsonify({'error' : 'Internal Server Error', 'details' : str(e)}), 500
 
-@recipe_bp.route("/favorited-recipes", methods=["GET"])
+@recipe_bp.route('/favorited-recipes', methods=['GET'])
 def get_favorited_recipes():
   try:
     user_id, error_response, status_code = authorize_user()
@@ -216,6 +216,36 @@ def get_favorited_recipes():
     )
     return jsonify({'favorited_recipes' : recipes.data}), 200
   
+  except Exception as e:
+    print('ERROR', e)
+    return jsonify({'error' : 'Internal Server Error', 'details' : str(e)}), 500
+  
+@recipe_bp.route('/recipe/info', methods=['GET'])
+def get_recipe_info():
+  try:
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
+    
+    data = request.get_json()
+    recipe_id = data.get('recipe_id')
+
+    if not recipe_id:
+      return jsonify({'error' : 'recipe_id is required'}), 400
+    
+    recipe_response = (
+      supabase.table('recipes')
+      .select('id, title, description, instructions, prep_time, cook_time, dietary_tags, type, ingredients(*), image_url')
+      .eq('id', recipe_id)
+      .execute()
+    )
+
+    if not recipe_response.data:
+      return jsonify({'error' : 'Recipe not found'}), 404
+    
+    recipe = recipe_response.data[0]
+
+    return jsonify({'recipe' : recipe}), 200
   except Exception as e:
     print('ERROR', e)
     return jsonify({'error' : 'Internal Server Error', 'details' : str(e)}), 500
