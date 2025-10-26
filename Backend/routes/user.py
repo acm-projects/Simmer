@@ -4,7 +4,7 @@ from utils.supabase import supabase
 from postgrest.exceptions import APIError as AuthApiError
 
 user_bp = Blueprint('main', __name__)
-@user_bp.route("/create_user", methods=["POST"])
+@user_bp.route("/create-user", methods=["POST"])
 def create_user():
   data = request.get_json()
   auth_header = request.headers.get('Authorization')
@@ -90,7 +90,7 @@ def set_preference():
   except Exception as e:
     return jsonify({"error": "An error occurred while updating preferences.", "details": str(e)}), 500
   
-@user_bp.route('/user/update_diet', methods=['PUT'])
+@user_bp.route('/user/dietary-restrictions', methods=['PUT'])
 def update_dietary_restrictions():
   try: 
     user_id, error_response, status_code = authorize_user()
@@ -130,7 +130,7 @@ def update_dietary_restrictions():
       'details' : str(e)
     }), 500
   
-@user_bp.route('/user/dietary_restrictions', methods=['GET'])
+@user_bp.route('/user/dietary-restrictions', methods=['GET'])
 def get_dietary_restrictions():
 
   try:
