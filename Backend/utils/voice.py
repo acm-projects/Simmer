@@ -2,16 +2,7 @@ import os
 from gtts import gTTS
 from google.oauth2 import service_account
 from google.cloud import speech
-from dotenv import load_dotenv
-import requests
-import json
-import urllib
-from googleapiclient.discovery import build
 from google.cloud import texttospeech
-
-load_dotenv()
-SCRAPECREATORS_API_KEY : str = os.environ.get("SCRAPECREATORS_KEY")
-YOUTUBE_API_KEY: str = os.environ.get("YOUTUBE_API_KEY")
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 key_path = os.path.join(current_dir, '..', 'sttKey.json')
@@ -24,6 +15,8 @@ voice = texttospeech.VoiceSelectionParams(
 audio_config = texttospeech.AudioConfig(
     audio_encoding=texttospeech.AudioEncoding.MP3
 )
+
+
 #fileName= path to recording file (will switch for streaming later)
 
 def stt(audio_data):
@@ -45,6 +38,7 @@ def stt(audio_data):
 def speak(words):
     tts = gTTS(words)
     tts.save("recipe.mp3")
+
 def speaks(text):
     synthesis_input = texttospeech.SynthesisInput(text=text)
     response = clientSpeaker.synthesize_speech(
@@ -54,10 +48,3 @@ def speaks(text):
         # Write the response to the output file.
         out.write(response.audio_content)
         print('Audio content written to file "output.mp3"')
-
-# speaks("To make the perfect cake, the first step is to mix all of the dry ingredients.")
-
-voices = clientSpeaker.list_voices()
-
-for v in voices.voices:
-    print(v.name)
