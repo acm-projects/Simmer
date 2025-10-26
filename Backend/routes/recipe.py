@@ -10,9 +10,9 @@ recipe_bp = Blueprint('recipe', __name__)
 @recipe_bp.route('/add-recipe', methods=['POST'])
 def add_recipe():
   try:
-    # user_id, error_response, status_code = authorize_user()
-    # if error_response:
-    #   return error_response, status_code
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
     
     data = request.get_json()
 
@@ -48,7 +48,7 @@ def add_recipe():
         'protein' : protein,
         'type' : type,
         'image_url' : image_url,
-        'created_by' : '5bf7dcc0-0f2b-4d9f-a601-d3d92b72d02d'
+        'created_by' : user_id
     }).execute()
 
     if not recipe.data:
@@ -77,9 +77,9 @@ def add_recipe():
 @recipe_bp.route("/import-recipe", methods=["POST"])
 def import_recipe():
   try:
-    # user_id, error_response, status_code = authorize_user()
-    # if error_response:
-    #   return error_response, status_code
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
     
     data = request.get_json()
     if not data or not all(key in data for key in ['content']):
