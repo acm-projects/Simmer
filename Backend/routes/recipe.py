@@ -144,7 +144,7 @@ def toggle_favorite():
     print('ERROR', e)
     return jsonify({"error": "Internal Server Error", "details": str(e)}), 500
   
-@recipe_bp.route("/user/saved-recipes", methods=["GET"])
+@recipe_bp.route("/saved-recipes", methods=["GET"])
 def get_saved_recipes():
   try:
     user_id, error_response, status_code = authorize_user()
@@ -174,7 +174,7 @@ def get_saved_recipes():
 
     recipes_response = (
       supabase.table('recipes')
-      .select('id, title, description, instructions, prep_time, cook_time, dietary_tags, created_at, image_url, ingredients(*)')
+      .select('id, title, description, prep_time, cook_time, created_at, image_url')
       .in_('id', recipe_ids)
       .execute()
     )
@@ -189,7 +189,7 @@ def get_saved_recipes():
     print('ERROR', e)
     return jsonify({'error' : 'Internal Server Error', 'details' : str(e)}), 500
 
-@recipe_bp.route("/user/favorited-recipes", methods=["GET"])
+@recipe_bp.route("/favorited-recipes", methods=["GET"])
 def get_favorited_recipes():
   try:
     user_id, error_response, status_code = authorize_user()
@@ -210,7 +210,7 @@ def get_favorited_recipes():
 
     recipes = (
       supabase.table('recipes')
-      .select('id, title, description, instructions, prep_time, cook_time, dietary_tags, created_at, ingredients(*)')
+      .select('id, title, description, prep_time, cook_time, created_at, image_url')
       .in_('id', recipe_ids)
       .execute()
     )
