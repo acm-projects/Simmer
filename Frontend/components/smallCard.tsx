@@ -1,6 +1,7 @@
 
-import { StyleSheet, Text, View, Image, ImageSourcePropType } from 'react-native';
+import { StyleSheet, Text, View, Image, ImageSourcePropType, Dimensions } from 'react-native';
 import FavoriteIcon from '@/components/favoriteIcon';
+import WavyBox from '@/components/wavyBox'
 import { Heart } from 'lucide-react-native';
 import { Link } from 'expo-router';
 import { Nunito_400Regular } from '@expo-google-fonts/nunito/400Regular';
@@ -13,19 +14,21 @@ interface Props{
 const SmallCard: React.FC<Props>= ({title, image }) => {
 
   return (
-    <Link href="../screens/description" style={styles.container}>
-         <View style={styles.container}>
-       <View style={styles.icon}>
-         <Heart size={22} color="black"/>
-         </View>
-         <Image source={image} style={styles.image}/>
-      <View style={styles.card}>
-       
-          <Text style={styles.title}>{title}</Text> 
-  
+    <Link href="../screens/description">
+       <View style={styles.container}>
         
-       </View>
-    </View>
+       <Image source={image} style={styles.image}/>
+          
+          <View style={styles.icon}>
+          <Heart size={20} color="black"/>
+          </View>
+        <View style={styles.card}>
+          <Text style={styles.title}>{title}</Text> 
+          <Text style={styles.text}>Time: 50 min</Text>
+          <WavyBox/>
+          </View>
+        </View>
+
     </Link>
   )
 }
@@ -34,6 +37,8 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     margin: 10,
+    height: 200,
+    width: 150,
     shadowColor: '#000000ff',
     shadowOffset:{width: 0, height: 0},
     shadowOpacity: 0.2,
@@ -41,35 +46,53 @@ const styles = StyleSheet.create({
   },
   image:{
     width: 150,
-    height: 160,
+    height: 140,
     borderRadius: 15,
-    bottom: 0
+    position: 'absolute',
+    bottom: 40,
    
   },
   card: {
     width: 150,
-    backgroundColor: 'white',
+    backgroundColor: 'transparent',
     borderBottomLeftRadius: 15,
     borderBottomRightRadius: 15,
     zIndex: 1,
     position: 'absolute',
     bottom: 0,
-    padding: 10,
     alignItems: 'flex-start'
     
     },
   title:{
       fontSize: 18,
       color: '#262e05ff',
+      fontFamily: 'Nunito_700Bold',
+      flexWrap: 'wrap',
+      position: 'absolute',
+      bottom: 33,
+      paddingLeft: 13,
+      zIndex: 1,
+
+  },
+    text:{
+      fontSize: 13,
+      color: '#262e05ff',
       fontFamily: 'Nunito_600SemiBold',
-      width: 70,
-      flexWrap: 'wrap'
+      flexWrap: 'wrap',
+      position: 'absolute',
+      bottom: 15,
+      paddingLeft: 15,
+      zIndex: 1,
+
   },
   icon:{
-    position: 'relative',
-    top: 133,
-    left: 50,
-    zIndex: 2
+    position: 'absolute',
+    top:27,
+    right: 10,
+    zIndex: 2,
+    backgroundColor: 'white',
+    borderRadius: 100,
+    padding: 4,
   },
 });
 

@@ -120,6 +120,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginTop: 15,
     color: '#333',
+    fontFamily: 'Nunito_700Bold'
   },
   tagContainer: {
     flexDirection: 'row',
@@ -146,9 +147,11 @@ const styles = StyleSheet.create({
   tagText: {
     fontSize: 14,
     color: '#fff',
+    fontFamily:'Nunito_400Regular'
   },
   tagTextSelected: {
     color: '#FFFFFF',
+    fontFamily: 'Nunito_400Regular'
   },
   inputContainer: {
     flexDirection: 'row',
@@ -175,11 +178,12 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+    fontFamily: 'Nunito_400Regular'
   },
   title:{
     fontSize:24,
-    fontWeight: 'bold',
-    marginTop:10
+    marginTop:10,
+    fontFamily: 'Nunito_700Bold'
   },
     doneButton: {
     backgroundColor: '#2E321E',

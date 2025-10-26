@@ -1,5 +1,5 @@
 
-import { StyleSheet, Text, View, Image, ImageSourcePropType, } from 'react-native';
+import { StyleSheet, Text, View, Image, ImageSourcePropType,  } from 'react-native';
 import FavoriteIcon from '@/components/favoriteIcon';
 import { Clock2 } from 'lucide-react-native'
 import { Heart } from 'lucide-react-native';
@@ -13,6 +13,7 @@ interface Props{
   title: string;
   image: ImageSourcePropType; 
 }
+
 
 const LargeCard: React.FC<Props>= ({title, image}) => {
 
@@ -52,6 +53,7 @@ const styles = StyleSheet.create({
     shadowOffset:{width: 0, height: 0},
     shadowOpacity: 0.2,
     shadowRadius: 2,
+    alignItems: 'center',
   },
   content:{
         
@@ -75,7 +77,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start'
   },
   title:{
-      fontSize: 25,
+      fontSize: 27,
       color: '#06402B',
       paddingTop: 5,
       marginLeft: 10,
@@ -89,8 +91,9 @@ const styles = StyleSheet.create({
     zIndex: 2
   },
   time:{
-    fontSize: 13,
+    fontSize: 15,
     marginLeft: 4,
+    marginTop: 6,
     fontFamily: 'Nunito_400Regular',
    
   }
