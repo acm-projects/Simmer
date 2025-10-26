@@ -20,7 +20,7 @@ const SmallCard: React.FC<Props>= ({title, image }) => {
        <Image source={image} style={styles.image}/>
           
           <View style={styles.icon}>
-          <Heart size={20} color="black"/>
+          <Heart size={20} color="#9BA760"/>
           </View>
         <View style={styles.card}>
           <Text style={styles.title}>{title}</Text> 
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
   },
   image:{
     width: 150,
-    height: 140,
+    height: 130,
     borderRadius: 15,
     position: 'absolute',
     bottom: 40,
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
       fontFamily: 'Nunito_700Bold',
       flexWrap: 'wrap',
       position: 'absolute',
-      bottom: 33,
+      bottom: 30,
       paddingLeft: 13,
       zIndex: 1,
 
@@ -80,14 +80,14 @@ const styles = StyleSheet.create({
       fontFamily: 'Nunito_600SemiBold',
       flexWrap: 'wrap',
       position: 'absolute',
-      bottom: 15,
+      bottom: 12,
       paddingLeft: 15,
       zIndex: 1,
 
   },
   icon:{
     position: 'absolute',
-    top:27,
+    top:37,
     right: 10,
     zIndex: 2,
     backgroundColor: 'white',

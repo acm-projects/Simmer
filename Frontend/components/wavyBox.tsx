@@ -4,7 +4,7 @@ import Svg, { Path } from 'react-native-svg';
 
 const WavyBox = () => {
   const boxWidth = 150;
-  const boxHeight = 140;
+  const boxHeight = 130;
   const waveHeight = 6; // Adjust for wave amplitude
 
   const wavePath = `

@@ -7,9 +7,32 @@ import TabLayout from '../(tabs)/_layout';
 import { Plus } from 'lucide-react-native';
 import LinkPopup from '@/components/linkPopup'
 import { router } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
+
+
 
 
 export default function ImportRecipe(){
+  const [selectedImage, setSelectedImage]= useState<string | undefined>(
+    undefined
+  );
+  const [imageRead, setImageRead] =useState(false);
+
+
+  const pickImageAsync = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if(!result.canceled){
+      setSelectedImage(result.assets[0].uri);
+      setImageRead(true);
+      console.log(result);
+    }else{
+      alert("You did not select any image.");
+    }
+  };
    const [title, setTitle] = useState('');
   const [prepMin, setPrepMin] = useState('');
   const [cookMin, setCookMin] = useState('');
@@ -129,9 +152,20 @@ export default function ImportRecipe(){
 
              <View>
             <View style={styles.card}>
-              <View style={styles.image}>
+              {!imageRead && (
+              <TouchableOpacity 
+              style={styles.image}
+              onPress={pickImageAsync}
+            
+              >
               <Plus size={40} color={'#9BA760'}/>
-              </View>
+              </TouchableOpacity>)}
+              {imageRead && (
+                <Image source={{uri: selectedImage}}
+                style={styles.image}/>
+              )}
+
+
                 <View style={styles.titleBox}>
                     <TextInput 
                     style={styles.title2}
@@ -237,7 +271,7 @@ export default function ImportRecipe(){
                     </KeyboardAvoidingView> 
         </View>
      
-    )}
+    )};
 
 const styles = StyleSheet.create({
    container: {
