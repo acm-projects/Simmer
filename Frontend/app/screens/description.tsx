@@ -87,6 +87,7 @@ const styles = StyleSheet.create({
     color: '#000',
     paddingLeft: 15,
     paddingTop: 5,
+    fontFamily: 'Nunito_400Regular',
 
   },
   heart:{
@@ -110,12 +111,14 @@ const styles = StyleSheet.create({
     paddingTop: 5,
     fontSize: 25,
     color: '#9BA760',
+    fontFamily: 'Nunito_700Bold',
   },
      title2:{
     paddingLeft: 15,
     paddingTop: 5,
     fontSize: 30,
     color: '#fff',
+    fontFamily: 'Nunito_700Bold',
   },
   titleBox:{
     backgroundColor: '#9BA760',
@@ -167,5 +170,6 @@ const styles = StyleSheet.create({
    fontSize: 16,
    color: "white",
    textAlign: "center",
+   fontFamily: 'Nunito_600SemiBold',
  },
 });

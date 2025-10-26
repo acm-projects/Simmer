@@ -88,7 +88,7 @@ export default function UserPreference() {
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
-          placeholder="Other Restriction"
+          placeholder="Other Allergen"
           value={customDietRestrictionInput}
           onChangeText={setCustomDietRestrictionInput}
           onSubmitEditing={handleAddCustomDietRestrictionTag}
@@ -101,7 +101,7 @@ export default function UserPreference() {
 
       </View>
       <TouchableOpacity style={styles.doneButton}>
-         <Link href='/'> <Text style={styles.addButtonText}>Done</Text> </Link>
+         <Link href='../homepage'> <Text style={styles.addButtonText}>Done</Text> </Link>
         </TouchableOpacity>
       
     </ScrollView>

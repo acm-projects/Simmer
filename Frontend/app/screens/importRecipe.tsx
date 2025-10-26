@@ -101,7 +101,10 @@ export default function ImportRecipe(){
             
             <View style={{position: 'relative' , top: 20}}>
             <View style={styles.greenBox}>
-                <Button title="Import" color='#fff' onPress={() => setIsVisible(true)}/>
+                <TouchableOpacity style={{padding: 5}}
+                onPress={() => setIsVisible(true)}>
+                  <Text style={styles.text}>Import</Text>
+                </TouchableOpacity>
                   <Modal
                   visible={isVisible}
                   transparent
@@ -142,6 +145,7 @@ export default function ImportRecipe(){
                     <TextInput
                       style={[styles.time, ]}
                       placeholder="__"
+                      placeholderTextColor="#e0e0e0ff"
                       value={prepMin}
                       onChangeText={setPrepMin}
                     />
@@ -153,6 +157,7 @@ export default function ImportRecipe(){
                     <TextInput
                       style={[styles.time, ]}
                       placeholder="__"
+                      placeholderTextColor="#e0e0e0ff"
                       value={cookMin}
                       onChangeText={setCookMin}
                     />
@@ -175,18 +180,21 @@ export default function ImportRecipe(){
             <TextInput
               style={[styles.recipe, { paddingLeft: 2 }]}
               placeholder="#"
+              placeholderTextColor="#a1a1a1ff"
               value={ing.quantity}
               onChangeText={(text) => updateIngredient(index, "quantity", text)}
             />
             <TextInput
               style={[styles.recipe, { paddingLeft: 2 }]}
               placeholder="unit"
+              placeholderTextColor="#a1a1a1ff"
               value={ing.unit}
               onChangeText={(text) => updateIngredient(index, "unit", text)}
             />
             <TextInput
               style={[styles.recipe, { paddingLeft: 2 }]}
               placeholder="ingredient"
+              placeholderTextColor="#a1a1a1ff"
               value={ing.name}
               onChangeText={(text) => updateIngredient(index, "name", text)}
             />
@@ -208,6 +216,7 @@ export default function ImportRecipe(){
             <TextInput
               style={[styles.recipe, { paddingLeft: 2, flex: 1 }]}
               placeholder="Step"
+              placeholderTextColor="#a1a1a1ff"
               value={stepText}
               onChangeText={(text) => updateStep(index, text)}
             />
@@ -247,6 +256,7 @@ const styles = StyleSheet.create({
     text:{
     fontSize: 18,
     color: '#fff',
+    fontFamily: 'Nunito_400Regular',
 
   },
     recipe:{
@@ -282,10 +292,7 @@ const styles = StyleSheet.create({
     paddingTop: 15,
     fontSize: 25,
     color: '#9BA760',
-  },
-  customText:{
-    fontFamily: 'Orbitron_400Regular',
-    fontSize: 80,
+    fontFamily: 'Nunito_700Bold',
   },
   greenBox:{
     borderRadius: 100,
@@ -325,12 +332,14 @@ const styles = StyleSheet.create({
     paddingTop: 5,
     fontSize: 25,
     color: '#9BA760',
+    fontFamily: 'Nunito_700Bold',
   },
      title2:{
     paddingLeft: 15,
     paddingTop: 5,
     fontSize: 30,
     color: '#fff',
+    fontFamily: 'Nunito_700Bold',
   },
   titleBox:{
     backgroundColor: '#9BA760',

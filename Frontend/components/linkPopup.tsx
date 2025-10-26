@@ -11,6 +11,7 @@ const LinkPopup = () => {
         <TextInput 
         style={styles.text}
         placeholder="Link"
+        placeholderTextColor={'#abb08cff'}
         value={link}
         onChangeText={setLink}
         />
@@ -40,6 +41,7 @@ const LinkPopup = () => {
     text:{
         fontSize: 20,
         color: '#9BA760',
+        fontFamily: 'Nunito_400Regular',
     }
 
   })

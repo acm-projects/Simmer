@@ -126,7 +126,8 @@ const styles = StyleSheet.create({
   },
     text:{
     fontSize: 18,
-    color: 'white'
+    color: 'white',
+    fontFamily: 'Nunito_400Regular',
   },
     info:{
     fontSize: 18,
@@ -148,10 +149,6 @@ const styles = StyleSheet.create({
     paddingTop: 15,
     fontSize: 25,
     color: '#9BA760',
-  },
-  customText:{
-    fontFamily: 'Orbitron_400Regular',
-    fontSize: 80,
   },
   mascot: {
       height: 400,

@@ -60,8 +60,8 @@ const styles = StyleSheet.create({
     },
   title:{
       fontSize: 18,
-      color: '#000',
-      fontFamily: 'Nunito_400Regular',
+      color: '#262e05ff',
+      fontFamily: 'Nunito_600SemiBold',
       width: 70,
       flexWrap: 'wrap'
   },

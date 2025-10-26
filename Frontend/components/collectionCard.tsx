@@ -59,6 +59,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
       color: '#06402B',
       paddingTop: 15,
+      fontFamily: 'Nunito_600SemiBold',
   },
   text: {
     marginTop: 1,

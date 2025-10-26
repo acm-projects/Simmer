@@ -8,7 +8,6 @@ import CornerIcon from "@/components/cornerIcon";
 import { Link } from 'expo-router';
 import MyCarousel from "@/components/carousel";
 
-
 export default function HomeScreen() {
   return (
 
@@ -83,19 +82,22 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     paddingTop: 15,
     color: '#262e05ff',
+    fontFamily: 'Nunito_700Bold',
   },
   text:{
     fontSize: 15,
     paddingLeft: 15,
     color: 'black',
+    fontFamily: 'Nunito_400Regular',
   
   },
   subtitle:{
     fontSize: 25,
     paddingLeft: 30,
     paddingTop: 15,
-    color: 'black',
+    color: '#262e05ff',
     alignSelf:'flex-start',
+    fontFamily: 'Nunito_600SemiBold',
   },  
   row: {
     flexDirection: 'row',

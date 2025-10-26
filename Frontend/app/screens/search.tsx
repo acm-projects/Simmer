@@ -13,7 +13,7 @@ export default function SearchScreen() {
     const protein = [
         { item: 'Chicken'}, {item: 'Beef'},{ item: 'Pork' }, {item: "Seafood"}, { item: 'Vegan'}, {item: 'Vegetarian'}];
     const type = [
-        { item: 'Snack'}, {item: 'Drinks'},{ item: 'Entrees' }, {item: "Appetizers"}, { item: 'Soups' }, {item: "Salads"}];
+        { item: 'Sides'}, {item: 'Drinks'},{ item: 'Entrees' }, {item: "Desserts"}, { item: 'Soups' }, {item: "Salads"}];
     const allergen = [
         { item: 'Eggs'}, {item: 'Peanuts'},{ item: 'Treenuts' }, {item: "Sesame"}, {item: "Milk"}, {item: "Wheat"}, {item: "Soy"}, {item: "Fish"}, {item: "Shelfish"}];
 
@@ -50,6 +50,7 @@ const [newAllergen, setNewAllergen] = useState('');
         <TextInput 
         style={styles.text}
         placeholder="Search"
+        placeholderTextColor="#e0e0e0ff"
         value={search}
         onChangeText={setSearch}
         />
@@ -164,6 +165,7 @@ const [newAllergen, setNewAllergen] = useState('');
         <TextInput 
         style={styles.text}
         placeholder='Add Other'
+        placeholderTextColor="#e0e0e0ff"
         value={newAllergen}
         onChangeText={setNewAllergen}
         ></TextInput>
@@ -242,6 +244,7 @@ const styles = StyleSheet.create({
     paddingTop: 15,
     fontSize: 25,
     color: '#9BA760',
+    fontFamily: 'Nunito_700Bold',
   },
   text:{
     fontSize: 15,
@@ -249,12 +252,14 @@ const styles = StyleSheet.create({
     margin: 3,
     marginLeft: 1,
     marginRight: 1,
+    fontFamily: 'Nunito_400Regular',
   },
   subtitle:{
     fontSize: 18,
     color: '#2E321E',
     paddingLeft: 10,
     paddingTop: 15,
+    fontFamily: 'Nunito_600SemiBold',
   },  
   x:{
     position: 'absolute',

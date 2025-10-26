@@ -66,11 +66,13 @@ const styles = StyleSheet.create({
     paddingTop: 15,
     fontSize: 25,
     color: '#9BA760',
+    fontFamily: 'Nunito_700Bold',
   },
   text:{
     fontSize: 16,
     paddingLeft: 25,
     paddingBottom: 5,
+    fontFamily: 'Nunito_400Regular'
   },
   subtitle:{
     fontSize: 20,

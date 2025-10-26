@@ -51,6 +51,7 @@ const styles = StyleSheet.create({
  text: {
    fontSize: 25,
    color: '#9BA760',
+   fontFamily: 'Nunito_700Bold',
  },
  bubble: {
    backgroundColor: '#9BA760',
@@ -64,6 +65,7 @@ const styles = StyleSheet.create({
    fontSize: 16,
    color: "white",
    textAlign: "center",
+   fontFamily: 'Nunito_400Regular',
  },
  arrow: {
    color: "#9BA760",
