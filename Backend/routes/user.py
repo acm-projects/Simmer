@@ -4,7 +4,7 @@ from utils.supabase import supabase
 from postgrest.exceptions import APIError as AuthApiError
 
 user_bp = Blueprint('main', __name__)
-@user_bp.route("/create_user", methods=["POST"])
+@user_bp.route("/create-user", methods=["POST"])
 def create_user():
   data = request.get_json()
   auth_header = request.headers.get('Authorization')
