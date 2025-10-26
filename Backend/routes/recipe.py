@@ -249,3 +249,35 @@ def get_recipe_info():
   except Exception as e:
     print('ERROR', e)
     return jsonify({'error' : 'Internal Server Error', 'details' : str(e)}), 500
+  
+@recipe_bp.route('/recipe/delete', methods=['DELETE'])
+def delete_recipe():
+  try:
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
+    
+    data = request.get_json()
+    recipe_id = data.get('recipe_id')
+
+    if not recipe_id:
+      return jsonify({'error' : 'recipe_id is required'}), 400
+    
+    response = (
+      supabase.table('recipes')
+      .delete()
+      .eq('id', recipe_id)
+      .execute()
+    )
+
+    if not response.data:
+      return jsonify({'error' : 'Recipe not found'})
+    
+    return jsonify({
+      'message' : 'Recipe deleted successfully',
+      'deleted_recipe_id' : response.data[0]
+    }), 200
+  
+  except Exception as e:
+    print('Error: ', e)
+    return jsonify({'error' : 'Internal Server Error', 'details' : str(e)}), 500
