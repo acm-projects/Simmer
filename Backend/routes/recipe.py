@@ -2,39 +2,40 @@ import json
 from flask import Blueprint, request, jsonify
 from utils.supabase import supabase
 from utils.auth import authorize_user
-from utils.createRecipe import createRecipe
+from utils.createRecipe import generate_recipe, generate_ai_instructions, categorize_protein_types
 from utils.import_videos import get_url_data
 
 recipe_bp = Blueprint('recipe', __name__)
 
-@recipe_bp.route("/create-recipe", methods=["POST"])
-def create_recipe():
+@recipe_bp.route('/add-recipe', methods=['POST'])
+def add_recipe():
   try:
-    user_id, error_response, status_code = authorize_user()
-    if error_response:
-      return error_response, status_code
+    # user_id, error_response, status_code = authorize_user()
+    # if error_response:
+    #   return error_response, status_code
     
     data = request.get_json()
-    if not data or not all(key in data for key in ['content']):
-      return jsonify({'message': 'Missing data: content.'}), 400
-    
-    content = data.get('content')
-    recipe_info = get_url_data(content)
-    if not recipe_info:
-      return jsonify ({'message' : 'Failed to extract data from content'})
 
-    recipe_str = create_recipe(recipe_info)
-    recipeJson = json.loads(recipe_str)
-
-    title = recipeJson.get('title')
-    description = recipeJson.get('description', '')
-    instructions = recipeJson.get('instructions')
-    ai_instructions = recipeJson.get('ai_instructions')
-    prep_time = recipeJson.get('prep_time', 0)
-    cook_time = recipeJson.get('cook_time', 0)
-    dietary_tags = recipeJson.get('dietary_tags', [])
-    ingredients = recipeJson.get('ingredients', [])
+    title = data.get('title')
+    description = data.get('description', '')
+    instructions = data.get('instructions')
+    prep_time = data.get('prep_time', 0)
+    cook_time = data.get('cook_time', 0)
+    dietary_tags = data.get('dietary_tags', [])
+    type = data.get('type')
+    ingredients = data.get('ingredients', [])
     image_url = data.get('image_url', '')
+
+    if not title or not instructions or not type:
+      return jsonify({'error' : 'title, instructions, and type are required'}), 400
+    
+    ai_instructions = generate_ai_instructions(instructions)
+    if not ai_instructions:
+      return jsonify({'error' : 'failed to generate AI instructions'}), 401
+    
+    protein = categorize_protein_types(ingredients)
+    if not protein:
+      return jsonify({'error' : 'failed to generate protein list'}), 401
 
     recipe = supabase.table('recipes').insert({
         'title' : title,
@@ -44,15 +45,17 @@ def create_recipe():
         'prep_time' : prep_time,
         'cook_time' : cook_time,
         'dietary_tags' : dietary_tags,
+        'protein' : protein,
+        'type' : type,
         'image_url' : image_url,
-        'created_by' : user_id
+        'created_by' : '5bf7dcc0-0f2b-4d9f-a601-d3d92b72d02d'
     }).execute()
 
     if not recipe.data:
       return jsonify({'error': 'Failed to create recipe'}), 400
       
     recipe_id = recipe.data[0]['id']
-    
+
     for ing in ingredients:
       supabase.table('ingredients').insert({
         'recipe_id' : recipe_id,
@@ -66,6 +69,34 @@ def create_recipe():
       'message' : 'Recipe created and saved!',
       'recipe_id' : recipe_id
     }), 200
+  
+  except Exception as e:
+    print('ERROR', e)
+    return jsonify({'error' : 'Internal Server Error', 'details' : str(e)}), 500
+
+@recipe_bp.route("/import-recipe", methods=["POST"])
+def import_recipe():
+  try:
+    # user_id, error_response, status_code = authorize_user()
+    # if error_response:
+    #   return error_response, status_code
+    
+    data = request.get_json()
+    if not data or not all(key in data for key in ['content']):
+      return jsonify({'message': 'Missing data: content.'}), 400
+    
+    content = data.get('content')
+    recipe_info = get_url_data(content)
+    if not recipe_info:
+      return jsonify ({'message' : 'Failed to extract data from content'})
+
+    recipe_str = generate_recipe(recipe_info)
+    recipeJson = json.loads(recipe_str)
+
+    if not recipeJson:
+      return jsonify({'error': 'Failed to create recipe'}), 400
+      
+    return recipeJson, 200
   
   except Exception as e:
     print('ERROR', e)

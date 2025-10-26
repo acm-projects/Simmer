@@ -82,10 +82,11 @@ def generate_recipe_from_youtube(url: str):
         else:
             print("No video details found.")
 
-        return {
+        results = {
             "caption": description,
             "transcript": transcript
         }
+        return results
     except NoTranscriptFound:
         print("No Transcripts")
         return None
