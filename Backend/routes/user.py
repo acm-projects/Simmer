@@ -4,7 +4,7 @@ from utils.supabase import supabase
 from postgrest.exceptions import APIError as AuthApiError
 
 user_bp = Blueprint('main', __name__)
-@user_bp.route("/create_user", methods=["POST"])
+@user_bp.route('/user/create-user', methods=['POST'])
 def create_user():
   data = request.get_json()
   auth_header = request.headers.get('Authorization')
@@ -60,7 +60,68 @@ def create_user():
     print(str(e))
     return jsonify({'message': 'An error occured trying to add a user'}), 500
 
-@user_bp.route('/set-preference', methods=['POST'])
+@user_bp.route('/user/update-name', methods=['PUT'])
+def update_name():
+  try:
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
+    
+    data = request.get_json()
+    if not data or not all(key in data for key in ['first_name', 'last_name']):
+      return jsonify({'message': 'Missing data: first_name, last_name'}), 400
+    
+    first_name = data.get('first_name')
+    last_name = data.get('last_name')
+
+    supabase.table('users').update({
+      'first_name' : first_name,
+      'last_name' : last_name
+    }).eq('id', user_id).execute()
+
+    return jsonify ({
+      'message' : 'Name updated successfully',
+      'first_name' : first_name,
+      'last_name' : last_name
+    }), 200
+  
+  except Exception as e:
+    print('Error updating name', e)
+    return jsonify({
+      'error' : 'Internal server error',
+      'details' : str(e)
+    }), 500
+
+@user_bp.route('/user/update-email', methods=['PUT'])
+def update_email():
+  try:
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
+    
+    data = request.get_json()
+    if not data or not all(key in data for key in ['email']):
+      return jsonify({'message': 'Missing data: email'}), 400
+    
+    email = data.get('email')
+
+    supabase.table('users').update({
+      'email' : email,
+    }).eq('id', user_id).execute()
+
+    return jsonify ({
+      'message' : 'Email updated successfully',
+      'email' : email
+    }), 200
+  
+  except Exception as e:
+    print('Error updating email', e)
+    return jsonify({
+      'error' : 'Internal server error',
+      'details' : str(e)
+    }), 500
+
+@user_bp.route('/user/set-preference', methods=['POST'])
 def set_preference():
 
   data = request.get_json()
