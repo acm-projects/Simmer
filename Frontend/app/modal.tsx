@@ -10,12 +10,11 @@ export default function CreateCollectionModal() {
         flex: 1,
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "white",
+        backgroundColor: "#f5ebe6ff",
         padding: 20,
       }}
     >
       <Text style={{ fontSize: 20, marginBottom: 20 }}>Create a new collection</Text>
-      {/* Add your form or UI here */}
       <Button title="Close" onPress={() => router.back()} />
     </View>
   );
