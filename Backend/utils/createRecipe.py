@@ -7,6 +7,11 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain.schema import SystemMessage, HumanMessage
 from pydantic import BaseModel
+from flask import request, jsonify 
+from werkzeug.utils import secure_filename
+from postgrest.exceptions import APIError as AuthApiError
+import uuid
+from utils.supabase import supabase
 from typing import List
 
 load_dotenv()
@@ -267,3 +272,37 @@ def generate_blog_transcript_and_caption(title: str, text: str) -> dict:
   except Exception as e:
       print(f'Error generating blog transcript: {e}')
       return None
+  
+
+
+def upload_image():
+    if 'thumbnail' not in request.files:
+        return jsonify({"error": "no thumbnail"}), 400
+
+    thumbnail = request.files['thumbnail']
+
+
+    if thumbnail.filename == '':
+        return jsonify({"error": "No file selected"}), 400
+    
+    if thumbnail:
+      thumbnail_name= secure_filename(thumbnail.filename)
+      thumbnail_name=f"{uuid.uuid4()}-{thumbnail_name}"
+      thumbnail_bytes = thumbnail.read()
+
+      bucket_name = "recipe_images"
+      thumbnail_path = f"/{thumbnail_name}"
+
+    try:
+      supabase.storage.from_(bucket_name).upload(
+          file=thumbnail_bytes,
+          path=thumbnail_path,
+          file_options={"content-type": 'image/png'} 
+      )
+      public_url = supabase.storage.from_(bucket_name).get_public_url(thumbnail_path)
+
+      return public_url
+    except AuthApiError as e:
+            return jsonify({"error":  f"auth error:{e.message}"}), 500
+    except Exception as e:
+        return jsonify({"error": f"other error:{e.message}"}), 500

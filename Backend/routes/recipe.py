@@ -1,10 +1,9 @@
 import json
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify 
 from utils.supabase import supabase
 from utils.auth import authorize_user
-from utils.createRecipe import generate_recipe, generate_ai_instructions, categorize_protein_types
+from utils.createRecipe import generate_recipe, generate_ai_instructions, categorize_protein_types, upload_image
 from utils.import_videos import get_url_data
-
 recipe_bp = Blueprint('recipe', __name__)
 
 @recipe_bp.route('/add-recipe', methods=['POST'])
@@ -13,9 +12,10 @@ def add_recipe():
     user_id, error_response, status_code = authorize_user()
     if error_response:
       return error_response, status_code
+    # user_id='8089f0b3-48fd-484a-8ed5-081459c556e3'
     
-    data = request.get_json()
-
+    data_string = request.form.get('json_data')
+    data = json.loads(data_string)
     title = data.get('title')
     description = data.get('description', '')
     instructions = data.get('instructions')
@@ -24,7 +24,10 @@ def add_recipe():
     dietary_tags = data.get('dietary_tags', [])
     type = data.get('type')
     ingredients = data.get('ingredients', [])
-    image_url = data.get('image_url', '')
+    try:
+      image_url = upload_image()
+    except Exception as e:
+        return jsonify({"error": f"other error:{e.message}"}), 500
 
     if not title or not instructions or not type:
       return jsonify({'error' : 'title, instructions, and type are required'}), 400
@@ -36,7 +39,6 @@ def add_recipe():
     protein = categorize_protein_types(ingredients)
     if not protein:
       return jsonify({'error' : 'failed to generate protein list'}), 400
-
     recipe = supabase.table('recipes').insert({
         'title' : title,
         'description' : description,
@@ -56,6 +58,7 @@ def add_recipe():
       
     recipe_id = recipe.data[0]['id']
 
+
     for ing in ingredients:
       supabase.table('ingredients').insert({
         'recipe_id' : recipe_id,
@@ -71,7 +74,6 @@ def add_recipe():
     }), 200
   
   except Exception as e:
-    print('error adding recipe to database', e)
     return jsonify({'error' : 'internal server error', 'details' : str(e)}), 500
 
 @recipe_bp.route('/import-recipe', methods=['POST'])
@@ -326,3 +328,52 @@ def delete_recipe():
   except Exception as e:
     print('error deleteing recipe ', e)
     return jsonify({'error' : 'internal server error', 'details' : str(e)}), 500
+  
+# @recipe_bp.route("/recipe/image", methods=["POST"])
+# def upload_image():
+#     if 'thumbnail' not in request.files:
+#         return jsonify({"error": "no thumbnail"}), 400
+
+#     thumbnail = request.files['thumbnail']
+
+#     if thumbnail.filename == '':
+#         return jsonify({"error": "No file selected"}), 400
+    
+#     if thumbnail:
+#       thumbnail_name= secure_filename(thumbnail.filename)
+#       thumbnail_bytes = thumbnail.read()
+
+#       bucket_name = "recipe_images"
+#       thumbnail_path = f"/{thumbnail_name}"
+#     try:
+#       supabase.storage.from_(bucket_name).upload(
+#           file=thumbnail_bytes,
+#           path=thumbnail_path,
+#           file_options={"content-type": 'image/png'} 
+#       )
+#       public_url = supabase.storage.from_(bucket_name).get_public_url(thumbnail_path)
+#       return jsonify({
+#           "public_url": public_url
+#       }), 200
+#     except AuthApiError as e:
+#             return jsonify({"error":  f"auth error:{e.message}"}), 500
+#     except Exception as e:
+#         return jsonify({"error": f"other error:{e.message}"}), 500
+
+@recipe_bp.route('/recipe/image', methods=['PUT'])
+def editImage():
+  id=request.form.get('id')
+  image_url=upload_image()
+  try:
+
+      response = supabase.table("recipes").update({
+          "image_url": image_url
+      }).eq("id", id).execute()
+
+      if not response.data:
+          return jsonify({"error": f"recipe not found"}), 404
+
+      return jsonify(image_url), 200
+  
+  except Exception as e:
+      return jsonify({"error": e.message}), 500
