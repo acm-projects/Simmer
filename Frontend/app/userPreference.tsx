@@ -118,7 +118,7 @@ export default function UserPreference() {
       console.log(session.user.id)
 
 
-      await fetch(`${process.env.EXPO_PUBLIC_API_URL}set-preference`, {
+      await fetch(`${process.env.EXPO_PUBLIC_API_URL}/user/set-preference`, {
           method: 'POST', 
           headers: {
               'Content-Type': 'application/json',

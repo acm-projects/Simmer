@@ -153,28 +153,28 @@ def update_dietary_restrictions():
       return error_response, status_code
     
     data = request.get_json()
-    new_restrictions = data.get('dietary_restrictions')
+    new_restrictions = data.get('diet_restriction')
 
     if not isinstance(new_restrictions, list):
-      return jsonify({'error' : 'dietary_restrictions must be an array of strings.'}), 400
+      return jsonify({'error' : 'diet_restrictions must be an array of strings.'}), 400
     
     user_response = (
       supabase.table('users')
-      .select('dietary_restrictions')
+      .select('diet_restriction')
       .eq('id', user_id)
       .single()
       .execute()
     )
 
-    cur_restrictions = user_response.data.get('dietary_restrictions') or []
+    cur_restrictions = user_response.data.get('diet_restriction') or []
     updated_restrictions = list(set(cur_restrictions + new_restrictions))
 
     supabase.table('users').update({
-      'dietary_restrictions' : updated_restrictions
+      'diet_restriction' : updated_restrictions
     }).eq('id', user_id).execute()
 
     return jsonify ({
-      'message' : 'dietary restrictions updated successfully.',
+      'message' : 'diet restriction updated successfully.',
       'updated_restrictions' : new_restrictions
     }), 200
   
@@ -192,7 +192,7 @@ def get_dietary_restrictions():
     
     response = (
       supabase.table('users')
-      .select('dietary_restrictions')
+      .select('diet_restriction')
       .eq('id', user_id)
       .single()
       .execute()
@@ -201,15 +201,15 @@ def get_dietary_restrictions():
     if not response.data:
       return jsonify({'error' : 'user not found.'}), 404
     
-    restrictions = response.data.get('dietary_restrictions') or []
+    restrictions = response.data.get('diet_restriction') or []
 
     return jsonify({
       'user_id' : user_id,
-      'dietary_restrictions' : restrictions
+      'diet_restriction' : restrictions
     }), 200
   
   except Exception as e:
-      print('error fetching dietary restrictions: ', e)
+      print('error fetching dietary restriction: ', e)
       return jsonify({'error' : 'internal server error', 'details' : str(e)})
   
 @user_bp.route('/user/collections/create', methods=['POST'])
@@ -257,7 +257,7 @@ def add_recipe_to_collection():
     
     collection_check = (
       supabase.table('collections')
-      .select('id', user_id)
+      .select('id, user_id')
       .eq('id', collection_id)
       .eq('user_id', user_id)
       .execute()
@@ -298,29 +298,7 @@ def get_user_collections():
     if not response.data:
       return jsonify({'message': 'No collections found.', 'collections': []}), 200
 
-    formatted_collections = []
-    for collection in response.data:
-      recipes = []
-      for entry in collection.get('collection_recipes', []):
-        recipe = entry.get('recipes')
-        if recipe:
-          recipes.append({
-            'recipe_id': recipe['id'],
-            'title': recipe['title'],
-            'prep_time': recipe.get('prep_time'),
-            'cook_time': recipe.get('cook_time'),
-            'image_url': recipe.get('image_url')
-          })
-            
-        formatted_collections.append({
-          'collection_id': collection['id'],
-          'name': collection['name'],
-          'description': collection.get('description'),
-          'created_at': collection.get('created_at'),
-          'recipes': recipes
-        })
-
-    return jsonify({'collections': formatted_collections}), 200
+    return jsonify({'collections': response.data}), 200
     
   except Exception as e:
     print('error retrieving user collections', e)

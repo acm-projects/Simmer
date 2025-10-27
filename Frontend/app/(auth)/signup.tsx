@@ -46,7 +46,7 @@ export default function Signup() {
 
       }
       try{
-        await fetch(`${process.env.EXPO_PUBLIC_API_URL}create_user`, {
+        await fetch(`${process.env.EXPO_PUBLIC_API_URL}user/create-user`, {
             method: 'POST', 
             headers: {
                 'Content-Type': 'application/json',
