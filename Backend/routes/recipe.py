@@ -15,9 +15,7 @@ def add_recipe():
     # user_id='8089f0b3-48fd-484a-8ed5-081459c556e3'
     
     data_string = request.form.get('json_data')
-    print(data_string)
     data = json.loads(data_string)
-    print(str(data))
     title = data.get('title')
     description = data.get('description', '')
     instructions = data.get('instructions')
@@ -30,7 +28,6 @@ def add_recipe():
       image_url = upload_image()
     except Exception as e:
         return jsonify({"error": f"other error:{e.message}"}), 500
-    print('hihfiusdoh')
 
     if not title or not instructions or not type:
       return jsonify({'error' : 'title, instructions, and type are required'}), 400
@@ -42,21 +39,6 @@ def add_recipe():
     protein = categorize_protein_types(ingredients)
     if not protein:
       return jsonify({'error' : 'failed to generate protein list'}), 400
-    print('bruh')
-    print(str({
-        'title' : title,
-        'description' : description,
-        'instructions' : instructions,
-        'ai_instructions': ai_instructions,
-        'prep_time' : prep_time,
-        'cook_time' : cook_time,
-        'dietary_tags' : dietary_tags,
-        'protein' : protein,
-        'type' : type,
-        'image_url' : image_url,
-        'created_by' : user_id
-    }))
-
     recipe = supabase.table('recipes').insert({
         'title' : title,
         'description' : description,
@@ -70,12 +52,12 @@ def add_recipe():
         'image_url' : image_url,
         'created_by' : user_id
     }).execute()
-    print('works')
+
     if not recipe.data:
       return jsonify({'error': 'failed to create recipe'}), 400
       
     recipe_id = recipe.data[0]['id']
-    print('ing')
+
 
     for ing in ingredients:
       supabase.table('ingredients').insert({
@@ -377,3 +359,21 @@ def delete_recipe():
 #             return jsonify({"error":  f"auth error:{e.message}"}), 500
 #     except Exception as e:
 #         return jsonify({"error": f"other error:{e.message}"}), 500
+
+@recipe_bp.route('/recipe/image', methods=['PUT'])
+def editImage():
+  id=request.form.get('id')
+  image_url=upload_image()
+  try:
+
+      response = supabase.table("recipes").update({
+          "image_url": image_url
+      }).eq("id", id).execute()
+
+      if not response.data:
+          return jsonify({"error": f"recipe not found"}), 404
+
+      return jsonify(image_url), 200
+  
+  except Exception as e:
+      return jsonify({"error": e.message}), 500
