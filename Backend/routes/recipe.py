@@ -298,9 +298,9 @@ def delete_recipe():
       return jsonify({'error' : 'recipe_id is required'}), 400
     
     recipe_check = (
-      supabase.table('recipes')
-      .select('id, user_id')
-      .eq('id', recipe_id)
+      supabase.table('user_saved_recipes')
+      .select('recipe_id, user_id')
+      .eq('recipe_id', recipe_id)
       .eq('user_id', user_id)
       .execute()
     )
