@@ -1,5 +1,5 @@
-
-import { StyleSheet, Text, View, Image, ImageSourcePropType,  } from 'react-native';
+import react, { useState} from 'react'
+import { StyleSheet, Text, View, Image, ImageSourcePropType, TouchableOpacity } from 'react-native';
 import FavoriteIcon from '@/components/favoriteIcon';
 import { Clock2 } from 'lucide-react-native'
 import { Heart } from 'lucide-react-native';
@@ -16,6 +16,7 @@ interface Props{
 
 
 const LargeCard: React.FC<Props>= ({title, image}) => {
+  const[favorite, setFavorite]= useState(false);
 
 
 
@@ -26,9 +27,21 @@ const LargeCard: React.FC<Props>= ({title, image}) => {
    
     <Image source={image} style={styles.image}/>
    
-   <View style={styles.icon}>
-         <Heart size={22} color="black"/>
-         </View>
+      <View style={styles.icon}>
+             {!favorite ? (
+                 <TouchableOpacity onPress={()=> setFavorite(true)}>
+                    <Heart size={20} color="#9BA760"/>
+                 </TouchableOpacity>
+                
+             ) : (
+               <TouchableOpacity onPress={()=> setFavorite(false)}>
+             <Heart size={20} color="#9BA760" fill="#9BA760"/>
+             </TouchableOpacity>
+           )}
+   
+             
+             
+             </View>
       <View style={styles.card}>
         
                <Text style={styles.title}>{title}</Text> 

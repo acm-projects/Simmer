@@ -1,5 +1,5 @@
-
-import { StyleSheet, Text, View, Image, ImageSourcePropType, Dimensions } from 'react-native';
+import react, {useState} from 'react'
+import { StyleSheet, Text, View, Image, ImageSourcePropType, TouchableOpacity,  } from 'react-native';
 import FavoriteIcon from '@/components/favoriteIcon';
 import WavyBox from '@/components/wavyBox'
 import { Heart } from 'lucide-react-native';
@@ -13,14 +13,27 @@ interface Props{
 }
 const SmallCard: React.FC<Props>= ({title, image }) => {
 
+  const [favorite, setFavorite] = useState(false);
+
   return (
     <Link href="../screens/description">
        <View style={styles.container}>
         
        <Image source={image} style={styles.image}/>
-          
           <View style={styles.icon}>
-          <Heart size={20} color="#9BA760"/>
+          {!favorite ? (
+              <TouchableOpacity onPress={()=> setFavorite(true)}>
+                 <Heart size={20} color="#9BA760"/>
+              </TouchableOpacity>
+             
+          ) : (
+            <TouchableOpacity onPress={()=> setFavorite(false)}>
+          <Heart size={20} color="#9BA760" fill="#9BA760"/>
+          </TouchableOpacity>
+        )}
+
+          
+          
           </View>
         <View style={styles.card}>
           <Text style={styles.title}>{title}</Text> 
