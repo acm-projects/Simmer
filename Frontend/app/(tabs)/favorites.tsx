@@ -1,6 +1,7 @@
 import { Image } from 'expo-image';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
+import { router } from 'expo-router';
 
 
 import CollectionCard from "@/components/collectionCard";
@@ -30,9 +31,14 @@ export default function FavoritesScreen() {
      </View>
 
 
-     <View style={styles.bubble}>
-       <Text style={styles.bubbleText}>+ Create Collection</Text>
-     </View>
+     <TouchableOpacity
+      onPress={() => router.push("../modal")}
+      activeOpacity={0.7}
+    >
+      <View style={styles.bubble}>
+        <Text style={styles.bubbleText}>+ Create Collection</Text>
+      </View>
+    </TouchableOpacity>
 
 
 
