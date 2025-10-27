@@ -1,9 +1,11 @@
 import React from 'react'
 import { StyleSheet, Text, View, Image } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { Link } from 'expo-router';
 
 const CollectionCard = () => {
   return (
+    <Link href="../screens/recipeCollection" style={styles.container}>
     <View style={styles.container}>
        
       <View style={styles.imageCard}>
@@ -20,6 +22,7 @@ const CollectionCard = () => {
      
        </View>
     </View>
+    </Link>
   )
 }
 
