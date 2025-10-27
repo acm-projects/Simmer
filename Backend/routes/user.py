@@ -223,3 +223,144 @@ def get_dietary_restrictions():
         'error' : 'Internal Server Error',
         'details' : str(e)
       })
+  
+@user_bp.route('/user/collections/create', methods=['POST'])
+def create_collection():
+  try:
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
+    
+    data = request.get_json()
+    title = data.get('title')
+    description = data.get('description', '')
+
+    if not data or not title:
+      return jsonify({'error' : 'title of collection is required.'}), 400
+    
+    response = (
+      supabase.table('collections')
+      .insert({'user_id': user_id, 'title': title, 'description': description})
+      .execute()
+    )
+
+    return jsonify({'message' : 'Collection created successfully!', 'collection_id' : response.data[0]}), 201
+
+  except Exception as e:
+    print('Error creating collection', e)
+    return jsonify({
+      'error' : 'Internal server error',
+      'details' : str(e)
+    }), 500
+  
+@user_bp.route('/user/collections/add-recipe', methods=['POST'])
+def add_recipe_to_collection():
+  try:
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
+    
+    data = request.get_json()
+    collection_id = data.get('collection_id')
+    recipe_id = data.get('recipe_id')
+
+    if not collection_id or not recipe_id:
+      return jsonify({'error' : 'collection_id and recipe_id are required.'}), 400
+    
+    response = (
+      supabase.table('collection_recipes')
+      .insert({'collection_id' : collection_id, 'recipe_id' : recipe_id})
+      .execute()
+    )
+
+    return jsonify({"message": "Recipe added to collection", 'recipe_id' : recipe_id}), 200
+
+  except Exception as e:
+    print('Error adding recipe to collection', e)
+    return jsonify({
+      'error' : 'Internal server error',
+      'details' : str(e)
+    }), 500
+  
+@user_bp.route('/collections/remove-recipe', methods=['DELETE'])
+def remove_recipe_from_collection():
+  try:
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
+    
+    data = request.get_json()
+    collection_id = data.get('collection_id')
+    recipe_id = data.get('recipe_id')
+
+    if not collection_id or not recipe_id:
+      return jsonify({'error' : 'collection_id and recipe_id are required.'}), 400
+    
+    response = (
+      supabase.table('collection_recipes')
+      .delete()
+      .eq('collection_id', collection_id)
+      .eq('recipe_id', recipe_id)
+      .execute()
+    )
+
+    return jsonify({"message": "Recipe removed from collection", 'recipe_id' : recipe_id}), 200
+    
+  except Exception as e:
+    print('Error removing recipe from collection', e)
+    return jsonify({
+      'error' : 'Internal server error',
+      'details' : str(e)
+    }), 500
+  
+@user_bp.route('/collections', methods=['GET'])
+def get_user_collections():
+  try:
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
+    
+    data = request.get_json()
+    user_id = data.get('user_id')
+
+    collections = (
+        supabase.table('collections')
+        .select('*, collection_recipes(recipe_id, recipes(*))')
+        .eq('user_id', user_id)
+        .execute()
+    )
+
+    return jsonify({'collections': collections.data}), 200
+    
+  except Exception as e:
+    print('Error retrieving user collections', e)
+    return jsonify({
+      'error' : 'Internal server error',
+      'details' : str(e)
+    }), 500
+  
+@user_bp.route('/collections/delete', methods=['DELETE'])
+def delete_collection():
+  try:
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
+    
+    data = request.get_json()
+    collection_id = data.get('collection_id')
+
+    response = (
+        supabase.table('collections')
+        .delete()
+        .eq('id', collection_id)
+        .execute()
+    )
+
+    return jsonify({'message': 'Collection deleted successfully', 'collection_id' : collection_id}), 200
+    
+  except Exception as e:
+    print('Error retrieving user collections', e)
+    return jsonify({
+      'error' : 'Internal server error',
+      'details' : str(e)
+    }), 500 
