@@ -369,6 +369,17 @@ def delete_collection():
 
     if not collection_id:
       return jsonify({'error' : 'collection_id is required'}), 400
+    
+    collection_check = (
+      supabase.table('collections')
+      .select('id, user_id')
+      .eq('id', collection_id)
+      .eq('user_id', user_id)
+      .execute()
+    )
+
+    if not collection_check.data:
+      return jsonify({'error' : 'unauthorized action: you do not own this collection.'}), 403
 
     response = (
         supabase.table('collections')

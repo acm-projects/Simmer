@@ -263,6 +263,17 @@ def delete_recipe():
     if not recipe_id:
       return jsonify({'error' : 'recipe_id is required'}), 400
     
+    recipe_check = (
+      supabase.table('recipes')
+      .select('id, user_id')
+      .eq('id', recipe_id)
+      .eq('user_id', user_id)
+      .execute()
+    )
+
+    if not recipe_check.data:
+      return jsonify({'error' : 'unauthorized action: you do not own this recipe.'}), 403
+    
     response = (
       supabase.table('recipes')
       .delete()
