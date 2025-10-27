@@ -374,3 +374,33 @@ def delete_collection():
   except Exception as e:
     print('error deleting user collection', e)
     return jsonify({'error' : 'internal server error', 'details' : str(e)}), 500 
+  
+
+@user_bp.route("/user/name", methods=["PUT"])
+def update_user_name():
+
+    data = request.get_json()
+
+    if not data or not all(key in data for key in ['id', 'first_name', 'last_name']):
+      return jsonify({'message': 'Missing data: name and id missing.'}), 400
+
+    first_name=data['first_name']
+    last_name=data['last_name']
+    id= data['id']
+
+    try:
+        update_response = supabase.table("users").update(
+          {
+            "first_name":first_name,
+            "last_name":last_name
+          }
+        ).eq("id", id).execute()
+
+        if not update_response.data:
+            return jsonify({"error": "user not found"}), 404
+
+        return jsonify(update_response.data[0]), 200
+    
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+    
