@@ -4,7 +4,7 @@ from utils.supabase import supabase
 from postgrest.exceptions import APIError as AuthApiError
 
 user_bp = Blueprint('main', __name__)
-@user_bp.route("/create-user", methods=["POST"])
+@user_bp.route('/user/create-user', methods=['POST'])
 def create_user():
   data = request.get_json()
   auth_header = request.headers.get('Authorization')
@@ -60,7 +60,62 @@ def create_user():
     print(str(e))
     return jsonify({'message': 'An error occured trying to add a user'}), 500
 
-@user_bp.route('/set-preference', methods=['POST'])
+@user_bp.route('/user/update-name', methods=['PUT'])
+def update_name():
+  try:
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
+    
+    data = request.get_json()
+    if not data or not all(key in data for key in ['first_name', 'last_name']):
+      return jsonify({'error': 'missing data: first_name, last_name'}), 400
+    
+    first_name = data.get('first_name')
+    last_name = data.get('last_name')
+
+    supabase.table('users').update({
+      'first_name' : first_name,
+      'last_name' : last_name
+    }).eq('id', user_id).execute()
+
+    return jsonify ({
+      'message' : 'name updated successfully',
+      'first_name' : first_name,
+      'last_name' : last_name
+    }), 200
+  
+  except Exception as e:
+    print('error updating name', e)
+    return jsonify({'error' : 'internal server error','details' : str(e)}), 500
+
+@user_bp.route('/user/update-email', methods=['PUT'])
+def update_email():
+  try:
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
+    
+    data = request.get_json()
+    if not data or not all(key in data for key in ['email']):
+      return jsonify({'error': 'missing data: email'}), 400
+    
+    email = data.get('email')
+
+    supabase.table('users').update({
+      'email' : email,
+    }).eq('id', user_id).execute()
+
+    return jsonify ({
+      'message' : 'email updated successfully',
+      'email' : email
+    }), 200
+  
+  except Exception as e:
+    print('error updating email', e)
+    return jsonify({'error' : 'Internal server error', 'details' : str(e)}), 500
+
+@user_bp.route('/user/set-preference', methods=['POST'])
 def set_preference():
 
   data = request.get_json()
@@ -119,16 +174,13 @@ def update_dietary_restrictions():
     }).eq('id', user_id).execute()
 
     return jsonify ({
-      'message' : 'Dietary restrictions updated successfully.',
+      'message' : 'dietary restrictions updated successfully.',
       'updated_restrictions' : new_restrictions
     }), 200
   
   except Exception as e:
-    print('Error updating dietary restrictions', e)
-    return jsonify({
-      'error' : 'Internal server error',
-      'details' : str(e)
-    }), 500
+    print('error updating dietary restrictions', e)
+    return jsonify({'error' : 'internal server error', 'details' : str(e)}), 500
   
 @user_bp.route('/user/dietary-restrictions', methods=['GET'])
 def get_dietary_restrictions():
@@ -147,7 +199,7 @@ def get_dietary_restrictions():
     )
 
     if not response.data:
-      return jsonify({'message' : 'User not found.'}), 404
+      return jsonify({'error' : 'user not found.'}), 404
     
     restrictions = response.data.get('dietary_restrictions') or []
 
@@ -157,8 +209,179 @@ def get_dietary_restrictions():
     }), 200
   
   except Exception as e:
-      print('Error fetching dietary restrictions: ', e)
-      return jsonify({
-        'error' : 'Internal Server Error',
-        'details' : str(e)
-      })
+      print('error fetching dietary restrictions: ', e)
+      return jsonify({'error' : 'internal server error', 'details' : str(e)})
+  
+@user_bp.route('/user/collections/create', methods=['POST'])
+def create_collection():
+  try:
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
+    
+    data = request.get_json()
+    title = data.get('title')
+    description = data.get('description', '')
+
+    if not title:
+      return jsonify({'error' : 'title of collection is required.'}), 400
+    
+    response = (
+      supabase.table('collections')
+      .insert({'user_id': user_id, 'title': title, 'description': description})
+      .execute()
+    )
+
+    if not response:
+      return jsonify({'error' : 'failed to create collection'}), 400
+
+    return jsonify({'message' : 'collection created successfully', 'collection_id' : response.data[0]}), 201
+
+  except Exception as e:
+    print('error creating collection', e)
+    return jsonify({'error' : 'Internal server error', 'details' : str(e)}), 500
+  
+@user_bp.route('/user/collections/add-recipe', methods=['POST'])
+def add_recipe_to_collection():
+  try:
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
+    
+    data = request.get_json()
+    collection_id = data.get('collection_id')
+    recipe_id = data.get('recipe_id')
+
+    if not collection_id or not recipe_id:
+      return jsonify({'error' : 'collection_id and recipe_id are required.'}), 400
+    
+    collection_check = (
+      supabase.table('collections')
+      .select('id', user_id)
+      .eq('id', collection_id)
+      .eq('user_id', user_id)
+      .execute()
+    )
+
+    if not collection_check.data:
+      return jsonify({'error' : 'collection not found for user'}), 404
+    
+    response = (
+      supabase.table('collection_recipes')
+      .insert({'collection_id' : collection_id, 'recipe_id' : recipe_id})
+      .execute()
+    )
+
+    if not response.data:
+      return jsonify({'error' : 'failed to add recipe to collection'}), 400
+
+    return jsonify({'message': 'recipe added to collection', 'recipe_id' : recipe_id}), 200
+
+  except Exception as e:
+    print('error adding recipe to collection', e)
+    return jsonify({'error' : 'internal server error', 'details' : str(e)}), 500
+
+@user_bp.route('/user/collections', methods=['GET'])
+def get_user_collections():
+  try:
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
+
+    response = (
+        supabase.table('collections')
+        .select('*, collection_recipes(recipe_id, recipes(id, title, prep_time, cook_time, image_url))')
+        .eq('user_id', user_id)
+        .execute()
+    )
+
+    if not response.data:
+      return jsonify({'message': 'No collections found.', 'collections': []}), 200
+
+    formatted_collections = []
+    for collection in response.data:
+      recipes = []
+      for entry in collection.get('collection_recipes', []):
+        recipe = entry.get('recipes')
+        if recipe:
+          recipes.append({
+            'recipe_id': recipe['id'],
+            'title': recipe['title'],
+            'prep_time': recipe.get('prep_time'),
+            'cook_time': recipe.get('cook_time'),
+            'image_url': recipe.get('image_url')
+          })
+            
+        formatted_collections.append({
+          'collection_id': collection['id'],
+          'name': collection['name'],
+          'description': collection.get('description'),
+          'created_at': collection.get('created_at'),
+          'recipes': recipes
+        })
+
+    return jsonify({'collections': formatted_collections}), 200
+    
+  except Exception as e:
+    print('error retrieving user collections', e)
+    return jsonify({'error' : 'internal server error', 'details' : str(e)}), 500
+
+@user_bp.route('/user/collections/remove-recipe', methods=['DELETE'])
+def remove_recipe_from_collection():
+  try:
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
+    
+    data = request.get_json()
+    collection_id = data.get('collection_id')
+    recipe_id = data.get('recipe_id')
+
+    if not collection_id or not recipe_id:
+      return jsonify({'error' : 'collection_id and recipe_id are required.'}), 400
+    
+    response = (
+      supabase.table('collection_recipes')
+      .delete()
+      .eq('collection_id', collection_id)
+      .eq('recipe_id', recipe_id)
+      .execute()
+    )
+
+    if hasattr(response, 'error') and response.error:
+      return jsonify({'error': 'failed to delete recipe from collection', 'details': response.error.message}), 400
+
+    return jsonify({'message': 'recipe removed from collection', 'recipe_id' : recipe_id}), 200
+    
+  except Exception as e:
+    print('error removing recipe from collection', e)
+    return jsonify({'error' : 'internal server error', 'details' : str(e)}), 500
+  
+@user_bp.route('/user/collections/delete', methods=['DELETE'])
+def delete_collection():
+  try:
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
+    
+    data = request.get_json()
+    collection_id = data.get('collection_id')
+
+    if not collection_id:
+      return jsonify({'error' : 'collection_id is required'}), 400
+
+    response = (
+        supabase.table('collections')
+        .delete()
+        .eq('id', collection_id)
+        .execute()
+    )
+
+    if hasattr(response, 'error') and response.error:
+      return jsonify({'error': 'failed to delete collection', 'details': response.error.message}), 400
+    
+    return jsonify({'message': 'collection deleted successfully', 'collection_id' : collection_id}), 200
+    
+  except Exception as e:
+    print('error deleting user collection', e)
+    return jsonify({'error' : 'internal server error', 'details' : str(e)}), 500 

@@ -1,7 +1,9 @@
 import os
 import requests
+from bs4 import BeautifulSoup
 import urllib, urllib.parse
 from urllib.parse import urlparse
+from utils.createRecipe import generate_blog_transcript_and_caption
 from youtube_transcript_api import YouTubeTranscriptApi, NoTranscriptFound
 from dotenv import load_dotenv
 from googleapiclient.discovery import build
@@ -55,37 +57,38 @@ def generate_recipe_from_tiktok(url: str):
         return None
 
 def generate_recipe_from_youtube(url: str):
-    if "v=" in url:
-        videoId = url.split("v=")[-1]
-    elif "shorts/" in url:
-        videoId = url.split("shorts/")[-1]
-    print("Video: " + videoId)
-    videoId = videoId.split("&")[0]
+    if 'v=' in url:
+        videoId = url.split('v=')[-1]
+    elif 'shorts/' in url:
+        videoId = url.split('shorts/')[-1]
+    print('Video: ' + videoId)
+    videoId = videoId.split('&')[0]
     print(videoId)
 
-    youtube = build("youtube", "v3", developerKey=YOUTUBE_API_KEY)
+    youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
 
     try:
         transcriptMachine = YouTubeTranscriptApi()
         fetchedTranscript = transcriptMachine.fetch(video_id=videoId)
-        transcript = ""
+        transcript = ''
         for snippet in fetchedTranscript:
-            transcript=transcript + snippet.text + "\n"
+            transcript=transcript + snippet.text + '\n'
         video_response = youtube.videos().list(
-            part="snippet",
+            part='snippet',
             id=videoId
         ).execute()
-        description = ""
-        if "items" in video_response and len(video_response["items"]) > 0:
-            snippet = video_response["items"][0]["snippet"]
-            description = snippet.get("description", "")
+        description = ''
+        if 'items' in video_response and len(video_response['items']) > 0:
+            snippet = video_response['items'][0]['snippet']
+            description = snippet.get('description', '')
         else:
-            print("No video details found.")
+            print('No video details found.')
 
-        return {
-            "caption": description,
-            "transcript": transcript
+        results = {
+            'caption': description,
+            'transcript': transcript
         }
+        return results
     except NoTranscriptFound:
         print("No Transcripts")
         return None
@@ -94,27 +97,53 @@ def generate_recipe_from_youtube(url: str):
         return None
 
 def generate_recipe_from_instagram(url: str):
-    encodedString = urllib.parse.quote(url,safe="")
-    urlTranscript = f"https://api.scrapecreators.com/v2/instagram/media/transcript?url={encodedString}"
+    encodedString = urllib.parse.quote(url,safe='')
+    urlTranscript = f'https://api.scrapecreators.com/v2/instagram/media/transcript?url={encodedString}'
     headers = {
-        "x-api-key": SCRAPECREATORS_API_KEY
+        'x-api-key': SCRAPECREATORS_API_KEY
     }
 
-    urlDescription = f"https://api.scrapecreators.com/v1/instagram/post?url={encodedString}"
+    urlDescription = f'https://api.scrapecreators.com/v1/instagram/post?url={encodedString}'
     responseTranscript = requests.get(urlTranscript, headers=headers)
     responseDescription = requests.get(urlDescription, headers=headers)
     dataTranscript = responseTranscript.json()
     dataDescription = responseDescription.json()
     results = {}
-    if ("transcripts" in dataTranscript.keys()):
-        results["transcript"] = dataTranscript["transcripts"][0]["text"]
+    if ('transcripts' in dataTranscript.keys()):
+        results['transcript'] = dataTranscript['transcripts'][0]['text']
     else:
         return None
         # for i in range(0,len(dataTranscript.keys())-2):
         #     if dataTranscript[f"{i}"]["text"]!=None:
         #         transcript[f"Recipe{i}"] = dataTranscript[f"{i}"]["text"]
-    results["caption"] = dataDescription["data"]["xdt_shortcode_media"]["edge_media_to_caption"]["edges"][0]["node"]["text"]
+    results['caption'] = dataDescription['data']['xdt_shortcode_media']['edge_media_to_caption']['edges'][0]['node']['text']
     return results
+
+def generate_recipe_from_blog(url: str):
+    try:
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        response = requests.get(url, headers=headers, timeout=15)
+        response.raise_for_status()
+
+        soup = BeautifulSoup(response.text, 'html.parser')
+        title = soup.title.string.strip() if soup.title else 'Untitled Recipe'
+
+        paragraphs = [p.get_text(strip=True) for p in soup.find_all("p")]
+        lists = [li.get_text(strip=True) for li in soup.find_all("li")]
+        text_content = '\n'.join(paragraphs + lists)
+
+        ai_generated = generate_blog_transcript_and_caption(
+            title=title, text=text_content
+        )
+
+        return {
+            'transcript': ai_generated.get('transcript', ''),
+            'caption': ai_generated.get('caption', '')
+        }
+
+    except Exception as e:
+        print(f'Error scraping blog: {e}')
+        return None
 
 PLATFORM_HANDLERS = {
     'tiktok.com' : generate_recipe_from_tiktok,
@@ -125,7 +154,11 @@ PLATFORM_HANDLERS = {
 
 def get_url_data(url: str):
     domain = urlparse(url).netloc.lower()
-    for key, handler in PLATFORM_HANDLERS.items():
-        if key in domain:
-            return handler(url)
-    return None
+    try:
+        for key, handler in PLATFORM_HANDLERS.items():
+            if key in domain:
+                return handler(url)
+        return generate_recipe_from_blog(url)
+    except Exception as e:
+        print(f'Error processing {domain}: {e}')
+        return None

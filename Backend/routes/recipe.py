@@ -2,39 +2,40 @@ import json
 from flask import Blueprint, request, jsonify
 from utils.supabase import supabase
 from utils.auth import authorize_user
-from utils.createRecipe import createRecipe
+from utils.createRecipe import generate_recipe, generate_ai_instructions, categorize_protein_types
 from utils.import_videos import get_url_data
 
 recipe_bp = Blueprint('recipe', __name__)
 
-@recipe_bp.route("/create-recipe", methods=["POST"])
-def create_recipe():
+@recipe_bp.route('/add-recipe', methods=['POST'])
+def add_recipe():
   try:
     user_id, error_response, status_code = authorize_user()
     if error_response:
       return error_response, status_code
     
     data = request.get_json()
-    if not data or not all(key in data for key in ['content']):
-      return jsonify({'message': 'Missing data: content.'}), 400
-    
-    content = data.get('content')
-    recipe_info = get_url_data(content)
-    if not recipe_info:
-      return jsonify ({'message' : 'Failed to extract data from content'})
 
-    recipe_str = create_recipe(recipe_info)
-    recipeJson = json.loads(recipe_str)
-
-    title = recipeJson.get('title')
-    description = recipeJson.get('description', '')
-    instructions = recipeJson.get('instructions')
-    ai_instructions = recipeJson.get('ai_instructions')
-    prep_time = recipeJson.get('prep_time', 0)
-    cook_time = recipeJson.get('cook_time', 0)
-    dietary_tags = recipeJson.get('dietary_tags', [])
-    ingredients = recipeJson.get('ingredients', [])
+    title = data.get('title')
+    description = data.get('description', '')
+    instructions = data.get('instructions')
+    prep_time = data.get('prep_time', 0)
+    cook_time = data.get('cook_time', 0)
+    dietary_tags = data.get('dietary_tags', [])
+    type = data.get('type')
+    ingredients = data.get('ingredients', [])
     image_url = data.get('image_url', '')
+
+    if not title or not instructions or not type:
+      return jsonify({'error' : 'title, instructions, and type are required'}), 400
+    
+    ai_instructions = generate_ai_instructions(instructions)
+    if not ai_instructions:
+      return jsonify({'error' : 'failed to generate AI instructions'}), 400
+    
+    protein = categorize_protein_types(ingredients)
+    if not protein:
+      return jsonify({'error' : 'failed to generate protein list'}), 400
 
     recipe = supabase.table('recipes').insert({
         'title' : title,
@@ -44,15 +45,17 @@ def create_recipe():
         'prep_time' : prep_time,
         'cook_time' : cook_time,
         'dietary_tags' : dietary_tags,
+        'protein' : protein,
+        'type' : type,
         'image_url' : image_url,
         'created_by' : user_id
     }).execute()
 
     if not recipe.data:
-      return jsonify({'error': 'Failed to create recipe'}), 400
+      return jsonify({'error': 'failed to create recipe'}), 400
       
     recipe_id = recipe.data[0]['id']
-    
+
     for ing in ingredients:
       supabase.table('ingredients').insert({
         'recipe_id' : recipe_id,
@@ -63,15 +66,43 @@ def create_recipe():
       }).execute()
 
     return jsonify({
-      'message' : 'Recipe created and saved!',
+      'message' : 'recipe created and saved',
       'recipe_id' : recipe_id
     }), 200
   
   except Exception as e:
-    print('ERROR', e)
-    return jsonify({'error' : 'Internal Server Error', 'details' : str(e)}), 500
+    print('error adding recipe to database', e)
+    return jsonify({'error' : 'internal server error', 'details' : str(e)}), 500
+
+@recipe_bp.route('/import-recipe', methods=['POST'])
+def import_recipe():
+  try:
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
     
-@recipe_bp.route("/toggle-favorite", methods=["POST"])
+    data = request.get_json()
+    if not data or not all(key in data for key in ['content']):
+      return jsonify({'error': 'missing data: content.'}), 400
+    
+    content = data.get('content')
+    recipe_info = get_url_data(content)
+    if not recipe_info:
+      return jsonify ({'error' : 'failed to extract data from content'}), 400
+
+    recipe_str = generate_recipe(recipe_info)
+    recipeJson = json.loads(recipe_str)
+
+    if not recipeJson:
+      return jsonify({'error': 'failed to create recipe'}), 400
+      
+    return recipeJson, 200
+  
+  except Exception as e:
+    print('error importing recipe', e)
+    return jsonify({'error' : 'internal server error', 'details' : str(e)}), 500
+    
+@recipe_bp.route('/toggle-favorite', methods=['POST'])
 def toggle_favorite():
   try:
 
@@ -96,7 +127,7 @@ def toggle_favorite():
     favorite_check = supabase.table('user_favorites').select('recipe_id').eq('user_id', user_id).eq('recipe_id', recipe_id).execute()
     if favorite_check.data:
       supabase.table('user_favorites').delete().eq('user_id', user_id).eq('recipe_id', recipe_id).execute()
-      return jsonify ({'message' : 'Recipe Unfavorited!'})
+      return jsonify ({'message' : 'recipe unfavorited'})
     
     else:
       favorite = supabase.table('user_favorites').insert({
@@ -107,13 +138,13 @@ def toggle_favorite():
       if not favorite.data:
         return jsonify({'error' : 'failed to favorite recipe'}), 400
       
-      return jsonify({'message' : 'Recipe favorited!', 'recipe_id' : favorite.data[0]['recipe_id']})
+      return jsonify({'message' : 'recipe favorited', 'recipe_id' : favorite.data[0]['recipe_id']})
   
   except Exception as e:
-    print('ERROR', e)
-    return jsonify({"error": "Internal Server Error", "details": str(e)}), 500
+    print('error toggling favorite', e)
+    return jsonify({"error": "internal server error", "details": str(e)}), 500
   
-@recipe_bp.route("/user/saved-recipes", methods=["GET"])
+@recipe_bp.route('/saved-recipes', methods=['GET'])
 def get_saved_recipes():
   try:
     user_id, error_response, status_code = authorize_user()
@@ -128,7 +159,7 @@ def get_saved_recipes():
     )
 
     if not saved_recipes_response.data:
-      return jsonify({'message' : 'No saved recipes found.', 'recipes' : [] }), 200
+      return jsonify({'message' : 'no saved recipes found.', 'recipes' : [] }), 200
     
     recipe_ids = [r['recipe_id'] for r in saved_recipes_response.data]
 
@@ -143,7 +174,7 @@ def get_saved_recipes():
 
     recipes_response = (
       supabase.table('recipes')
-      .select('id, title, description, instructions, prep_time, cook_time, dietary_tags, created_at, image_url, ingredients(*)')
+      .select('id, title, description, prep_time, cook_time, created_at, image_url')
       .in_('id', recipe_ids)
       .execute()
     )
@@ -155,10 +186,10 @@ def get_saved_recipes():
     return jsonify({'saved_recipes' : recipes}), 200
   
   except Exception as e:
-    print('ERROR', e)
-    return jsonify({'error' : 'Internal Server Error', 'details' : str(e)}), 500
+    print('error retreiving saved recipes', e)
+    return jsonify({'error' : 'internal server error', 'details' : str(e)}), 500
 
-@recipe_bp.route("/user/favorited-recipes", methods=["GET"])
+@recipe_bp.route('/favorited-recipes', methods=['GET'])
 def get_favorited_recipes():
   try:
     user_id, error_response, status_code = authorize_user()
@@ -173,22 +204,20 @@ def get_favorited_recipes():
     )
 
     if not favorited_recipes_response.data:
-      return jsonify({'message' : 'No favorited recipes found.', 'recipes' : [] }), 200
+      return jsonify({'message' : 'no favorited recipes found.', 'recipes' : [] }), 200
     
     recipe_ids = [r['recipe_id'] for r in favorited_recipes_response.data]
 
     recipes = (
       supabase.table('recipes')
-      .select('id, title, description, instructions, prep_time, cook_time, dietary_tags, created_at, ingredients(*)')
+      .select('id, title, description, prep_time, cook_time, created_at, image_url')
       .in_('id', recipe_ids)
       .execute()
     )
     return jsonify({'favorited_recipes' : recipes.data}), 200
   
   except Exception as e:
-    print('ERROR', e)
-    return jsonify({'error' : 'Internal Server Error', 'details' : str(e)}), 500
-  
+
 @recipe_bp.route("/recipes", methods=["GET"])
 def get_recipes():
   data = request.get_json()
@@ -223,7 +252,65 @@ def get_recipes():
     ]
   return jsonify({'result' : data}), 200
 
+@recipe_bp.route('/recipe/info', methods=['GET'])
+def get_recipe_info():
+  try:
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
+    
+    data = request.get_json()
+    recipe_id = data.get('recipe_id')
 
+    if not recipe_id:
+      return jsonify({'error' : 'recipe_id is required'}), 400
+    
+    recipe_response = (
+      supabase.table('recipes')
+      .select('id, title, description, instructions, prep_time, cook_time, dietary_tags, type, ingredients(*), image_url')
+      .eq('id', recipe_id)
+      .execute()
+    )
 
+    if not recipe_response.data:
+      return jsonify({'error' : 'recipe not found'}), 404
+    
+    recipe = recipe_response.data[0]
+
+    return jsonify({'recipe' : recipe}), 200
+  except Exception as e:
+    print('error retrieving recipe data', e)
+    return jsonify({'error' : 'internal server error', 'details' : str(e)}), 500
   
+@recipe_bp.route('/recipe/delete', methods=['DELETE'])
+def delete_recipe():
+  try:
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
+    
+    data = request.get_json()
+    recipe_id = data.get('recipe_id')
+
+    if not recipe_id:
+      return jsonify({'error' : 'recipe_id is required'}), 400
+    
+    response = (
+      supabase.table('recipes')
+      .delete()
+      .eq('id', recipe_id)
+      .execute()
+    )
+
+    if hasattr(response, 'error') and response.error:
+      return jsonify({'error': 'failed to delete recipe', 'details': response.error.message}), 400
+    
+    return jsonify({
+      'message' : 'recipe deleted successfully',
+      'deleted_recipe_id' : response.data[0]
+    }), 200
   
+  except Exception as e:
+    print('error deleteing recipe ', e)
+    return jsonify({'error' : 'internal server error', 'details' : str(e)}), 500
+
