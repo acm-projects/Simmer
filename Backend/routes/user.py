@@ -428,4 +428,28 @@ def update_diet_restriction():
   
   except Exception as e:
       return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+  
+@user_bp.route("/user", methods=["DELETE"])
+def delete_user():
+  data = request.get_json()
+  if not data or not all(key in data for key in ['id']):
+    return jsonify({'message': 'Missing data: id missing.'}), 400
+
+  id= data['id']
+  try:
+      db_response = supabase.table("users").delete().eq("id", id).execute()
+  except Exception as e:
+      print(f"Could not delete user profile {id}: {str(e)}")
+      pass
+  
+  try:
+      auth_response = supabase.auth.admin.delete_user(id)
+      
+      return jsonify({"message": f"User {id} deleted"}), 200
+
+  except AuthApiError as e:
+      return jsonify({"error": f"Auth error deleting user: {e.message}"}), 500
+  
+  except Exception as e:
+      return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
     
