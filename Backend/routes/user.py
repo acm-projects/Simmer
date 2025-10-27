@@ -319,18 +319,40 @@ def get_user_collections():
     user_id, error_response, status_code = authorize_user()
     if error_response:
       return error_response, status_code
-    
-    data = request.get_json()
-    user_id = data.get('user_id')
 
-    collections = (
+    response = (
         supabase.table('collections')
-        .select('*, collection_recipes(recipe_id, recipes(*))')
+        .select('*, collection_recipes(recipe_id, recipes(id, title, prep_time, cook_time, image_url))')
         .eq('user_id', user_id)
         .execute()
     )
 
-    return jsonify({'collections': collections.data}), 200
+    if not response.data:
+      return jsonify({"message": "No collections found.", "collections": []}), 200
+
+    formatted_collections = []
+    for collection in response.data:
+      recipes = []
+      for entry in collection.get("collection_recipes", []):
+        recipe = entry.get("recipes")
+        if recipe:
+          recipes.append({
+            "recipe_id": recipe["id"],
+            "title": recipe["title"],
+            "prep_time": recipe.get("prep_time"),
+            "cook_time": recipe.get("cook_time"),
+            "image_url": recipe.get("image_url")
+          })
+            
+        formatted_collections.append({
+          "collection_id": collection["id"],
+          "name": collection["name"],
+          "description": collection.get("description"),
+          "created_at": collection.get("created_at"),
+          "recipes": recipes
+        })
+        
+    return jsonify({"collections": formatted_collections}), 200
     
   except Exception as e:
     print('Error retrieving user collections', e)
