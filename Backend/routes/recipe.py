@@ -217,6 +217,8 @@ def get_favorited_recipes():
     return jsonify({'favorited_recipes' : recipes.data}), 200
   
   except Exception as e:
+    print('error retrieving favorited recipes', e)
+    return jsonify({'error' : 'internal server error', 'details' : str(e)}), 500
 
 @recipe_bp.route("/recipes", methods=["GET"])
 def get_recipes():
@@ -324,4 +326,3 @@ def delete_recipe():
   except Exception as e:
     print('error deleteing recipe ', e)
     return jsonify({'error' : 'internal server error', 'details' : str(e)}), 500
-
