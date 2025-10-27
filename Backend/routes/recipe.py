@@ -31,11 +31,11 @@ def add_recipe():
     
     ai_instructions = generate_ai_instructions(instructions)
     if not ai_instructions:
-      return jsonify({'error' : 'failed to generate AI instructions'}), 401
+      return jsonify({'error' : 'failed to generate AI instructions'}), 400
     
     protein = categorize_protein_types(ingredients)
     if not protein:
-      return jsonify({'error' : 'failed to generate protein list'}), 401
+      return jsonify({'error' : 'failed to generate protein list'}), 400
 
     recipe = supabase.table('recipes').insert({
         'title' : title,
@@ -52,7 +52,7 @@ def add_recipe():
     }).execute()
 
     if not recipe.data:
-      return jsonify({'error': 'Failed to create recipe'}), 400
+      return jsonify({'error': 'failed to create recipe'}), 400
       
     recipe_id = recipe.data[0]['id']
 
@@ -66,13 +66,13 @@ def add_recipe():
       }).execute()
 
     return jsonify({
-      'message' : 'Recipe created and saved!',
+      'message' : 'recipe created and saved',
       'recipe_id' : recipe_id
     }), 200
   
   except Exception as e:
-    print('ERROR', e)
-    return jsonify({'error' : 'Internal Server Error', 'details' : str(e)}), 500
+    print('error adding recipe to database', e)
+    return jsonify({'error' : 'internal server error', 'details' : str(e)}), 500
 
 @recipe_bp.route('/import-recipe', methods=['POST'])
 def import_recipe():
@@ -83,24 +83,24 @@ def import_recipe():
     
     data = request.get_json()
     if not data or not all(key in data for key in ['content']):
-      return jsonify({'message': 'Missing data: content.'}), 400
+      return jsonify({'error': 'missing data: content.'}), 400
     
     content = data.get('content')
     recipe_info = get_url_data(content)
     if not recipe_info:
-      return jsonify ({'message' : 'Failed to extract data from content'})
+      return jsonify ({'error' : 'failed to extract data from content'}), 400
 
     recipe_str = generate_recipe(recipe_info)
     recipeJson = json.loads(recipe_str)
 
     if not recipeJson:
-      return jsonify({'error': 'Failed to create recipe'}), 400
+      return jsonify({'error': 'failed to create recipe'}), 400
       
     return recipeJson, 200
   
   except Exception as e:
-    print('ERROR', e)
-    return jsonify({'error' : 'Internal Server Error', 'details' : str(e)}), 500
+    print('error importing recipe', e)
+    return jsonify({'error' : 'internal server error', 'details' : str(e)}), 500
     
 @recipe_bp.route('/toggle-favorite', methods=['POST'])
 def toggle_favorite():
@@ -127,7 +127,7 @@ def toggle_favorite():
     favorite_check = supabase.table('user_favorites').select('recipe_id').eq('user_id', user_id).eq('recipe_id', recipe_id).execute()
     if favorite_check.data:
       supabase.table('user_favorites').delete().eq('user_id', user_id).eq('recipe_id', recipe_id).execute()
-      return jsonify ({'message' : 'Recipe Unfavorited!'})
+      return jsonify ({'message' : 'recipe unfavorited'})
     
     else:
       favorite = supabase.table('user_favorites').insert({
@@ -138,11 +138,11 @@ def toggle_favorite():
       if not favorite.data:
         return jsonify({'error' : 'failed to favorite recipe'}), 400
       
-      return jsonify({'message' : 'Recipe favorited!', 'recipe_id' : favorite.data[0]['recipe_id']})
+      return jsonify({'message' : 'recipe favorited', 'recipe_id' : favorite.data[0]['recipe_id']})
   
   except Exception as e:
-    print('ERROR', e)
-    return jsonify({"error": "Internal Server Error", "details": str(e)}), 500
+    print('error toggling favorite', e)
+    return jsonify({"error": "internal server error", "details": str(e)}), 500
   
 @recipe_bp.route('/saved-recipes', methods=['GET'])
 def get_saved_recipes():
@@ -159,7 +159,7 @@ def get_saved_recipes():
     )
 
     if not saved_recipes_response.data:
-      return jsonify({'message' : 'No saved recipes found.', 'recipes' : [] }), 200
+      return jsonify({'message' : 'no saved recipes found.', 'recipes' : [] }), 200
     
     recipe_ids = [r['recipe_id'] for r in saved_recipes_response.data]
 
@@ -186,8 +186,8 @@ def get_saved_recipes():
     return jsonify({'saved_recipes' : recipes}), 200
   
   except Exception as e:
-    print('ERROR', e)
-    return jsonify({'error' : 'Internal Server Error', 'details' : str(e)}), 500
+    print('error retreiving saved recipes', e)
+    return jsonify({'error' : 'internal server error', 'details' : str(e)}), 500
 
 @recipe_bp.route('/favorited-recipes', methods=['GET'])
 def get_favorited_recipes():
@@ -204,7 +204,7 @@ def get_favorited_recipes():
     )
 
     if not favorited_recipes_response.data:
-      return jsonify({'message' : 'No favorited recipes found.', 'recipes' : [] }), 200
+      return jsonify({'message' : 'no favorited recipes found.', 'recipes' : [] }), 200
     
     recipe_ids = [r['recipe_id'] for r in favorited_recipes_response.data]
 
@@ -217,8 +217,8 @@ def get_favorited_recipes():
     return jsonify({'favorited_recipes' : recipes.data}), 200
   
   except Exception as e:
-    print('ERROR', e)
-    return jsonify({'error' : 'Internal Server Error', 'details' : str(e)}), 500
+    print('error retrieving favorite recipes', e)
+    return jsonify({'error' : 'internal server error', 'details' : str(e)}), 500
   
 @recipe_bp.route('/recipe/info', methods=['GET'])
 def get_recipe_info():
@@ -241,14 +241,14 @@ def get_recipe_info():
     )
 
     if not recipe_response.data:
-      return jsonify({'error' : 'Recipe not found'}), 404
+      return jsonify({'error' : 'recipe not found'}), 404
     
     recipe = recipe_response.data[0]
 
     return jsonify({'recipe' : recipe}), 200
   except Exception as e:
-    print('ERROR', e)
-    return jsonify({'error' : 'Internal Server Error', 'details' : str(e)}), 500
+    print('error retrieving recipe data', e)
+    return jsonify({'error' : 'internal server error', 'details' : str(e)}), 500
   
 @recipe_bp.route('/recipe/delete', methods=['DELETE'])
 def delete_recipe():
@@ -270,14 +270,14 @@ def delete_recipe():
       .execute()
     )
 
-    if not response.data:
-      return jsonify({'error' : 'Recipe not found'})
+    if hasattr(response, 'error') and response.error:
+      return jsonify({'error': 'failed to delete recipe', 'details': response.error.message}), 400
     
     return jsonify({
-      'message' : 'Recipe deleted successfully',
+      'message' : 'recipe deleted successfully',
       'deleted_recipe_id' : response.data[0]
     }), 200
   
   except Exception as e:
-    print('Error: ', e)
-    return jsonify({'error' : 'Internal Server Error', 'details' : str(e)}), 500
+    print('error deleteing recipe ', e)
+    return jsonify({'error' : 'internal server error', 'details' : str(e)}), 500
