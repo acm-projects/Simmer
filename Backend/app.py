@@ -37,51 +37,51 @@ app.register_blueprint(chat_bp)
 
 
 #############################
-FORMAT = pyaudio.paInt16  
-CHANNELS = 1     
-RATE = 16000          
-CHUNK = 1024          
-RECORD_SECONDS = 5      
-DEVICE_INDEX = 1          
-WAVE_OUTPUT_FILENAME = "output.wav"
-audio = pyaudio.PyAudio()
+# FORMAT = pyaudio.paInt16  
+# CHANNELS = 1     
+# RATE = 16000          
+# CHUNK = 1024          
+# RECORD_SECONDS = 5      
+# DEVICE_INDEX = 1          
+# WAVE_OUTPUT_FILENAME = "output.wav"
+# audio = pyaudio.PyAudio()
 
 
-stream = audio.open(format=FORMAT,
-                    channels=CHANNELS,
-                    rate=RATE,
-                    input=True,
-                    input_device_index=DEVICE_INDEX,
-                    frames_per_buffer=CHUNK)
+# stream = audio.open(format=FORMAT,
+#                     channels=CHANNELS,
+#                     rate=RATE,
+#                     input=True,
+#                     input_device_index=DEVICE_INDEX,
+#                     frames_per_buffer=CHUNK)
 
-print("Recording...")
+# print("Recording...")
 
-frames = []
+# frames = []
 
 
-for _ in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
-    data = stream.read(CHUNK)
-    audio_segment = AudioSegment(
-            data,
-            sample_width=audio.get_sample_size(FORMAT),
-            frame_rate=RATE,
-            channels=CHANNELS
-    )
-    amplitude = audio_segment.dBFS
-    if amplitude == float('-inf'):
-       continue
-    bar_length = int((60 + amplitude) / 2) 
-    bar = "#" * bar_length
+# for _ in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
+#     data = stream.read(CHUNK)
+#     audio_segment = AudioSegment(
+#             data,
+#             sample_width=audio.get_sample_size(FORMAT),
+#             frame_rate=RATE,
+#             channels=CHANNELS
+#     )
+#     amplitude = audio_segment.dBFS
+#     if amplitude == float('-inf'):
+#        continue
+#     bar_length = int((60 + amplitude) / 2) 
+#     bar = "#" * bar_length
     
 
-    print(f"Amplitude: {amplitude:.2f} dBFS | {bar}")
+#     print(f"Amplitude: {amplitude:.2f} dBFS | {bar}")
 
-print("Finished recording.")
+# print("Finished recording.")
 
-stream.stop_stream()
-stream.close()
+# stream.stop_stream()
+# stream.close()
 
-audio.terminate()
+# audio.terminate()
 
 if __name__ == "__main__":
   app.run(host='0.0.0.0', port=5000, debug=True)
