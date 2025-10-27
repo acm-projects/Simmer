@@ -126,23 +126,63 @@ def chat():
       return jsonify({'message': 'Could not process audio file.'}), 500
 
   userMessage = stt(userAudioBytes)
+  print('-----------------------------------')
+  print(userMessage)
+  chat_response = (
+      supabase.table('conversations')
+      .select('*')
+      .eq('chat_id', cid)
+      .single()
+      .execute()
+  )
+  chat=chat_response.data
+  rid=chat['recipe_id']
+  uid=chat['user_id']
 
-  
-  print(str(instructions))
+  recipes_response = (
+      supabase.table('recipes')
+      .select('*')
+      .eq('id', rid)
+      .single()
+      .execute()
+  )
+  recipe=recipes_response.data
+  chat_message=""
+  print(userMessage)
+  if "next" in userMessage:
+    if(chat['state']>=len(recipe['ai_instructions']['ai_steps'])):
+      chat_message="The recipe has been completed. Please feel free to restart or checkout other recipes."
+    else:
+      chat_message=recipe['ai_instructions']['ai_steps'][chat['state']]['description']
+      update_response = (
+        supabase.table('conversations')
+        .update({'state':(chat['state']+1)})  
+        .eq('chat_id', cid)
+        .execute()
+      )
+  elif "previous" in userMessage:
+    if(chat['state']<=1):
+      chat_message="You are on the first step. You cannot got back any further"
+    else:
+      chat_message=recipe['ai_instructions']['ai_steps'][chat['state']-2]['description']
+  elif "repeat" in userMessage:
+    if(chat['state']==1):
+      chat_message="We have not started yet, please say next to continue"
+    else:  
+      chat_message=recipe['ai_instructions']['ai_steps'][chat['state']-1]['description']
+  else:
+    config = {"configurable": {"thread_id": cid}}
+    start_time = time.perf_counter()
+    response = app.invoke({"messages": [HumanMessage(content=userMessage)]}, config)
+    end_time = time.perf_counter()
 
 
-
-  config = {"configurable": {"thread_id": cid}}
-  start_time = time.perf_counter()
-  response = app.invoke({"messages": [HumanMessage(content=userMessage)]}, config)
-  end_time = time.perf_counter()
-
-
-  duration = end_time - start_time
-  print(f"The code took {duration:.6f} seconds to run.")
-  wav_fp = io.BytesIO()
+    duration = end_time - start_time
+    print(f"The code took {duration:.6f} seconds to run.")
+    chat_message=response["messages"][-1].content
   try:
-    tts = gTTS(response["messages"][-1].content, lang='en')
+    wav_fp = io.BytesIO()
+    tts = gTTS(chat_message, lang='en')
     tts.write_to_fp(wav_fp)
   except Exception as e:
     return jsonify({"message":"Speech could not be generated"}), 500
