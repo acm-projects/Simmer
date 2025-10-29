@@ -219,7 +219,7 @@ export default function ImportRecipe(){
               onChangeText={(text) => updateIngredient(index, "quantity", text)}
             />
             <TextInput
-              style={[styles.recipe, { paddingLeft: 2 }]}
+              style={[styles.recipe, { paddingLeft: 2, }]}
               placeholder="unit"
               placeholderTextColor="#a1a1a1ff"
               value={ing.unit}
@@ -244,11 +244,11 @@ export default function ImportRecipe(){
         {step.map((stepText, index) => (
           <View
             key={index}
-            style={{ flexDirection: 'row', alignItems: 'flex-end', paddingLeft: 20 }}
+            style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 20 }}
           >
-            <Text style={styles.bullet}>{index + 1}.</Text>
+            <Text style={[styles.bullet,{}]}>{index + 1}.</Text>
             <TextInput
-              style={[styles.recipe, { paddingLeft: 2, flex: 1 }]}
+              style={[styles.recipe, { paddingLeft: 2, }]}
               placeholder="Step"
               placeholderTextColor="#a1a1a1ff"
               value={stepText}
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
    container: {
     flex: 1,
     backgroundColor: '#f5ebe6ff',
-    paddingTop: 70,
+    paddingTop: 40,
     paddingLeft: 15,
     paddingRight: 15,
     paddingBottom: 10,
@@ -296,12 +296,13 @@ const styles = StyleSheet.create({
     recipe:{
     fontSize: 16,
     color: '#000',
-    paddingTop: 4,
+    paddingVertical: 5,
 
   },
     time:{
     fontSize: 15,
     color: '#fff',
+   
 
   },
     info:{
@@ -403,7 +404,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
    bullet: {
-    fontSize: 16, // Adjust size as needed
+    fontSize: 16,
     marginRight: 8,
   },
   image:{

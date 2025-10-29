@@ -18,7 +18,7 @@ export default function RecipeScreen() {
      <Text style={styles.title}>Recipes</Text>
      </View>
 
-<View style ={{marginTop: 30}}>
+<View style ={{marginTop: 20}}>
 <Text style={styles.text}>11 Recipes</Text>
 
  <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
@@ -43,11 +43,11 @@ const styles = StyleSheet.create({
    container: {
     flex: 1,
     backgroundColor: '#f5ebe6ff',
-    paddingTop: 50,
+    paddingTop: 30,
   },
   content:{
     padding: 1,
-    top: 50,
+    top: 30,
   },
   gridItem: {
     flex: 1, // Ensures items take equal space in a row

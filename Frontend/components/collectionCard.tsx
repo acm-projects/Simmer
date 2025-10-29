@@ -32,7 +32,7 @@ const CollectionCard = ({title}: CollectionCardProps) => {
     };
 
   return (
-    <Link href="../screens/recipeCollection" style={styles.container}>
+
     <View style={styles.container}>
        
       <View style={styles.imageCard}>
@@ -59,7 +59,7 @@ const CollectionCard = ({title}: CollectionCardProps) => {
      
        </View>
     </View>
-    </Link>
+  
   )
 }
 
@@ -67,10 +67,11 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     margin: 10,
-   shadowColor: '#000000ff',
+    shadowColor: "#fff",
     shadowOffset:{width: 0, height: 0},
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.1,
     shadowRadius: 2,
+    borderRadius: 15,
   },
   image:{
     backgroundColor: 'white',
@@ -78,13 +79,11 @@ const styles = StyleSheet.create({
     height: 100,
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
-    bottom: -6,
+    bottom: 0,
     alignItems: 'center',
     justifyContent: 'center',
 
-   
   
-
   },
   imageCard:{
   
@@ -100,6 +99,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 15,
     borderBottomRightRadius: 15,
     zIndex: 1,
+    bottom: 7,
   },
   title:{
     textAlign: 'center',

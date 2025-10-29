@@ -64,8 +64,7 @@ export default function UserPreference() {
 
   return (
     <ScrollView style={styles.container}>
-       <Link href='/voiceAssistant'>Temporary link to homepage</Link>
-      <Text style={styles.title}>Dietary Restrictions</Text>
+       <Link href='/voiceAssistant'><Text style={styles.title}>Dietary Restrictions</Text></Link>
       <Text style={styles.label}>Select Options</Text>
       <View style={styles.tagContainer}>
         {dietRestrictionTags.map((tag) => {
@@ -133,7 +132,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#9BA760',
     borderRadius: 100,
-    margin: 3,
+    margin: 1,
     paddingHorizontal: 10,
     padding: 10,
   },
@@ -142,7 +141,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#2E321E',
     borderRadius: 100,
-    margin: 3,
+    margin: 1,
   },
   tagText: {
     fontSize: 14,

@@ -46,9 +46,9 @@ const [newAllergen, setNewAllergen] = useState('');
             <TouchableOpacity onPress={() => router.back()}>
     <ArrowLeft size={20} style={{margin: 5}}/>
     </TouchableOpacity>
-    <View style={[styles.greenBox, {width: '85%'}]}>
+    <View style={[styles.greenBox, {width: '85%',  height: 45,}]}>
         <TextInput 
-        style={styles.text}
+        style={[styles.text, {margin: 1}]}
         placeholder="Search"
         placeholderTextColor="#e0e0e0ff"
         value={search}
@@ -136,7 +136,7 @@ const [newAllergen, setNewAllergen] = useState('');
 </CollapsibleSection>
 
 
-<CollapsibleSection title="Allergens" isVisible={showAllergen} setIsVisible={setShowAllergen}>
+<CollapsibleSection title="Allergen" isVisible={showAllergen} setIsVisible={setShowAllergen}>
 <View style={{ alignItems: 'center' }}>
   {Array.from({ length: Math.ceil(allergen.length / 3) }, (_, rowIndex) => {
     const rowItems = allergen.slice(rowIndex * 3, rowIndex * 3 + 3);
@@ -160,10 +160,10 @@ const [newAllergen, setNewAllergen] = useState('');
 
 <View style={{flexDirection: 'row', alignItems: 'center', width: '90%'}}>
     <Plus color={'white'} size={22}style={styles.plus}/>
-    <View style={[styles.greenBox, {width: '90%', marginTop: 10,}]}>
+    <View style={[styles.lightGreenBox, {width: '90%', marginTop: 10,}]}>
         
         <TextInput 
-        style={styles.text}
+        style={[styles.text, {margin: 0,}]}
         placeholder='Add Other'
         placeholderTextColor="#e0e0e0ff"
         value={newAllergen}
@@ -175,8 +175,8 @@ const [newAllergen, setNewAllergen] = useState('');
     </View>
     </CollapsibleSection>
     <View style={{alignItems: 'center', width: '100%'}}>
-    <TouchableOpacity style={[styles.greenBox,{marginTop: 10, width: 110, alignItems:'center', backgroundColor: '#262e05ff', paddingLeft: 10}]}>
-    <Text style={styles.text}>Search</Text>
+    <TouchableOpacity style={[styles.greenBox,{marginTop: 10, paddingLeft: 0, width: 115, alignItems:'center', backgroundColor: '#262e05ff'}]}>
+    <Text style={[styles.text, {paddingLeft: 0}]}>Search</Text>
     </TouchableOpacity>
     </View>
     </View> 
@@ -203,7 +203,13 @@ const styles = StyleSheet.create({
   },
   greenBox:{
     backgroundColor: '#9BA760',
-    padding: 5,
+    paddingLeft: 15,
+    marginLeft: 10,
+    marginRight: 10,
+    borderRadius: 100,
+  },
+   lightGreenBox:{
+    backgroundColor: '#9BA760',
     paddingLeft: 15,
     marginLeft: 10,
     marginRight: 10,

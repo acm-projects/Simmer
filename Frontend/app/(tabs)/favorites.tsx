@@ -1,8 +1,8 @@
 import react, {useState} from 'react'
 import { Image } from 'expo-image';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform} from 'react-native';
-import { router } from 'expo-router';
+import { StyleSheet, Text, View, ScrollView, Touchable, TextInput, KeyboardAvoidingView, Platform} from 'react-native';
+import { router, Link } from 'expo-router';
 
 
 import CollectionCard from "@/components/collectionCard";
@@ -45,7 +45,9 @@ export default function FavoritesScreen() {
 
      <View style={{ justifyContent: 'center', alignItems: 'center'}}>
       {collections.map((title, index) => (
+        <Link href="../screens/recipeCollection" style={{padding: 10}}>
           <CollectionCard title={collections.at(index) ?? 'Untitled'}/>
+          </Link>
       ))}
        
      </View>
@@ -79,12 +81,13 @@ const styles = StyleSheet.create({
   container: {
    flex: 1,
    backgroundColor: '#f5ebe6ff',
-   paddingTop: 65,
+   paddingTop: 45,
  },
  text: {
    fontSize: 25,
    color: '#9BA760',
    fontFamily: 'Nunito_700Bold',
+   marginBottom: 10,
  },
   textAdd: {
    fontSize: 15,
@@ -113,12 +116,12 @@ const styles = StyleSheet.create({
  },
    greenBox:{
     backgroundColor: '#9BA760',
-    padding: 5,
+   
     paddingLeft: 15,
     marginLeft: 10,
     marginRight: 10,
     borderRadius: 100,
-    height: 40,
+    height: 42,
     alignContent: 'center',
     justifyContent: 'center',
   },

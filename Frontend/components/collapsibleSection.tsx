@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Nunito_600SemiBold',
   },
   subtitle:{
-    fontSize: 18,
+    fontSize: 19,
     color: '#2E321E',
     paddingLeft: 10,
     paddingTop: 15,

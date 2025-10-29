@@ -36,14 +36,17 @@ export default function MyCarousel() {
       <Carousel
         loop
         width={width}
-        height={220}
+        height={225}
         data={pairedData}
         renderItem={({ item }: { item: CarouselItem[] }) => (
           <View style={{ 
             flexDirection: 'row', 
             width: width, 
             justifyContent: 'space-around',
-            paddingHorizontal: 10 
+            paddingHorizontal: 10,
+            alignContent: 'center',
+        
+            
           }}>
             <SmallCard title={item[0].title} image={item[0].image} />
             {item[1] && <SmallCard title={item[1].title} image={item[1].image} />}

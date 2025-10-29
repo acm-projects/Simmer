@@ -145,10 +145,11 @@ const handleAddAllergen = () => {
 <View style={{alignItems:'center', width: '100%'}}>
     <View style={{flexDirection: 'row', alignItems: 'center', paddingTop: 10,}}>
     <Plus color={'white'} size={22} style={styles.plus}/>
-    <View style={[styles.greenBox]}>
+    <View style={[styles.greenBox, {height: 60,}]}>
         
         <TextInput 
         placeholder='Add Other'
+        style={{margin:-1}}
         value={newAllergen}
         onChangeText={setNewAllergen}
         onSubmitEditing={handleAddAllergen}
@@ -290,7 +291,7 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     paddingHorizontal: 10,
     padding: 10,
-    marginHorizontal: 5,
+    marginHorizontal: 10,
   },
     plus:{
     backgroundColor: '#262e05ff', 

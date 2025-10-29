@@ -49,7 +49,7 @@ const SmallCard: React.FC<Props>= ({title, image }) => {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    margin: 10,
+    margin: 20,
     height: 200,
     width: 150,
     shadowColor: '#000000ff',

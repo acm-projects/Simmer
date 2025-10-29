@@ -4,14 +4,12 @@ import FavoriteIcon from '@/components/favoriteIcon';
 import { Clock2 } from 'lucide-react-native'
 import { Heart } from 'lucide-react-native';
 import { Link } from 'expo-router';
-import { useFonts } from '@expo-google-fonts/nunito/useFonts';
-import { Nunito_400Regular } from '@expo-google-fonts/nunito/400Regular';
-import { Nunito_600SemiBold } from '@expo-google-fonts/nunito/600SemiBold';
-import { Nunito_700Bold } from '@expo-google-fonts/nunito/700Bold';
 
 interface Props{
   title: string;
   image: ImageSourcePropType; 
+  
+
 }
 
 
@@ -22,7 +20,7 @@ const LargeCard: React.FC<Props>= ({title, image}) => {
 
   return (
     <Link href="../screens/description" style={styles.container}>
-    <View style={styles.content}>
+    <View style={[styles.content, {alignItems:'center'}]}>
        
    
     <Image source={image} style={styles.image}/>
@@ -42,7 +40,7 @@ const LargeCard: React.FC<Props>= ({title, image}) => {
              
              
              </View>
-      <View style={styles.card}>
+      <View style={[styles.card, {justifyContent: 'center'}]}>
         
                <Text style={styles.title}>{title}</Text> 
                    <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 10, }}>
@@ -63,9 +61,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     backgroundColor: 'white',
     shadowColor: "#303030ff",
-    shadowOffset:{width: 0, height: 0},
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
     alignItems: 'center',
   },
   content:{
@@ -90,7 +87,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start'
   },
   title:{
-      fontSize: 27,
+      fontSize: 25,
       color: '#06402B',
       paddingTop: 5,
       marginLeft: 10,

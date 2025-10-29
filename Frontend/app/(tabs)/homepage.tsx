@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
    
   },
   content:{
-    top: 50,
+    top: 30,
   },
   gridItem: {
     flex: 1, // Ensures items take equal space in a row
