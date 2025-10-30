@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SupabaseProvider, useSupabase } from './contexts/SupabaseContext';
+import CookingModePage from './screens/cookingMode';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -59,12 +60,14 @@ export default function RootLayout() {
           <Stack.Screen name="screens/cookingMode" options={{ headerShown: false }} />
           <Stack.Screen name="screens/importRecipe" options={{ headerShown: false }} />
           <Stack.Screen name="screens/description" options={{ headerShown: false }} />
+          <Stack.Screen name="screens/recipeCollection" options={{ headerShown: false }} />
+          <Stack.Screen name="screens/profilePage" options={{ headerShown: false }} />
           <Stack.Screen name="userPreference" options={{ headerShown: false }} />
           <Stack.Screen name="voiceAssistant" options={{ headerShown: false }} />
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+          <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal', headerShown: false }} />
         </Stack>
         <StatusBar style="auto" />
       </ThemeProvider>

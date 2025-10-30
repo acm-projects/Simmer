@@ -21,7 +21,7 @@ container:{
     height: 34,
     width: 34,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
 },
 
 

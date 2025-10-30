@@ -7,12 +7,26 @@ import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Heart } from 'lucide-react-native';
 import { Layers } from 'lucide-react-native';
+import { useFonts } from '@expo-google-fonts/nunito/useFonts';
+import { Nunito_400Regular } from '@expo-google-fonts/nunito/400Regular';
+import { Nunito_600SemiBold } from '@expo-google-fonts/nunito/600SemiBold';
+import { Nunito_700Bold } from '@expo-google-fonts/nunito/700Bold';
+
 
 
 
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+    const [fontsLoaded] = useFonts({
+    Nunito_400Regular,
+    Nunito_600SemiBold,
+    Nunito_700Bold,
+  });
+
+    if (!fontsLoaded) {
+    return null; // 👈 waits quietly
+  }
 
 
   return (

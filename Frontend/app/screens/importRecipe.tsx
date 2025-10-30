@@ -1,28 +1,118 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, ScrollView, ActivityIndicator, Image, Button, TextInput, Modal, TouchableOpacity} from 'react-native';
+import { StyleSheet, Text, View, ScrollView, Image, Button, TextInput, Modal, TouchableOpacity, KeyboardAvoidingView, Platform} from 'react-native';
 import { ArrowLeft } from 'lucide-react-native';
 import { useFonts, Orbitron_400Regular, Orbitron_700Bold} from '@expo-google-fonts/orbitron'
 import TabLayout from '../(tabs)/_layout';
 import { Plus } from 'lucide-react-native';
 import LinkPopup from '@/components/linkPopup'
 import { router } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
+
+
 
 
 export default function ImportRecipe(){
+  const [selectedImage, setSelectedImage]= useState<string | undefined>(
+    undefined
+  );
+  const [imageRead, setImageRead] =useState(false);
 
-  const [title, setTitle] = useState('');
+
+  const pickImageAsync = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if(!result.canceled){
+      setSelectedImage(result.assets[0].uri);
+      setImageRead(true);
+      console.log(result);
+    }else{
+      alert("You did not select any image.");
+    }
+  };
+   const [title, setTitle] = useState('');
   const [prepMin, setPrepMin] = useState('');
   const [cookMin, setCookMin] = useState('');
-  const [ingredient, setIngredient] = useState('');
-  const [step, setStep] = useState('');
-  const [amount, setAmount] = useState('');
-
+  const [step, setStep] = useState(['']);
   const[isVisible, setIsVisible] = useState(false);
+  const [ingredient, setIngredient] = useState([{name: '', quantity: '', unit: ''}]);
+  const [userToken, setUserToken] = useState("YOUR_JWT_TOKEN_HERE");
+  
+
+ const updateIngredient = (index: number, field: "quantity" | "unit" | "name", value: string) => {
+  const updated = [...ingredient];
+  updated[index] = { ...updated[index], [field]: value };
+  setIngredient(updated);
+};
+
+    const addIngredient = () => {
+    setIngredient([...ingredient, { name: '', quantity: '', unit: '' }]);
+  };
+
+  // --- Step handlers ---
+  const updateStep = (index: number, value: string) => {
+    const updated = [...step];
+    updated[index] = value;
+    setStep(updated);
+  };
+
+  const addStep = () => {
+    setStep([...step, '']);
+  };
+
+ const handleCreateRecipe = async () => {
+  // Create recipe data object from state
+  const recipeData = {
+    title: title,
+    instructions: step,
+    prep_time: parseInt(prepMin) || 0,
+    cook_time: parseInt(cookMin) || 0,
+    dietary_tags: [],
+    ingredients: ingredient,
+  };
+
+  try {
+    const response =  await fetch(`${process.env.EXPO_PUBLIC_API_URL}create_recipe`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${userToken}`
+      },
+      body: JSON.stringify(recipeData)
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert(`Recipe created successfully! ID: ${data.recipe_id}`);
+      setTitle('');
+      setPrepMin('');
+      setCookMin('');
+      setIngredient([{ name: '', quantity: '', unit: '' }]);
+      setStep(['']);
+    } else {
+      alert(`Error: ${data.error || 'Failed to create recipe'}`);
+    }
+  } catch (err) {
+    console.error("Error creating recipe:", err);
+    alert("Could not connect to server");
+  }
+};
+  
+ 
 
     return(
-        <ScrollView style={styles.container}>
-     
+   
+    <View style={styles.container}>
+      <KeyboardAvoidingView 
+      style={{flex: 1}}
+      behavior={Platform.OS === "ios" ? "padding": undefined}
+      keyboardVerticalOffset={0}
+      >
+        <ScrollView>
      <View style={{ justifyContent: 'center', alignItems: 'center'}}>
          <Text style={styles.title}>Recipes</Text>
          </View>
@@ -34,7 +124,10 @@ export default function ImportRecipe(){
             
             <View style={{position: 'relative' , top: 20}}>
             <View style={styles.greenBox}>
-                <Button title="Import" color='#fff' onPress={() => setIsVisible(true)}/>
+                <TouchableOpacity style={{padding: 5}}
+                onPress={() => setIsVisible(true)}>
+                  <Text style={styles.text}>Import</Text>
+                </TouchableOpacity>
                   <Modal
                   visible={isVisible}
                   transparent
@@ -58,90 +151,136 @@ export default function ImportRecipe(){
              
 
              <View>
-                         <View style={styles.card}>
-                            <View style={styles.image}>
-                            <Plus size={40} style={{color: '#9BA760'}}/>
-                            </View>
-                             <View style={styles.titleBox}>
-                                 <TextInput 
-                                 style={styles.title2}
-                                 placeholder="Title"
-                                 value={title}
-                                 onChangeText={setTitle}
-                                 />
-                                 <View>
-                                     <Text style={styles.time}>Prep:  
-                                  <TextInput 
-                                 style={styles.time}
-                                 placeholder="__"
-                                 value={prepMin}
-                                 onChangeText={setPrepMin}
-                                 />min</Text>
+            <View style={styles.card}>
+              {!imageRead && (
+              <TouchableOpacity 
+              style={styles.image}
+              onPress={pickImageAsync}
+            
+              >
+              <Plus size={40} color={'#9BA760'}/>
+              </TouchableOpacity>)}
+              {imageRead && (
+                <Image source={{uri: selectedImage}}
+                style={styles.image}/>
+              )}
 
-                                      <Text style={styles.time}>Cook:  
-                                  <TextInput 
-                                 style={styles.time}
-                                 placeholder="__"
-                                 value={cookMin}
-                                 onChangeText={setCookMin}
-                                 />min</Text>
-                                 </View>
-                             
-                             </View>
-                         </View>
+
+                <View style={styles.titleBox}>
+                    <TextInput 
+                    style={styles.title2}
+                    placeholder="Title"
+                    value={title}
+                    onChangeText={setTitle}
+                    />
+                    <View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Text style={styles.time}>Prep: </Text>
+                    <TextInput
+                      style={[styles.time, ]}
+                      placeholder="__"
+                      placeholderTextColor="#e0e0e0ff"
+                      value={prepMin}
+                      onChangeText={setPrepMin}
+                    />
+                    <Text style={styles.time}> min</Text>
+                  </View>
+
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Text style={styles.time}>Cook: </Text>
+                    <TextInput
+                      style={[styles.time, ]}
+                      placeholder="__"
+                      placeholderTextColor="#e0e0e0ff"
+                      value={cookMin}
+                      onChangeText={setCookMin}
+                    />
+                    <Text style={styles.time}> min</Text>
+                  </View>
+                    </View>
+                
+                </View>
+            </View>
+            </View>
+
+        <View style={styles.desBox}>
+        <Text style={styles.title1}>Ingredients</Text>
+        {ingredient.map((ing, index) => (
+          <View
+            key={index}
+            style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 20 }}
+          >
+            <Text style={styles.bullet}>{'\u2022'}</Text>
+            <TextInput
+              style={[styles.recipe, { paddingLeft: 2 }]}
+              placeholder="#"
+              placeholderTextColor="#a1a1a1ff"
+              value={ing.quantity}
+              onChangeText={(text) => updateIngredient(index, "quantity", text)}
+            />
+            <TextInput
+              style={[styles.recipe, { paddingLeft: 2, }]}
+              placeholder="unit"
+              placeholderTextColor="#a1a1a1ff"
+              value={ing.unit}
+              onChangeText={(text) => updateIngredient(index, "unit", text)}
+            />
+            <TextInput
+              style={[styles.recipe, { paddingLeft: 2 }]}
+              placeholder="ingredient"
+              placeholderTextColor="#a1a1a1ff"
+              value={ing.name}
+              onChangeText={(text) => updateIngredient(index, "name", text)}
+            />
+          </View>
+        ))}
+        <TouchableOpacity onPress={addIngredient} style={[styles.smallGreenBox, { width: 120 }]}>
+          <Text style={styles.time}>Add Ingredient</Text>
+        </TouchableOpacity>
+      </View>
              
                          <View style={styles.desBox}>
-                             <Text style={styles.title1}>Ingredients</Text>
-                               <View style={{flexDirection: 'row', alignItems: 'center', paddingLeft: 20}}>
-                                <Text style={styles.bullet}>{'\u2022'}</Text>
-                                  <TextInput 
-                                 style={[styles.recipe,{paddingLeft: 2, paddingRight: 2,}]}
-                                 placeholder="__ "
-                                 value={amount}
-                                 onChangeText={setAmount}
-                                 />
-                                   <TextInput 
-                                 style={[styles.recipe,{paddingLeft: 2}]}
-                                 placeholder="ingredient"
-                                 value={ingredient}
-                                 onChangeText={setIngredient}
-                                 />
-                              
-                              </View>
-
-                              
-                             <View style={[styles.smallGreenBox,{width: 120}]}>
-                              <Text style={styles.time}>Add Ingredient</Text></View> 
-                         </View>
-             
-                          <View style={styles.desBox}>
-                             <Text style={styles.title1}>Steps</Text>
-                             <View style={{flexDirection: 'row', alignItems: 'flex-end', paddingLeft: 20}}>
-                                <Text style={styles.bullet}>1.</Text>
-                                 <TextInput 
-                                 style={[styles.recipe,{paddingLeft: 2}]}
-                                 placeholder="steps"
-                                 value={step}
-                                 onChangeText={setStep}
-                                 />
-                              </View>
-                            
-                                 <View style={styles.smallGreenBox}>
-                              <Text style={styles.time}>Add Step</Text></View> 
-                            
-                              
-                         </View>
+        <Text style={styles.title1}>Steps</Text>
+        {step.map((stepText, index) => (
+          <View
+            key={index}
+            style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 20 }}
+          >
+            <Text style={[styles.bullet,{}]}>{index + 1}.</Text>
+            <TextInput
+              style={[styles.recipe, { paddingLeft: 2, }]}
+              placeholder="Step"
+              placeholderTextColor="#a1a1a1ff"
+              value={stepText}
+              onChangeText={(text) => updateStep(index, text)}
+            />
+          </View>
+        ))}
+        <TouchableOpacity onPress={addStep} style={[styles.smallGreenBox, { width: 100 }]}>
+          <Text style={styles.time}>Add Step</Text>
+        </TouchableOpacity>
+      </View>
+                     <View style={{alignItems: 'center', marginTop: 20}}>
+                      <TouchableOpacity
+                      style={[styles.greenBox, {width: 180}]}
+                      onPress={handleCreateRecipe}>
+                        <Text style={styles.text}>Done</Text>
+                      </TouchableOpacity>
                      </View>
-        </ScrollView>
-    )}
+                     </ScrollView>
+                    </KeyboardAvoidingView> 
+        </View>
+     
+    )};
 
 const styles = StyleSheet.create({
    container: {
     flex: 1,
     backgroundColor: '#f5ebe6ff',
-    paddingTop: 70,
+    paddingTop: 40,
     paddingLeft: 15,
     paddingRight: 15,
+    paddingBottom: 10,
     
   },
   content:{
@@ -151,17 +290,19 @@ const styles = StyleSheet.create({
     text:{
     fontSize: 18,
     color: '#fff',
+    fontFamily: 'Nunito_400Regular',
 
   },
     recipe:{
     fontSize: 16,
     color: '#000',
-    paddingTop: 4,
+    paddingVertical: 5,
 
   },
     time:{
     fontSize: 15,
     color: '#fff',
+   
 
   },
     info:{
@@ -186,16 +327,13 @@ const styles = StyleSheet.create({
     paddingTop: 15,
     fontSize: 25,
     color: '#9BA760',
-  },
-  customText:{
-    fontFamily: 'Orbitron_400Regular',
-    fontSize: 80,
+    fontFamily: 'Nunito_700Bold',
   },
   greenBox:{
     borderRadius: 100,
     marginHorizontal: 15,
     backgroundColor: '#9BA760',
-    padding: 0,
+    padding: 2,
     alignItems: 'center',
     margin: 5,
 
@@ -229,12 +367,14 @@ const styles = StyleSheet.create({
     paddingTop: 5,
     fontSize: 25,
     color: '#9BA760',
+    fontFamily: 'Nunito_700Bold',
   },
      title2:{
     paddingLeft: 15,
     paddingTop: 5,
     fontSize: 30,
     color: '#fff',
+    fontFamily: 'Nunito_700Bold',
   },
   titleBox:{
     backgroundColor: '#9BA760',
@@ -264,7 +404,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
    bullet: {
-    fontSize: 16, // Adjust size as needed
+    fontSize: 16,
     marginRight: 8,
   },
   image:{

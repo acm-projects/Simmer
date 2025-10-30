@@ -1,35 +1,22 @@
-import { Image } from 'expo-image';
+
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
 import LargeCard from "@/components/largeCard";
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
-import { ArrowLeft } from 'lucide-react-native';
 
 
 export default function RecipeScreen() {
+  
   return (
     <ScrollView style={styles.container}>
       <View style={{ justifyContent: 'center', alignItems: 'center'}}>
      <Text style={styles.title}>Recipes</Text>
      </View>
 
-<View style ={{marginTop: 30}}>
+<View style ={{marginTop: 20}}>
 <Text style={styles.text}>11 Recipes</Text>
 
  <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
- <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
- <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
- <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
- <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
- <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
- <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
- <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
- <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+
  
 
 </View>
@@ -43,11 +30,11 @@ const styles = StyleSheet.create({
    container: {
     flex: 1,
     backgroundColor: '#f5ebe6ff',
-    paddingTop: 50,
+    paddingTop: 30,
   },
   content:{
     padding: 1,
-    top: 50,
+    top: 30,
   },
   gridItem: {
     flex: 1, // Ensures items take equal space in a row
@@ -66,11 +53,13 @@ const styles = StyleSheet.create({
     paddingTop: 15,
     fontSize: 25,
     color: '#9BA760',
+    fontFamily: 'Nunito_700Bold',
   },
   text:{
     fontSize: 16,
     paddingLeft: 25,
     paddingBottom: 5,
+    fontFamily: 'Nunito_400Regular'
   },
   subtitle:{
     fontSize: 20,
