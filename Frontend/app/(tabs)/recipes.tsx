@@ -1,17 +1,11 @@
-import { Image } from 'expo-image';
+
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
 import LargeCard from "@/components/largeCard";
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
-import { ArrowLeft } from 'lucide-react-native';
 
 
 export default function RecipeScreen() {
+  
   return (
     <ScrollView style={styles.container}>
       <View style={{ justifyContent: 'center', alignItems: 'center'}}>
@@ -22,14 +16,7 @@ export default function RecipeScreen() {
 <Text style={styles.text}>11 Recipes</Text>
 
  <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
- <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
- <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
- <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
- <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
- <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
- <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
- <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
- <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+
  
 
 </View>

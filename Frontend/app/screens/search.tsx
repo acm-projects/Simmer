@@ -48,7 +48,7 @@ const [newAllergen, setNewAllergen] = useState('');
     </TouchableOpacity>
     <View style={[styles.greenBox, {width: '85%',  height: 45,}]}>
         <TextInput 
-        style={[styles.text, {margin: 1}]}
+        style={[styles.text, {margin: 2}]}
         placeholder="Search"
         placeholderTextColor="#e0e0e0ff"
         value={search}
@@ -59,7 +59,7 @@ const [newAllergen, setNewAllergen] = useState('');
 
 
 <View style={{paddingTop: 15}}>
-<CollapsibleSection title="Time" isVisible={showTime} setIsVisible={setShowTime}>
+<CollapsibleSection title="Times" isVisible={showTime} setIsVisible={setShowTime}>
 
 
 <View style={{ alignItems: 'center' }}>
@@ -86,7 +86,7 @@ const [newAllergen, setNewAllergen] = useState('');
 </CollapsibleSection>
 
 
-<CollapsibleSection title="Protein" isVisible={showProtein} setIsVisible={setShowProtein}>
+<CollapsibleSection title="Proteins" isVisible={showProtein} setIsVisible={setShowProtein}>
 <View style={{ alignItems: 'center' }}>
   {Array.from({ length: Math.ceil(protein.length / 3) }, (_, rowIndex) => {
     const rowItems = protein.slice(rowIndex * 3, rowIndex * 3 + 3);
@@ -111,7 +111,7 @@ const [newAllergen, setNewAllergen] = useState('');
 </CollapsibleSection>
 
 
-<CollapsibleSection title="Type" isVisible={showType} setIsVisible={setShowType}>
+<CollapsibleSection title="Types" isVisible={showType} setIsVisible={setShowType}>
 <View style={{ alignItems: 'center' }}>
   {Array.from({ length: Math.ceil(type.length / 3) }, (_, rowIndex) => {
     const rowItems = type.slice(rowIndex * 3, rowIndex * 3 + 3);
@@ -136,7 +136,7 @@ const [newAllergen, setNewAllergen] = useState('');
 </CollapsibleSection>
 
 
-<CollapsibleSection title="Allergen" isVisible={showAllergen} setIsVisible={setShowAllergen}>
+<CollapsibleSection title="Allergens" isVisible={showAllergen} setIsVisible={setShowAllergen}>
 <View style={{ alignItems: 'center' }}>
   {Array.from({ length: Math.ceil(allergen.length / 3) }, (_, rowIndex) => {
     const rowItems = allergen.slice(rowIndex * 3, rowIndex * 3 + 3);
