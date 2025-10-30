@@ -57,88 +57,8 @@ export default function UserPreference() {
     setSelectedDietRestrictions(new Set([...selectedDietRestrictions, newTag]));
     setCustomDietRestrictionInput('');
   };
-<<<<<<< HEAD
-  //////////////////////
-   const [selectedFoodPreference, setSelectedFoodPreference] = useState<Set<string>>(new Set([]));
-  const [foodPreferenceTags, setFoodPreferenceTags] = useState<string[]>(() => {
-    const combined = new Set([... DEFAULT_FOOD_PREFERENCE]);
-    return Array.from(combined);
-  });
-  const [customFoodPreferenceInput, setCustomFoodPreferenceInput] = useState('');
 
-  const handleFoodPreferencePress = (tag:string) => {
-    setSelectedFoodPreference((prevSelected) => {
-      const newSelected = new Set<string>(prevSelected);
-      if (newSelected.has(tag)) {
-        newSelected.delete(tag);
-      } else {
-        newSelected.add(tag);
-      }
-      return newSelected;
-    });
-  };
-  const handleAddCustomFoodPreferenceTag = () => {
-    const newTag = customFoodPreferenceInput.trim();
-
-    if (newTag === '') {
-      return;
-    }
-
-    const isDuplicate = foodPreferenceTags.some(
-      (tag) => tag.toLowerCase() === newTag.toLowerCase()
-    );
-
-    if (isDuplicate) {
-      Alert.alert('Duplicate Tag', `"${newTag}" already exists.`);
-      return;
-    }
-
-    setFoodPreferenceTags([...foodPreferenceTags, newTag]);
-    setSelectedFoodPreference(new Set([...selectedFoodPreference, newTag]));
-    setCustomFoodPreferenceInput('');
-  };
-
-  const submitPreference=async ()=>{
-    try{
-      const { data: { session }, error } = await supabase.auth.getSession();
-
-      if (error){ 
-        setMessage(error.message)
-        return;
-      }
-      if(!session){
-        setMessage(`Session doesn't exist, please try again.`)
-        return;
-      }
-
-      console.log(session.access_token)
-      console.log(session.user.id)
-
-
-      await fetch(`${process.env.EXPO_PUBLIC_API_URL}/user/set-preference`, {
-          method: 'POST', 
-          headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${session.access_token}`
-          },
-          body: JSON.stringify({
-              id:session.user.id,
-              "diet_restriction":[...selectedDietRestrictions],
-              "food_preference":[...selectedFoodPreference]
-
-          })
-      })
-      setMessage("Preferenced has been changed");
-    }catch(error){
-      console.error('Fetch error:', error);
-    }
-  }
-=======
->>>>>>> frontend
- 
-
- 
-
+  
 
   return (
     <ScrollView style={styles.container}>
