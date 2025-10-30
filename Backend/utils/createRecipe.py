@@ -20,6 +20,7 @@ GEMINI_API_KEY: str = os.environ.get("GOOGLE_API_KEY")
 class InstructionStep(BaseModel):
     step: int
     description: str
+    time: int
 
 class Instructions(BaseModel):
     steps: List[InstructionStep]
@@ -71,8 +72,11 @@ def generate_recipe(data: dict):
         Fill out the ingredients in the JSON solely based on the caption. Make sure the quantity and unit fields match what is in the caption, but infer is_allergen attributes.
         If caption is empty and/or doesn't list ingredients, infer ingredient list based on context of the transcript.
         Ingredient quantities MUST be strictly numerical, so if quantity is not explicity stated in the caption, infer the quantity and respective unit.
+        "For the time in the instruction step, if it is needed include the time in minutes but only if it is specified in the instruction step." \
+        "if no time is specified in the instruction, please do not assume how long it takes, just leave it as 0"
         The type attribute is limited to one of these 6 -> Desserts, Drinks, Entrees, Sides, Soups, and Salads.
         The dietary_tags attribute should *only* include tags that mention possible allergens.
+          
 
         Transcript:
         {transcript}
@@ -143,6 +147,8 @@ def generate_ai_instructions(instructions: dict) -> dict:
       content=(
         f"Here are the structured cooking steps:\n\n{formatted_steps}\n\n"
         "Rewrite each step as a human-friendly, conversational instruction. "
+        "For the time in the instruction step, if it is needed include the time in minutes but only if it is specified in the instruction step." \
+        "if no time is specified in the instruction, please do not assume how long it takes, just leave it as 0"
         "Return ONLY valid JSON, with double-quoted keys and string values, "
         "matching this exact schema (no extra text, no markdown):\n\n"
         f"{prompt_json_schema}\n\n"
