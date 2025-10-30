@@ -6,8 +6,6 @@ import {useAudioRecorderState, AudioPlayer, useAudioPlayer, createAudioPlayer,se
 // import * as FileSystem from 'expo-file-system';
 import * as FileSystem from 'expo-file-system/legacy';
 
-
-
 const recordingOptions = {
   // android not currently supported, but works with these settings
   android: {
@@ -34,6 +32,7 @@ const recordingOptions = {
     bitsPerSecond: 128000,
   },
 };
+
 export default function VoiceAssistant() {
 
   const [recordingStatus, setRecordingStatus]=useState(false)
@@ -41,9 +40,11 @@ export default function VoiceAssistant() {
   const [permissionResponse, requestPermission] = Audio.usePermissions();
   const [recordingUri, setRecordingUri] = useState<string | null>(null);
   const [sound, setSound] = useState<Audio.Sound | undefined>();
+  const [streamingInterval, setStreamingInterval] = useState<ReturnType<typeof setInterval> | null>(null); // updated for deprecated Timer
   const player: AudioPlayer = useAudioPlayer();
   const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY,(status) => console.log('Recording status:', status));
   const state= useAudioRecorderState(audioRecorder,100);
+
   useEffect(()=>{
     const setAudioMode= async()=>{
       try {
@@ -53,7 +54,6 @@ export default function VoiceAssistant() {
           interruptionModeAndroid: 'duckOthers',
           interruptionMode: 'mixWithOthers',
           allowsRecording: true,
-
         });
       } catch (e) {
         console.error("Failed to set audio mode", e);
@@ -62,8 +62,7 @@ export default function VoiceAssistant() {
     setAudioMode();
   },[])
 
-
-
+  // Standard recording start
   async function startRecording(){
     const status = await AudioModule.requestRecordingPermissionsAsync();
     if (!status.granted) {
@@ -72,27 +71,23 @@ export default function VoiceAssistant() {
     await audioRecorder.prepareToRecordAsync();
     audioRecorder.record();
     setRecordingStatus(true)
-
   }
 
-
-
-
+  // Standard recording stop
   const stopRecording = async () => {
-
     await audioRecorder.stop();
     setRecordingUri(audioRecorder.uri);
     setRecordingStatus(false)
   };
 
-
+  // Playback
   async function playBackAudio(){
     let newValue: string | undefined = recordingUri === null ? undefined : recordingUri;
     const player = createAudioPlayer({uri:newValue});
-
     player.play();
   }
 
+  // Upload recorded audio
   async function upload() {
     if (!recordingUri) {
       Alert.alert("No recording to send.");
@@ -100,25 +95,19 @@ export default function VoiceAssistant() {
     }
 
     const formData = new FormData();
-
     const file = {
       uri: recordingUri,
       name: `recording-${Date.now()}.wav`, 
       type: 'audio/wav', 
     };
-
-
     formData.append('audio', file as any);
     formData.append('cid', 'test12345');
-
 
     try {
       const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}chat`, {
         method: 'POST',
         body: formData,
-
       });
-
 
       const responseBlob = await response.blob();
       const reader = new FileReader();
@@ -129,10 +118,7 @@ export default function VoiceAssistant() {
         reader.onerror = reject;
       });
       const base64Content = base64Data.split(',')[1];
-      
 
-
-  
       const fileUri = `${FileSystem.cacheDirectory}response-audio.wav`;
       await FileSystem.writeAsStringAsync(fileUri, base64Content, {
         encoding: FileSystem.EncodingType.Base64,
@@ -145,58 +131,82 @@ export default function VoiceAssistant() {
       const formData2 = new FormData();
       formData2.append('audio', file2 as any);
 
-
       try {
         const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}upload`, {
           method: 'POST',
           body: formData2,
-
-      });
+        });
       } catch (error) {
-      console.error("Error uploading audio:", error);
-      Alert.alert("Error", `Failed to upload audio: ${error.message}`);
-    } 
-      
+        console.error("Error uploading audio:", error);
+        Alert.alert("Error", `Failed to upload audio: ${error.message}`);
+      } 
       
       console.log(fileUri)
-
       const player = createAudioPlayer({uri:fileUri});
-
       player.play();
-
-
-
       console.log(file.uri)
-
-      
-
     } catch (error) {
       console.error("Error uploading audio:", error);
       Alert.alert("Error", `Failed to upload audio: ${error.message}`);
     } finally {
     }
   }
-  
 
- 
+  // -------------------------
+  // New streaming functions
+  // -------------------------
+  async function streamAudioStart() {
+    const status = await Audio.requestPermissionsAsync();
+    if (!status.granted) {
+      Alert.alert("Permission denied for microphone.");
+      return;
+    }
 
- 
+    if (!recording) {
+      const newRecording = new Audio.Recording();
+      setRecording(newRecording);
+    }
 
+    await recording?.prepareToRecordAsync(recordingOptions);
+    recording?.startAsync();
+
+    const CHUNK_INTERVAL = 300; // send chunk every 300ms
+    const interval = setInterval(async () => {
+      const uri = recording?.getURI();
+      if (!uri) return;
+
+      const fileInfo = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
+      const chunkBytes = Uint8Array.from(atob(fileInfo), c => c.charCodeAt(0));
+      const formData = new FormData();
+      formData.append("audio_chunk", chunkBytes as any);
+      formData.append("cid", "test123");
+
+      await fetch(`${process.env.EXPO_PUBLIC_API_URL}chat_stream`, {
+        method: "POST",
+        body: formData
+      });
+    }, CHUNK_INTERVAL);
+
+    setStreamingInterval(interval);
+    setRecordingStatus(true);
+  }
+
+  async function streamAudioStop() {
+    await recording?.stopAndUnloadAsync();
+    if (streamingInterval) clearInterval(streamingInterval);
+    setStreamingInterval(null);
+    setRecordingStatus(false);
+  }
 
   return (
-    <SafeAreaView >
+    <SafeAreaView>
       <Button title={'play'} onPress={recordingStatus ? stopRecording : startRecording}/>
       <Button title="play back audio" onPress={playBackAudio}/>
       <Button title="upload" onPress={upload}/>
       <Button
-        title={recording ? "Stop Listening" : "Start Listening"}
-
+        title={recordingStatus ? "Stop Streaming" : "Start Streaming"}
+        onPress={recordingStatus ? streamAudioStop : streamAudioStart}
       />
-
-      
     </SafeAreaView>
   )
 }
-
-
-
