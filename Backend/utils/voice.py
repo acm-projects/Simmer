@@ -27,7 +27,7 @@ def stt(audio_data):
     audio = speech.RecognitionAudio(content=audio_data)
     config = speech.RecognitionConfig(
         encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
-        sample_rate_hertz=41000,
+        sample_rate_hertz=16000,
         language_code="en-US"
     )
 
