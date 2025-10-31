@@ -440,8 +440,8 @@ def update_diet_restriction():
 @user_bp.route("/user", methods=["DELETE"])
 def delete_user():
   user_id, error_response, status_code = authorize_user()
-  if error_response:
-    return error_response, status_code
+  # if error_response:
+  #   return error_response, status_code
   data = request.get_json()
   if not data or not all(key in data for key in ['id']):
     return jsonify({'message': 'Missing data: id missing.'}), 400

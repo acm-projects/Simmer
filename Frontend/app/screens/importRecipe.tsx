@@ -8,12 +8,14 @@ import { Plus } from 'lucide-react-native';
 import LinkPopup from '@/components/linkPopup'
 import { router } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
+import { useSupabase } from '../contexts/SupabaseContext';
 
 
 
 
 export default function ImportRecipe(){
-  const [selectedImage, setSelectedImage]= useState<string | undefined>(
+  const supabase=useSupabase();
+  const [selectedImage, setSelectedImage]= useState<ImagePicker.ImagePickerAsset | undefined>(
     undefined
   );
   const [imageRead, setImageRead] =useState(false);
@@ -26,7 +28,7 @@ export default function ImportRecipe(){
     });
 
     if(!result.canceled){
-      setSelectedImage(result.assets[0].uri);
+      setSelectedImage(result.assets[0]);
       setImageRead(true);
       console.log(result);
     }else{
@@ -39,7 +41,7 @@ export default function ImportRecipe(){
   const [step, setStep] = useState(['']);
   const[isVisible, setIsVisible] = useState(false);
   const [ingredient, setIngredient] = useState([{name: '', quantity: '', unit: ''}]);
-  const [userToken, setUserToken] = useState("YOUR_JWT_TOKEN_HERE");
+  // const [userToken, setUserToken] = useState("YOUR_JWT_TOKEN_HERE");
   
 
  const updateIngredient = (index: number, field: "quantity" | "unit" | "name", value: string) => {
@@ -65,26 +67,53 @@ export default function ImportRecipe(){
 
  const handleCreateRecipe = async () => {
   // Create recipe data object from state
+  console.log('start')
+  const formattedSteps=step.map((currentStep,index)=>({"step":index+1,"description":currentStep}))
+  //const formattedIngredients=ingredient.map((currentIngredients,index)=>( {"name": "Potatoes", "quantity": "500", "unit": "g", "is_allergen": false},))
   const recipeData = {
     title: title,
-    instructions: step,
+    instructions: {"steps":formattedSteps},
     prep_time: parseInt(prepMin) || 0,
     cook_time: parseInt(cookMin) || 0,
     dietary_tags: [],
     ingredients: ingredient,
+    type:'dinner'
   };
+  const image = {
+    uri: selectedImage?.uri,
+    name: selectedImage?.fileName || `photo_${Date.now()}.jpg`, 
+    type: selectedImage?.mimeType || 'image/jpeg'              
+  };
+  const formData = new FormData();
+  formData.append('thumbnail', image as any);
+
+  formData.append('json_data', JSON.stringify(recipeData));
 
   try {
-    const response =  await fetch(`${process.env.EXPO_PUBLIC_API_URL}create_recipe`, {
+    const { data: { session }, error } = await supabase.auth.getSession();
+
+    if (error){ 
+      return;
+    }
+    if(!session){
+      return;
+    }
+    formData.append('id', session.user.id);
+    console.log(session.access_token)
+    console.log('before reqest sent')
+
+    const response =  await fetch(`${process.env.EXPO_PUBLIC_API_URL}add-recipe`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${userToken}`
+        "Authorization": `Bearer ${session.access_token}`
       },
-      body: JSON.stringify(recipeData)
+      body: formData
     });
 
+    console.log('reqest sent')
     const data = await response.json();
+    
 
     if (response.ok) {
       alert(`Recipe created successfully! ID: ${data.recipe_id}`);
@@ -161,7 +190,7 @@ export default function ImportRecipe(){
               <Plus size={40} color={'#9BA760'}/>
               </TouchableOpacity>)}
               {imageRead && (
-                <Image source={{uri: selectedImage}}
+                <Image source={{uri: selectedImage?.uri}}
                 style={styles.image}/>
               )}
 

@@ -12,9 +12,10 @@ def add_recipe():
     user_id, error_response, status_code = authorize_user()
     if error_response:
       return error_response, status_code
-    # user_id='8089f0b3-48fd-484a-8ed5-081459c556e3'
+    user_id='8089f0b3-48fd-484a-8ed5-081459c556e3'
     
     data_string = request.form.get('json_data')
+    user_id = request.form.get('id')
     data = json.loads(data_string)
     title = data.get('title')
     description = data.get('description', '')
@@ -33,12 +34,14 @@ def add_recipe():
       return jsonify({'error' : 'title, instructions, and type are required'}), 400
     
     ai_instructions = generate_ai_instructions(instructions)
+    print(str(instructions))
     if not ai_instructions:
       return jsonify({'error' : 'failed to generate AI instructions'}), 400
-    
+    print(ingredients)
     protein = categorize_protein_types(ingredients)
     if not protein:
       return jsonify({'error' : 'failed to generate protein list'}), 400
+    print('protein done bruh')
     recipe = supabase.table('recipes').insert({
         'title' : title,
         'description' : description,
@@ -65,7 +68,7 @@ def add_recipe():
         'name' : ing.get('name'),
         'quantity' : ing.get('quantity'),
         'unit' : ing.get('unit'),
-        'is_allergen' : ing.get('is_allergen', False)
+        'is_allergen' : False
       }).execute()
 
     return jsonify({
@@ -74,6 +77,7 @@ def add_recipe():
     }), 200
   
   except Exception as e:
+    print(str(e))
     return jsonify({'error' : 'internal server error', 'details' : str(e)}), 500
 
 @recipe_bp.route('/import-recipe', methods=['POST'])
@@ -366,12 +370,12 @@ def editImage():
       user_id, error_response, status_code = authorize_user()
       if error_response:
         return error_response, status_code
-      id=request.form.get('id')
+      rid=request.form.get('rid')
       image_url=upload_image()
 
       response = supabase.table("recipes").update({
           "image_url": image_url
-      }).eq("id", id).execute()
+      }).eq("id", rid).execute()
 
       if not response.data:
           return jsonify({"error": f"recipe not found"}), 404
