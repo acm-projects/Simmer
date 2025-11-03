@@ -4,29 +4,34 @@ import FavoriteIcon from '@/components/favoriteIcon';
 import { Clock2 } from 'lucide-react-native'
 import { Heart } from 'lucide-react-native';
 import { Link } from 'expo-router';
+import RecipeScreen from '@/app/(tabs)/recipes';
 
-interface Props{
+interface Recipe {
   title: string;
-  image: ImageSourcePropType; 
-  
+  image: string;
+  cookTime: string;
+  prepTime: string;
 
 }
 
+interface LargeCardProps {
+  recipe: Recipe;
+}
 
-const LargeCard: React.FC<Props>= ({title, image}) => {
-  const[favorite, setFavorite]= useState(false);
-
-
+export default function LargeCard({recipe}: LargeCardProps) {
+ 
+  const {title, image, cookTime, prepTime} = recipe;
+  const[favorites, setFavorite]= useState(false);
 
   return (
     <Link href="../screens/description" style={styles.container}>
     <View style={[styles.content, {alignItems:'center'}]}>
        
    
-    <Image source={image} style={styles.image}/>
+    <Image source={{uri: image}} style={styles.image}/>
    
       <View style={styles.icon}>
-             {!favorite ? (
+             {!favorites ? (
                  <TouchableOpacity onPress={()=> setFavorite(true)}>
                     <Heart size={20} color="#9BA760"/>
                  </TouchableOpacity>
@@ -42,9 +47,9 @@ const LargeCard: React.FC<Props>= ({title, image}) => {
              </View>
       <View style={[styles.card, {justifyContent: 'center'}]}>
         
-               <Text style={styles.title}>{title}</Text> 
+               <Text style={styles.title}>{recipe?.title ?? 'No title'}</Text> 
                    <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 10, }}>
-                         <Text style={styles.time}>Prep: 30 min | Cook: 20 min </Text>       
+                         <Text style={styles.time}>Prep: {prepTime} min | Cook: {cookTime} min </Text>       
                     </View>
               
        </View>
@@ -109,7 +114,4 @@ const styles = StyleSheet.create({
   }
 });
 
-
-
-export default LargeCard
 

@@ -1,22 +1,85 @@
-
+import {useState, useEffect} from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
 import LargeCard from "@/components/largeCard";
+import { useSupabase } from '../../app/contexts/SupabaseContext';
 
+interface Recipe {
+  title: string;
+  image: string;
+  cookTime: string;
+  prepTime: string;
+}
 
 export default function RecipeScreen() {
-  
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const[loading, setLoading]=useState(true);
+  const [message,setMessage]=useState<string|null>(null);
+
+  useEffect(()=> {
+    const supabase=useSupabase();
+    const fetchSavedRecipes = async () => {
+        
+      try{
+        const{ data: {session}, error} = await supabase.auth.getSession();
+
+        if(error){
+          setMessage(error.message);
+          setLoading(false);
+          return;
+        }
+
+        if(!session){
+          setMessage(`Session doesn't exist, please try again.`);
+          setLoading(false);
+          return;
+        }
+
+        console.log(session.access_token);
+        console.log(session.user.id);
+
+        // Fetch saved recipes
+        const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/user/saved-recipe`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization':  `Bearer ${session.access_token}`
+          }
+        });
+
+        if(!response.ok){
+          throw new Error('Failed to fetch saved recipes');
+        }
+
+        const data = await response.json();
+        setRecipes(data);
+        setMessage("Saved recipes loaded successfully");
+        console.log("saved successful");
+        console.log(data);
+        setLoading(false);
+      } 
+      catch(error){
+        console.error('Fetch error:', error);
+        setMessage(error instanceof Error ? error.message : 'An error occurred');
+        setLoading(false);
+      }
+    };
+    fetchSavedRecipes();
+  }, []);
+    
   return (
     <ScrollView style={styles.container}>
+      <Text>{recipes[0].title}</Text>
       <View style={{ justifyContent: 'center', alignItems: 'center'}}>
      <Text style={styles.title}>Recipes</Text>
      </View>
 
 <View style ={{marginTop: 20}}>
-<Text style={styles.text}>11 Recipes</Text>
-
- <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
-
+<Text style={styles.text}>
+  {loading ? 'Loading...' : `${recipes.length} Recipes`}</Text>
+{recipes.map(recipe =>
+  <LargeCard recipe={recipe}/>
+)}
  
 
 </View>

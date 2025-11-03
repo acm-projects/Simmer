@@ -57,48 +57,8 @@ export default function UserPreference() {
     setSelectedDietRestrictions(new Set([...selectedDietRestrictions, newTag]));
     setCustomDietRestrictionInput('');
   };
-<<<<<<< HEAD
-  //////////////////////
-   const [selectedFoodPreference, setSelectedFoodPreference] = useState<Set<string>>(new Set([]));
-  const [foodPreferenceTags, setFoodPreferenceTags] = useState<string[]>(() => {
-    const combined = new Set([... DEFAULT_FOOD_PREFERENCE]);
-    return Array.from(combined);
-  });
-  const [customFoodPreferenceInput, setCustomFoodPreferenceInput] = useState('');
-
-  const handleFoodPreferencePress = (tag:string) => {
-    setSelectedFoodPreference((prevSelected) => {
-      const newSelected = new Set<string>(prevSelected);
-      if (newSelected.has(tag)) {
-        newSelected.delete(tag);
-      } else {
-        newSelected.add(tag);
-      }
-      return newSelected;
-    });
-  };
-  const handleAddCustomFoodPreferenceTag = () => {
-    const newTag = customFoodPreferenceInput.trim();
-
-    if (newTag === '') {
-      return;
-    }
-
-    const isDuplicate = foodPreferenceTags.some(
-      (tag) => tag.toLowerCase() === newTag.toLowerCase()
-    );
-
-    if (isDuplicate) {
-      Alert.alert('Duplicate Tag', `"${newTag}" already exists.`);
-      return;
-    }
-
-    setFoodPreferenceTags([...foodPreferenceTags, newTag]);
-    setSelectedFoodPreference(new Set([...selectedFoodPreference, newTag]));
-    setCustomFoodPreferenceInput('');
-  };
-
-  const submitPreference=async ()=>{
+ 
+const submitPreference=async ()=>{
     try{
       const { data: { session }, error } = await supabase.auth.getSession();
 
@@ -124,7 +84,6 @@ export default function UserPreference() {
           body: JSON.stringify({
               id:session.user.id,
               "diet_restriction":[...selectedDietRestrictions],
-              "food_preference":[...selectedFoodPreference]
 
           })
       })
@@ -133,10 +92,6 @@ export default function UserPreference() {
       console.error('Fetch error:', error);
     }
   }
-=======
->>>>>>> frontend
- 
-
  
 
 
@@ -177,7 +132,8 @@ export default function UserPreference() {
          
 
       </View>
-      <TouchableOpacity style={styles.doneButton}>
+      <TouchableOpacity style={styles.doneButton}
+      onPress={submitPreference}>
          <Link href='../homepage'> <Text style={styles.addButtonText}>Done</Text> </Link>
         </TouchableOpacity>
       
