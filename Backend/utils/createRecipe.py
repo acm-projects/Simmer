@@ -226,6 +226,7 @@ def categorize_protein_types(ingredients):
       categories = json.loads(json_text)
       if not isinstance(categories, list):
           raise ValueError("Parsed result is not a list")
+      print(categories)
       return categories
 
   except json.JSONDecodeError as e:

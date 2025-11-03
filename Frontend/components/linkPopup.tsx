@@ -1,9 +1,13 @@
-import React, {useState} from 'react'
+import React, {Dispatch, SetStateAction} from 'react'
 import { StyleSheet, Text, View, Image, TextInput } from 'react-native';
 
-const LinkPopup = () => {
+interface LinkPopupProps {
+  link: string | undefined;
+  setLink: Dispatch<SetStateAction<string | undefined>>;
+}
 
-    const[link, setLink] = useState('');
+const LinkPopup = ({link, setLink}: LinkPopupProps) => {
+
   return (
     <View style={styles.container}>
         <Text style={styles.text}>Recipe Link:</Text>
