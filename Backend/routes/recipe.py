@@ -6,6 +6,11 @@ from utils.createRecipe import generate_recipe, generate_ai_instructions, catego
 from utils.import_videos import get_url_data
 recipe_bp = Blueprint('recipe', __name__)
 
+def default_quantity_to_one(value):
+  try:
+    return float(value)
+  except (ValueError, TypeError):
+    return 1.0
 @recipe_bp.route('/add-recipe', methods=['POST'])
 def add_recipe():
   try:
@@ -66,7 +71,7 @@ def add_recipe():
       supabase.table('ingredients').insert({
         'recipe_id' : recipe_id,
         'name' : ing.get('name'),
-        'quantity' : ing.get('quantity'),
+        'quantity' : default_quantity_to_one(ing.get('quantity')),
         'unit' : ing.get('unit'),
         'is_allergen' : False
       }).execute()

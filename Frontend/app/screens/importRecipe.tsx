@@ -11,14 +11,59 @@ import * as ImagePicker from 'expo-image-picker';
 import { useSupabase } from '../contexts/SupabaseContext';
 
 
-
+interface stepsProp {
+  description: string | undefined;
+  step: string | undefined;
+  time: string | undefined;
+}
 
 export default function ImportRecipe(){
   const supabase=useSupabase();
+  const [link, setLink]=useState<string|undefined>('');
   const [selectedImage, setSelectedImage]= useState<ImagePicker.ImagePickerAsset | undefined>(
     undefined
   );
   const [imageRead, setImageRead] =useState(false);
+
+  const importRecipeFromLink= async()=>{
+    setIsVisible(false)
+    if(link==='')
+      return;
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+
+      if (error){ 
+        return;
+      }
+      if(!session){
+        return;
+      }
+
+      const response =  await fetch(`${process.env.EXPO_PUBLIC_API_URL}import-recipe`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({'content':link})
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setTitle(data.title);
+        setPrepMin(data.prep_time);
+        setCookMin(data.cook_time);
+        setIngredient(data.ingredients);
+        setStep(data.instructions.steps.map((currentStep:stepsProp)=>currentStep.description));
+      } else {
+        alert(`Error: ${data.error || 'Failed to create recipe'}`);
+      }
+    } catch (err) {
+      console.error("Error creating recipe:", err);
+      alert("Could not connect to server");
+    }
+
+
+  }
 
 
   const pickImageAsync = async () => {
@@ -165,10 +210,10 @@ export default function ImportRecipe(){
                   >
                   <View style={styles.overlay}>
                     <View style={styles.popup}>
-                      <LinkPopup/>
+                      <LinkPopup link={link} setLink={setLink}/>
                       <TouchableOpacity
                   style={styles.closeButton}
-                  onPress={() => setIsVisible(false)}>
+                  onPress={() => importRecipeFromLink()}>
                     <Text style={styles.text}>OK</Text>
                   </TouchableOpacity>
                     </View>
