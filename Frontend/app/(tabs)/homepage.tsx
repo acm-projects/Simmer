@@ -1,16 +1,16 @@
-import { Image } from 'expo-image';
+
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
 
-import SmallCard from "@/components/smallCard";
 import LargeCard from "@/components/largeCard";
 import CornerIcon from "@/components/cornerIcon";
-import { Link } from 'expo-router';
-import MyCarousel from "@/components/carousel";
 import { useRecipes } from '../contexts/RecipeContext';
+import MyCarousel from "@/components/carousel";
 
 export default function HomeScreen() {
   const {recipes}=useRecipes();
+  console.log(recipes)
+  // const favoriteRecipes=recipes?.filter((recipe)=>recipe.user_favorites.length>0)
   return (
     
 

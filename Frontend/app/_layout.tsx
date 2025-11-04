@@ -5,10 +5,7 @@ import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useEffect, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SupabaseProvider, useSupabase } from './contexts/SupabaseContext';
-import CookingModePage from './screens/cookingMode';
 import { RecipeProvider } from './contexts/RecipeContext';
 
 export const unstable_settings = {
@@ -21,8 +18,15 @@ export default function RootLayout() {
 
   const router= useRouter();
   const [recipes,setRecipes]=useState<any[] | undefined>(undefined)
+  const [isNavigationReady, setIsNavigationReady] = useState(false);
+  useEffect(() => {
+    setIsNavigationReady(true);
+  }, []); 
 
   useEffect(()=>{
+    if (!isNavigationReady) {
+      return;
+    }
     const getRecipes=async(jwt:string|undefined)=>{
       try{
         const response =  await fetch(`${process.env.EXPO_PUBLIC_API_URL}recipes`, {
@@ -33,32 +37,30 @@ export default function RootLayout() {
           }
         });
         const data=await response.json()
-        console.log(data)
+        //console.log(data.result)
         setRecipes(data.result)
       } catch (err) {
         console.error( err);
         alert("Could not connect to server");
       }
     }
-    const authenticateUser = async () => {
+    const authenticateUser = async (jwt:string|undefined) => {
       const { data, error } = await supabase.auth.getUser()
       if (error) {
         router.navigate("/signup");
         return;
       } else {
+        await getRecipes(jwt);
         router.navigate("/userPreference");
       }
     }
 
-    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data } = supabase.auth.onAuthStateChange( async (event, session) => {
     console.log(event, session)
     if (event === 'INITIAL_SESSION') {
-      authenticateUser()
+      await authenticateUser(session?.access_token)
     } else if (event === 'SIGNED_IN') {
       router.navigate('/userPreference');
-      console.log('-----------------------------------------')
-      console.log(session?.access_token)
-      getRecipes(session?.access_token);
     } else if (event === 'SIGNED_OUT') {
       router.navigate('/signup')
     } else if (event === 'PASSWORD_RECOVERY') {
@@ -70,7 +72,7 @@ export default function RootLayout() {
     }
   })
 
-  },[])
+  },[isNavigationReady,supabase, router])
   const colorScheme = useColorScheme();
 
   return (

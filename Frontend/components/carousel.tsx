@@ -2,25 +2,24 @@ import React from "react";
 import { View, Dimensions } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import SmallCard from "../components/smallCard";
-import LargeCard from "../components/largeCard";
 import { ImageSourcePropType } from "react-native";
+import { useRecipes } from "../app/contexts/RecipeContext";
 
 const { width } = Dimensions.get("window");
 
 type CarouselItem = {
-  id: number;
+  id: string;
   title: string;
   image: ImageSourcePropType;
 };
 
-const data: CarouselItem[] = [
-  { id: 1, title: "Chicken Tacos", image: require("../assets/images/tacos.jpg") },
-  { id: 2, title: "Chicken Tacos", image: require("../assets/images/tacos.jpg") },
-  { id: 3, title: "Chicken Tacos", image: require("../assets/images/tacos.jpg") },
-  { id: 4, title: "Chicken Tacos", image: require("../assets/images/tacos.jpg") },
-];
+
+
 
 export default function MyCarousel() {
+  const {recipes}=useRecipes();
+  const favoriteRecipes=recipes?recipes?.filter((recipe)=>recipe.user_favorites.length>0):[]
+  const data: CarouselItem[] = favoriteRecipes?.map((recipe:any)=>({id:recipe.id,title:recipe.title,image:recipe.image_url}))
   // Transform data into pairs
   const pairedData = data.reduce((acc: CarouselItem[][], item: CarouselItem, index: number) => {
     if (index % 2 === 0) {
@@ -48,7 +47,7 @@ export default function MyCarousel() {
         
             
           }}>
-            <SmallCard title={item[0].title} image={item[0].image} />
+            <SmallCard title={item[0].title} image={item[0].image} id={item[0].id} />
             {item[1] && <SmallCard title={item[1].title} image={item[1].image} />}
           </View>
         )}

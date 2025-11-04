@@ -1,7 +1,5 @@
 import react, { useState} from 'react'
 import { StyleSheet, Text, View, Image, ImageSourcePropType, TouchableOpacity } from 'react-native';
-import FavoriteIcon from '@/components/favoriteIcon';
-import { Clock2 } from 'lucide-react-native'
 import { Heart } from 'lucide-react-native';
 import { Link } from 'expo-router';
 

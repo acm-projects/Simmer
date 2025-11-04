@@ -253,7 +253,7 @@ def get_recipes():
         # .eq("type", type)
         # .overlaps("dietary_tags", dietary_restrictions)
         # .overlaps("protein", protein)
-    response= supabase.table("recipes").select("*,ingredients(*)").eq('created_by',user_id).execute()
+    response= supabase.table("recipes").select("*,ingredients(*), user_favorites(*)").eq('created_by',user_id).execute()
 
   except Exception as e:
     return jsonify({"error": "An error occurred while updating preferences.", "details": str(e)}), 500
