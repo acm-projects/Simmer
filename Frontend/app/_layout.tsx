@@ -4,11 +4,11 @@ import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect, useState } from 'react';
 import { SupabaseProvider, useSupabase } from './contexts/SupabaseContext';
-import CookingModePage from './screens/cookingMode';
+import { RecipeProvider } from './contexts/RecipeContext';
+import { getRecipes } from './utils/recipe';
+import { UserProvider } from './contexts/UserContext';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -19,22 +19,53 @@ export default function RootLayout() {
   const supabase=useSupabase();
 
   const router= useRouter();
+  const [user,setUser]=useState<any[] | undefined>(undefined)
+  const [recipes,setRecipes]=useState<any[] | undefined>(undefined)
+  const [isNavigationReady, setIsNavigationReady] = useState(false);
+  useEffect(() => {
+    setIsNavigationReady(true);
+  }, []); 
 
   useEffect(()=>{
-    const authenticateUser = async () => {
+    if (!isNavigationReady) {
+      return;
+    }
+    const getUser= async (jwt:string|undefined)=>{
+      try{
+        const response =  await fetch(`${process.env.EXPO_PUBLIC_API_URL}user`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${jwt}`
+          }
+        });
+        const data=await response.json()
+        console.log('hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh')
+        console.log(data.data)
+        setUser(data.data)
+      } catch (err) {
+        console.error( err);
+        alert("Could not connect to server");
+      }
+
+    }
+    
+    const authenticateUser = async (jwt:string|undefined) => {
       const { data, error } = await supabase.auth.getUser()
       if (error) {
         router.navigate("/signup");
         return;
       } else {
+        await getUser(jwt)
+        await getRecipes(jwt, setRecipes);
         router.navigate("/userPreference");
       }
     }
 
-    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data } = supabase.auth.onAuthStateChange( async (event, session) => {
     console.log(event, session)
     if (event === 'INITIAL_SESSION') {
-      authenticateUser()
+      await authenticateUser(session?.access_token)
     } else if (event === 'SIGNED_IN') {
       router.navigate('/userPreference');
     } else if (event === 'SIGNED_OUT') {
@@ -48,10 +79,12 @@ export default function RootLayout() {
     }
   })
 
-  },[])
+  },[isNavigationReady,supabase, router])
   const colorScheme = useColorScheme();
 
   return (
+    <UserProvider user={user} setUser={setUser}>
+    <RecipeProvider recipes={recipes} setRecipes={setRecipes}>
     <SupabaseProvider>
       <ThemeProvider value={colorScheme === 'light' ? DarkTheme : DefaultTheme}>
         <Stack>
@@ -59,7 +92,7 @@ export default function RootLayout() {
           <Stack.Screen name="screens/settings" options={{ headerShown: false }} />
           <Stack.Screen name="screens/cookingMode" options={{ headerShown: false }} />
           <Stack.Screen name="screens/importRecipe" options={{ headerShown: false }} />
-          <Stack.Screen name="screens/description" options={{ headerShown: false }} />
+          <Stack.Screen name="screens/description/[id]" options={{ headerShown: false }} />
           <Stack.Screen name="screens/recipeCollection" options={{ headerShown: false }} />
           <Stack.Screen name="screens/profilePage" options={{ headerShown: false }} />
           <Stack.Screen name="userPreference" options={{ headerShown: false }} />
@@ -72,5 +105,8 @@ export default function RootLayout() {
         <StatusBar style="auto" />
       </ThemeProvider>
     </SupabaseProvider>
+    </RecipeProvider>
+    </UserProvider>
+
   );
 }

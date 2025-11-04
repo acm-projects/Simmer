@@ -1,19 +1,25 @@
-import { Image } from 'expo-image';
+
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
 
-import SmallCard from "@/components/smallCard";
 import LargeCard from "@/components/largeCard";
 import CornerIcon from "@/components/cornerIcon";
-import { Link } from 'expo-router';
+import { useRecipes } from '../contexts/RecipeContext';
 import MyCarousel from "@/components/carousel";
+import { useUser } from '../contexts/UserContext';
 
 export default function HomeScreen() {
+  const {recipes}=useRecipes();
+  const{user}=useUser()
+  console.log('yyyyyyyyyyyyyyyyyyyyyyyyyy')
+  console.log(user)
+  // const favoriteRecipes=recipes?.filter((recipe)=>recipe.user_favorites.length>0)
   return (
+    
 
    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
     <View style={styles.row}>
-      <Text style={styles.title}>Hi! Dianne </Text>
+      <Text style={styles.title}>Hi! {user?user.first_name:""} </Text>
       <View style={styles.icons}>
 
         <CornerIcon />  
@@ -24,29 +30,26 @@ export default function HomeScreen() {
     <Text style={styles.text}>What are you cooking today?</Text>
 
       
-<Text style={styles.subtitle}>Favorites</Text>
-      <View style={styles.greenBox}>
+    <Text style={styles.subtitle}>Favorites</Text>
+    <View style={styles.greenBox}>
         
         
-          <MyCarousel />
+      <MyCarousel />
         
        
   
-      </View>
+    </View>
+    {recipes?.map((currentRecipe,index)=>{
+      return (<LargeCard key={index} title={currentRecipe.title} image={currentRecipe.image_url} cook_time={currentRecipe.cook_time} prep_time={currentRecipe.prep_time} id={currentRecipe.id} />);
+    })}
   
-<LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+    {/* <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} /> */}
 
   
      
 
-    <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+    
 
-
-    <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
-
-    <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
-
-<LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
 
 
 

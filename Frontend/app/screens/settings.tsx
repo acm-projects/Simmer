@@ -5,10 +5,16 @@ import { User } from 'lucide-react-native';
 import { LogOut } from 'lucide-react-native';
 import { ChevronRight } from 'lucide-react-native';
 import { Link, router } from 'expo-router';
+import { useSupabase } from '../contexts/SupabaseContext';
 
 
 
 export default function SettingScreen() {
+  const supabase=useSupabase();
+  const logout=async ()=>{
+    console.log('logout')
+    const { error } = await supabase.auth.signOut();
+  }
   return (
 <ScrollView style={styles.container}>
   <View>
@@ -33,7 +39,9 @@ export default function SettingScreen() {
      
      <View style={styles.info}>
      <LogOut color={'#9BA760'}/>
+     <TouchableOpacity onPress={logout}>
      <Text style={styles.text}>Log Out</Text>
+     </TouchableOpacity>
       </View>
      <Text style={styles.delete}>Delete Account</Text>
     </View>

@@ -1,29 +1,33 @@
 import react, { useState} from 'react'
 import { StyleSheet, Text, View, Image, ImageSourcePropType, TouchableOpacity } from 'react-native';
-import FavoriteIcon from '@/components/favoriteIcon';
-import { Clock2 } from 'lucide-react-native'
 import { Heart } from 'lucide-react-native';
 import { Link } from 'expo-router';
 
 interface Props{
   title: string;
-  image: ImageSourcePropType; 
+  image: string; 
+  cook_time: number;
+  prep_time:number;
+  id:string;
   
 
 }
 
 
-const LargeCard: React.FC<Props>= ({title, image}) => {
+const LargeCard: React.FC<Props>= ({title, image, cook_time, prep_time,id}) => {
   const[favorite, setFavorite]= useState(false);
 
 
 
   return (
-    <Link href="../screens/description" style={styles.container}>
+    <Link href={{
+    pathname: `../screens/description/${id}`,
+    params: {}
+    }} style={styles.container}>
     <View style={[styles.content, {alignItems:'center'}]}>
        
    
-    <Image source={image} style={styles.image}/>
+    <Image source={{uri:image}} style={styles.image}/>
    
       <View style={styles.icon}>
              {!favorite ? (
@@ -44,7 +48,7 @@ const LargeCard: React.FC<Props>= ({title, image}) => {
         
                <Text style={styles.title}>{title}</Text> 
                    <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 10, }}>
-                         <Text style={styles.time}>Prep: 30 min | Cook: 20 min </Text>       
+                         <Text style={styles.time}>Prep: {prep_time} min | Cook: {cook_time} min </Text>       
                     </View>
               
        </View>

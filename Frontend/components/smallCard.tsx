@@ -10,16 +10,19 @@ import { Nunito_400Regular } from '@expo-google-fonts/nunito/400Regular';
 interface Props{
   title: string;
   image: ImageSourcePropType; 
+  id: string;
 }
-const SmallCard: React.FC<Props>= ({title, image }) => {
+const SmallCard: React.FC<Props>= ({title, image, id }) => {
 
   const [favorite, setFavorite] = useState(false);
 
   return (
-    <Link href="../screens/description">
+    <Link href={{
+    pathname: `../screens/description/${id}`,
+    params: {}}}>
        <View style={styles.container}>
         
-       <Image source={image} style={styles.image}/>
+       <Image source={{uri:image}} style={styles.image}/>
           <View style={styles.icon}>
           {!favorite ? (
               <TouchableOpacity onPress={()=> setFavorite(true)}>

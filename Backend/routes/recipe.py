@@ -233,36 +233,40 @@ def get_favorited_recipes():
 
 @recipe_bp.route("/recipes", methods=["GET"])
 def get_recipes():
-  data = request.get_json()
-  dietary_restrictions=data.get('dietary_tags')
-  time=data.get('time')
-  type=data.get('type')
-  protein=data.get('protein')
+  # data = request.get_json()
+  # dietary_restrictions=data.get('dietary_tags')
+  # time=data.get('time')
+  # type=data.get('type')
+  # protein=data.get('protein')
   try:
-    query= supabase.table("recipes").select("*")
-    if(type):
-      query=query.eq("type", type)
-    if(dietary_restrictions):
-      query=query.overlaps("dietary_tags", dietary_restrictions)
-    if(protein):
-      query=query.overlaps("protein", protein)
-      response = query.execute()
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
+    # query= supabase.table("recipes").select("*")
+    # if(type):
+    #   query=query.eq("type", type)
+    # if(dietary_restrictions):
+    #   query=query.overlaps("dietary_tags", dietary_restrictions)
+    # if(protein):
+    #   query=query.overlaps("protein", protein)
+    #   response = query.execute()
         # .eq("type", type)
         # .overlaps("dietary_tags", dietary_restrictions)
         # .overlaps("protein", protein)
+    response= supabase.table("recipes").select("*,ingredients(*), user_favorites(*)").eq('created_by',user_id).execute()
 
   except Exception as e:
     return jsonify({"error": "An error occurred while updating preferences.", "details": str(e)}), 500
-  print('bye')
-  print(response.data)
+  # print('bye')
+  # print(response.data)
   data=response.data
-  if not time == -1:
-    data=[
-      item for item in data
-      if isinstance(item.get('cook_time'), (int, float)) and \
-        isinstance(item.get('prep_time'), (int, float)) and \
-        (item.get('cook_time') + item.get('prep_time')) <= time
-    ]
+  # if not time == -1:
+  #   data=[
+  #     item for item in data
+  #     if isinstance(item.get('cook_time'), (int, float)) and \
+  #       isinstance(item.get('prep_time'), (int, float)) and \
+  #       (item.get('cook_time') + item.get('prep_time')) <= time
+  #   ]
   return jsonify({'result' : data}), 200
 
 @recipe_bp.route('/recipe/info', methods=['GET'])
