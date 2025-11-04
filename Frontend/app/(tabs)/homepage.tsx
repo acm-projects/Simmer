@@ -7,9 +7,12 @@ import LargeCard from "@/components/largeCard";
 import CornerIcon from "@/components/cornerIcon";
 import { Link } from 'expo-router';
 import MyCarousel from "@/components/carousel";
+import { useRecipes } from '../contexts/RecipeContext';
 
 export default function HomeScreen() {
+  const {recipes}=useRecipes();
   return (
+    
 
    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
     <View style={styles.row}>
@@ -24,29 +27,26 @@ export default function HomeScreen() {
     <Text style={styles.text}>What are you cooking today?</Text>
 
       
-<Text style={styles.subtitle}>Favorites</Text>
-      <View style={styles.greenBox}>
+    <Text style={styles.subtitle}>Favorites</Text>
+    <View style={styles.greenBox}>
         
         
-          <MyCarousel />
+      <MyCarousel />
         
        
   
-      </View>
+    </View>
+    {recipes?.map((currentRecipe,index)=>{
+      return (<LargeCard key={index} title={currentRecipe.title} image={currentRecipe.image_url} cook_time={currentRecipe.cook_time} prep_time={currentRecipe.prep_time} id={currentRecipe.id} />);
+    })}
   
-<LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+    {/* <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} /> */}
 
   
      
 
-    <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+    
 
-
-    <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
-
-    <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
-
-<LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
 
 
 

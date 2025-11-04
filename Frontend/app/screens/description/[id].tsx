@@ -3,13 +3,19 @@ import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity, Pressable 
 import { useNavigation } from '@react-navigation/native';
 import { ArrowLeft } from 'lucide-react-native';
 import { Heart } from 'lucide-react-native';
-import { router } from 'expo-router';
+import { router,useLocalSearchParams} from 'expo-router';
+import { useRecipes } from '@/app/contexts/RecipeContext';
+
 
 
 
 export default function Description(){
-    const items = ['Item 1', 'Item 2', 'Item 3'];
-    const steps = ['step 1', 'step 2', 'step 3'];
+    const {id} = useLocalSearchParams<any>();
+    const {recipes}=useRecipes();
+    const recipe=recipes?.find((recipe)=>(recipe.id===id))
+    const items = recipe.ingredients.map((ingredient:any)=>`${ingredient.quantity} ${ingredient.unit} of ${ingredient.name}`);
+    console.log(id)
+    const steps = recipe.instructions.steps.map((step:any)=>step.description)
 
     const navigation = useNavigation();
 
@@ -26,12 +32,12 @@ export default function Description(){
 
         <View>
             <View style={styles.card}>
-               <Image source={require('../../assets/images/tiramisu.jpg')} style={styles.image}/>
+               <Image source={{uri:recipe.image_url}} style={styles.image}/>
                 <View style={styles.titleBox}>
-                    <Text style={styles.title2}>Tiramisu</Text>
+                    <Text style={styles.title2}>{recipe.title}</Text>
                     <View>
-                        <Text style={[styles.text, {fontSize: 15, color: '#fff'}]}>Prep: 30min</Text>
-                        <Text style={[styles.text, {fontSize: 15, color:'#fff'}]}>Cook: 10min</Text>
+                        <Text style={[styles.text, {fontSize: 15, color: '#fff'}]}>Prep: {recipe?.prep_time}min</Text>
+                        <Text style={[styles.text, {fontSize: 15, color:'#fff'}]}>Cook: {recipe?.cook_time}min</Text>
                     </View>
                 
                 </View>
