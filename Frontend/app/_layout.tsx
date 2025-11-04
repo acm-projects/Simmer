@@ -7,6 +7,8 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useEffect, useState } from 'react';
 import { SupabaseProvider, useSupabase } from './contexts/SupabaseContext';
 import { RecipeProvider } from './contexts/RecipeContext';
+import { getRecipes } from './utils/recipe';
+import { UserProvider } from './contexts/UserContext';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -17,6 +19,7 @@ export default function RootLayout() {
   const supabase=useSupabase();
 
   const router= useRouter();
+  const [user,setUser]=useState<any[] | undefined>(undefined)
   const [recipes,setRecipes]=useState<any[] | undefined>(undefined)
   const [isNavigationReady, setIsNavigationReady] = useState(false);
   useEffect(() => {
@@ -27,9 +30,9 @@ export default function RootLayout() {
     if (!isNavigationReady) {
       return;
     }
-    const getRecipes=async(jwt:string|undefined)=>{
+    const getUser= async (jwt:string|undefined)=>{
       try{
-        const response =  await fetch(`${process.env.EXPO_PUBLIC_API_URL}recipes`, {
+        const response =  await fetch(`${process.env.EXPO_PUBLIC_API_URL}user`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -37,20 +40,24 @@ export default function RootLayout() {
           }
         });
         const data=await response.json()
-        //console.log(data.result)
-        setRecipes(data.result)
+        console.log('hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh')
+        console.log(data.data)
+        setUser(data.data)
       } catch (err) {
         console.error( err);
         alert("Could not connect to server");
       }
+
     }
+    
     const authenticateUser = async (jwt:string|undefined) => {
       const { data, error } = await supabase.auth.getUser()
       if (error) {
         router.navigate("/signup");
         return;
       } else {
-        await getRecipes(jwt);
+        await getUser(jwt)
+        await getRecipes(jwt, setRecipes);
         router.navigate("/userPreference");
       }
     }
@@ -76,6 +83,7 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   return (
+    <UserProvider user={user} setUser={setUser}>
     <RecipeProvider recipes={recipes} setRecipes={setRecipes}>
     <SupabaseProvider>
       <ThemeProvider value={colorScheme === 'light' ? DarkTheme : DefaultTheme}>
@@ -98,6 +106,7 @@ export default function RootLayout() {
       </ThemeProvider>
     </SupabaseProvider>
     </RecipeProvider>
+    </UserProvider>
 
   );
 }

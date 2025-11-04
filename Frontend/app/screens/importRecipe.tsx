@@ -9,6 +9,8 @@ import LinkPopup from '@/components/linkPopup'
 import { router } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { useSupabase } from '../contexts/SupabaseContext';
+import { getRecipes } from '../utils/recipe';
+import { useRecipes } from '../contexts/RecipeContext';
 
 
 interface stepsProp {
@@ -19,6 +21,7 @@ interface stepsProp {
 
 export default function ImportRecipe(){
   const supabase=useSupabase();
+  const {setRecipes}=useRecipes();
   const [link, setLink]=useState<string|undefined>('');
   const [selectedImage, setSelectedImage]= useState<ImagePicker.ImagePickerAsset | undefined>(
     undefined
@@ -167,6 +170,7 @@ export default function ImportRecipe(){
       setCookMin('');
       setIngredient([{ name: '', quantity: '', unit: '' }]);
       setStep(['']);
+      await getRecipes(session.access_token,setRecipes)
     } else {
       alert(`Error: ${data.error || 'Failed to create recipe'}`);
     }

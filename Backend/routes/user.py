@@ -463,4 +463,32 @@ def delete_user():
   
   except Exception as e:
       return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
+
+@user_bp.route('/user', methods=['GET'])
+def get_user():
+  try: 
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
+
+    user_response = (
+      supabase.table('users')
+      .select('*')
+      .eq('id', user_id)
+      .single()
+      .execute()
+    )
+
+
+  
+
+    return jsonify ({
+      'data':user_response.data
+    }), 200
+  
+  except Exception as e:
+    print( e)
+    return jsonify({'error' : 'internal server error', 'details' : str(e)}), 500
+  
+
     

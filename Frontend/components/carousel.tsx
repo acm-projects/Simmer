@@ -48,7 +48,7 @@ export default function MyCarousel() {
             
           }}>
             <SmallCard title={item[0].title} image={item[0].image} id={item[0].id} />
-            {item[1] && <SmallCard title={item[1].title} image={item[1].image} />}
+            {item[1] && <SmallCard title={item[1].title} image={item[1].image} id={item[0].id} />}
           </View>
         )}
       />

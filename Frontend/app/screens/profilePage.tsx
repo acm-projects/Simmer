@@ -2,10 +2,13 @@ import React, {useState} from 'react'
 import { StyleSheet, Text, View, ScrollView, Image, Button, TextInput, Modal, TouchableOpacity, KeyboardAvoidingView, Platform, } from 'react-native';
 import { router } from 'expo-router'
 import {ArrowLeft, Pencil, Plus} from 'lucide-react-native'
+import { useRecipes } from '../contexts/RecipeContext';
+import { useUser } from '../contexts/UserContext';
 export default function profilePage() {
+  const {user}=useUser();
   const[isEditing, setIsEditing] = useState(false);
-   const[firstName, setFirstName] = useState('Liana');
-   const[lastName, setLastName] = useState('Forster');
+   const[firstName, setFirstName] = useState(user?user.first_name:'');
+   const[lastName, setLastName] = useState(user?user.last_name:'');
    const[allergens, setAllergens] =useState(['Eggs', 'Peanuts', 'Tree Nuts', 'Milk', 'Sesame']);
    const[allAllergens, setAllAllergens] = useState(['Eggs', 'Peanuts', 'Tree Nuts', 'Milk', 'Sesame', 'Wheat', 'Soy', 'Shellfish', 'Fish']);
    const[newAllergen, setNewAllergen] = useState('');

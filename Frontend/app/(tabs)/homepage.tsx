@@ -6,17 +6,20 @@ import LargeCard from "@/components/largeCard";
 import CornerIcon from "@/components/cornerIcon";
 import { useRecipes } from '../contexts/RecipeContext';
 import MyCarousel from "@/components/carousel";
+import { useUser } from '../contexts/UserContext';
 
 export default function HomeScreen() {
   const {recipes}=useRecipes();
-  console.log(recipes)
+  const{user}=useUser()
+  console.log('yyyyyyyyyyyyyyyyyyyyyyyyyy')
+  console.log(user)
   // const favoriteRecipes=recipes?.filter((recipe)=>recipe.user_favorites.length>0)
   return (
     
 
    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
     <View style={styles.row}>
-      <Text style={styles.title}>Hi! Dianne </Text>
+      <Text style={styles.title}>Hi! {user?user.first_name:""} </Text>
       <View style={styles.icons}>
 
         <CornerIcon />  
