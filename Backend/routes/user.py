@@ -379,16 +379,19 @@ def delete_collection():
 @user_bp.route("/user/name", methods=["PUT"])
 def update_user_name():
 
-  data = request.get_json()
-
-  if not data or not all(key in data for key in ['id', 'first_name', 'last_name']):
-    return jsonify({'message': 'Missing data: name and id missing.'}), 400
-
-  first_name=data['first_name']
-  last_name=data['last_name']
-  id= data['id']
 
   try:
+      user_id, error_response, status_code = authorize_user()
+      if error_response:
+        return error_response, status_code
+      data = request.get_json()
+
+      if not data or not all(key in data for key in ['id', 'first_name', 'last_name']):
+        return jsonify({'message': 'Missing data: name and id missing.'}), 400
+
+      first_name=data['first_name']
+      last_name=data['last_name']
+      id= data['id']
       update_response = supabase.table("users").update(
         {
           "first_name":first_name,
@@ -406,15 +409,20 @@ def update_user_name():
 
 @user_bp.route("/user/diet_restriction", methods=["PUT"])
 def update_diet_restriction():
-  data = request.get_json()
-
-  if not data or not all(key in data for key in ['id', 'diet_restriction']):
-    return jsonify({'message': 'Missing data: allergies and id missing.'}), 400
-
-  diet_restriction=data['diet_restriction']
-  id= data['id']
 
   try:
+      user_id, error_response, status_code = authorize_user()
+      if error_response:
+        return error_response, status_code
+      
+      data = request.get_json()
+
+      if not data or not all(key in data for key in ['id', 'diet_restriction']):
+        return jsonify({'message': 'Missing data: allergies and id missing.'}), 400
+
+      diet_restriction=data['diet_restriction']
+      id= data['id']
+
       update_response = supabase.table("users").update(
         {
           "diet_restriction":diet_restriction,
@@ -431,6 +439,9 @@ def update_diet_restriction():
   
 @user_bp.route("/user", methods=["DELETE"])
 def delete_user():
+  user_id, error_response, status_code = authorize_user()
+  # if error_response:
+  #   return error_response, status_code
   data = request.get_json()
   if not data or not all(key in data for key in ['id']):
     return jsonify({'message': 'Missing data: id missing.'}), 400
@@ -452,4 +463,32 @@ def delete_user():
   
   except Exception as e:
       return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
+
+@user_bp.route('/user', methods=['GET'])
+def get_user():
+  try: 
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
+
+    user_response = (
+      supabase.table('users')
+      .select('*')
+      .eq('id', user_id)
+      .single()
+      .execute()
+    )
+
+
+  
+
+    return jsonify ({
+      'data':user_response.data
+    }), 200
+  
+  except Exception as e:
+    print( e)
+    return jsonify({'error' : 'internal server error', 'details' : str(e)}), 500
+  
+
     

@@ -48,7 +48,7 @@ const [newAllergen, setNewAllergen] = useState('');
     </TouchableOpacity>
     <View style={[styles.greenBox, {width: '85%',  height: 45,}]}>
         <TextInput 
-        style={[styles.text, {margin: 2}]}
+        style={[styles.text, {margin: 14,}]}
         placeholder="Search"
         placeholderTextColor="#e0e0e0ff"
         value={search}
@@ -163,7 +163,7 @@ const [newAllergen, setNewAllergen] = useState('');
     <View style={[styles.lightGreenBox, {width: '90%', marginTop: 10,}]}>
         
         <TextInput 
-        style={[styles.text, {margin: 0,}]}
+        style={[styles.text, {margin: 3,}]}
         placeholder='Add Other'
         placeholderTextColor="#e0e0e0ff"
         value={newAllergen}

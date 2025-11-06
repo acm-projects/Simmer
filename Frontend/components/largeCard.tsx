@@ -1,37 +1,36 @@
 import react, { useState} from 'react'
 import { StyleSheet, Text, View, Image, ImageSourcePropType, TouchableOpacity } from 'react-native';
-import FavoriteIcon from '@/components/favoriteIcon';
-import { Clock2 } from 'lucide-react-native'
 import { Heart } from 'lucide-react-native';
 import { Link } from 'expo-router';
 import RecipeScreen from '@/app/(tabs)/recipes';
 
 interface Recipe {
   title: string;
-  image: string;
-  cookTime: string;
-  prepTime: string;
+  image: string; 
+  cook_time: number;
+  prep_time:number;
+  id:string;
+  
 
 }
 
-interface LargeCardProps {
-  recipe: Recipe;
-}
+const LargeCard: React.FC<Recipe>= ({title, image, cook_time, prep_time, id}) => {
+  const[favorite, setFavorite]= useState(false);
 
-export default function LargeCard({recipe}: LargeCardProps) {
- 
-  const {title, image, cookTime, prepTime} = recipe;
-  const[favorites, setFavorite]= useState(false);
+
 
   return (
-    <Link href="../screens/description" style={styles.container}>
+    <Link href={{
+    pathname: `../screens/description/${id}`,
+    params: {}
+    }} style={styles.container}>
     <View style={[styles.content, {alignItems:'center'}]}>
        
    
-    <Image source={{uri: image}} style={styles.image}/>
+    <Image source={{uri:image}} style={styles.image}/>
    
       <View style={styles.icon}>
-             {!favorites ? (
+             {!favorite ? (
                  <TouchableOpacity onPress={()=> setFavorite(true)}>
                     <Heart size={20} color="#9BA760"/>
                  </TouchableOpacity>
@@ -45,19 +44,30 @@ export default function LargeCard({recipe}: LargeCardProps) {
              
              
              </View>
-      <View style={[styles.card, {justifyContent: 'center'}]}>
+       <View style={[styles.card, {justifyContent: 'center'}]}>
         
-               <Text style={styles.title}>{recipe?.title ?? 'No title'}</Text> 
+               <Text style={styles.title}>{title ?? 'No title'}</Text> 
                    <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 10, }}>
-                         <Text style={styles.time}>Prep: {prepTime} min | Cook: {cookTime} min </Text>       
+                         <Text style={styles.time}>Prep: {prep_time} min | Cook: {cook_time} min </Text>       
                     </View>
               
        </View>
+
+      {/*  <View style={[styles.card, {justifyContent: 'center'}]}>
+        
+               <Text style={styles.title}>PIzzzaaaaanad</Text> 
+                   <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 10, }}>
+                         <Text style={styles.time}>Prep: 30 min | Cook: 30 min </Text>       
+                    </View>
+              
+       </View> */}
        
     </View>
     </Link>
-  )
+  );
 }
+
+export default LargeCard;
 
 const styles = StyleSheet.create({
   container: {
@@ -96,8 +106,10 @@ const styles = StyleSheet.create({
       color: '#06402B',
       paddingTop: 5,
       marginLeft: 10,
-      width: '60%',
+      width: '55%',
       fontFamily: 'Nunito_700Bold',
+      flexWrap: 'wrap',
+      flexShrink: 1,
   },
     icon:{
     position: 'absolute',

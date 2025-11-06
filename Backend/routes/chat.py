@@ -15,6 +15,7 @@ import json
 import time
 from pydub import AudioSegment
 from utils.supabase import supabase
+from utils.auth import authorize_user
 load_dotenv()
 
 if not os.environ.get("GOOGLE_API_KEY"):
@@ -73,7 +74,7 @@ def create_chat():
   instructions=(
   f"For the following recipe in json... {recipe}, analyze it"
   "youll will first introduce yourself, describe the recipe"
-  "then user will be transversing through the instructions as the" \
+  "then user will be transversing through the instructions" \
   "but that isnt your responasbility as the"
   "code has prerecorded messages for each step and"
   "keywords to signify when to go to the next step, previous step, or to repeat a step"
@@ -105,7 +106,9 @@ def create_chat():
 
 @chat_bp.route("/chat", methods=["POST"])
 def chat():
-
+  user_id, error_response, status_code = authorize_user()
+  if error_response:
+    return error_response, status_code
 
   cid = request.form.get('cid')
   if 'audio' not in request.files or not cid:

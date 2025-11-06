@@ -94,6 +94,7 @@ const submitPreference=async ()=>{
   }
  
 
+  
 
   return (
     <ScrollView style={styles.container}>

@@ -1,6 +1,10 @@
 import React from 'react';
 import { View, Text, Modal, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import LargeCard from '@/components/largeCard';
+import { useSupabase } from '../app/contexts/SupabaseContext';
+import { useRecipes } from './contexts/RecipeContext';
+import { useUser } from './contexts/UserContext'
+
 
 type AddToCollectionModalProps = {
   open: boolean;
@@ -8,18 +12,8 @@ type AddToCollectionModalProps = {
 };
 
 export default function AddToCollectionModal({ open, onClose }: AddToCollectionModalProps) {
-  const recipes = [
-    { title: "Creamy Garlic Pasta", image: { uri: "https://images.unsplash.com/photo-1603133872878-684f208fb84b" } },
-    { title: "Avocado Toast Deluxe", image: { uri: "https://images.unsplash.com/photo-1551183053-bf91a1d81141" } },
-    { title: "Blueberry Pancakes", image: { uri: "https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b" } },
-    { title: "Classic Margherita Pizza", image: { uri: "https://images.unsplash.com/photo-1601924582971-c9a7e9d2d4b3" } },
-    { title: "Teriyaki Chicken Bowl", image: { uri: "https://images.unsplash.com/photo-1604908177522-43256d31e45a" } },
-    { title: "Beef Tacos", image: { uri: "https://images.unsplash.com/photo-1601050690597-36e95e17fd97" } },
-    { title: "Fresh Caesar Salad", image: { uri: "https://images.unsplash.com/photo-1603133873035-33263c3d9c3d" } },
-    { title: "Salmon Poke Bowl", image: { uri: "https://images.unsplash.com/photo-1617196034796-73f6d5aa1f86" } },
-    { title: "Chocolate Lava Cake", image: { uri: "https://images.unsplash.com/photo-1605470351558-330b4b88f7e5" } },
-    { title: "Veggie Stir Fry", image: { uri: "https://images.unsplash.com/photo-1605470351558-330b4b88f7e5" } },
-  ];
+const {recipes} = useRecipes();
+const{user}=useUser();
 
   return (
     <Modal
@@ -38,12 +32,9 @@ export default function AddToCollectionModal({ open, onClose }: AddToCollectionM
             <Text style={styles.title}>Recipes</Text>
 
             <ScrollView contentContainerStyle={{ alignItems: 'center', paddingBottom: 20 }}>
-              {recipes.map((recipe, index) => (
-                <TouchableOpacity>
-                    <LargeCard key={index} title={recipe.title} image={recipe.image} />
-                </TouchableOpacity>
-                
-              ))}
+              {recipes?.map((currentRecipe,index)=>{
+      return (<LargeCard key={index} title={currentRecipe.title} image={currentRecipe.image_url} cook_time={currentRecipe.cook_time} prep_time={currentRecipe.prep_time} id={currentRecipe.id} />);
+    })}
             </ScrollView>
 
             <TouchableOpacity style={styles.closeButton} onPress={onClose}>

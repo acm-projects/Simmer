@@ -107,9 +107,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5ebe6ff',
     paddingTop: 70,
-    paddingLeft: 15,
-    paddingRight: 15,
     paddingBottom: 10,
+    alignItems: 'center'
+  
   },
   title:{
     marginTop:5,
@@ -119,11 +119,11 @@ const styles = StyleSheet.create({
   
   },
   forum:{
-    height:400
+    height:400,
+   width: '90%',
 
   },
   header:{
-    flex:1,
     alignItems: 'center'
 
   },
@@ -131,7 +131,6 @@ const styles = StyleSheet.create({
     textAlign:'center',
     alignItems: 'center',
     justifyContent:'center',
-    flex:6
   },
   submitButton:{
     backgroundColor: '#9BA760',
