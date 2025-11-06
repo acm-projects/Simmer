@@ -1,4 +1,4 @@
-import react, {useState} from 'react'
+import react, {useEffect, useState} from 'react'
 import { Image } from 'expo-image';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView, Modal, TextInput, KeyboardAvoidingView, Platform, TouchableOpacity} from 'react-native';
@@ -14,6 +14,8 @@ import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Fonts } from '@/constants/theme';
 import { useSupabase } from '../contexts/SupabaseContext';
+import { useCollection } from '../contexts/CollectionContext';
+import { getCollections } from '../utils/recipe';
 
 
 
@@ -21,14 +23,23 @@ import { useSupabase } from '../contexts/SupabaseContext';
 
 
 export default function FavoritesScreen() {
-  const[collections, setCollections]= useState(['Favorites', 'Midnight Snacks']);
+  const {collections:collectionResult}=useCollection();
+  const[collections, setCollections]= useState<any[]|undefined>([]);
   const[addCollection, setAddCollection] = useState('');
   const supabase = useSupabase();
   const[modalVisible, setModalVisible] = useState(false);
+  useEffect(()=>{
+    if(collectionResult)
+      setCollections(collectionResult);
+  },[])
 
-  const handleAddCollection = () => {
+  const handleAddCollection = async () => {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if(!session)
+      return
     if (addCollection.trim() === '') return; // avoid empty names
-    setCollections(prev => [...prev, addCollection]);
+    // setCollections(prev => [...prev, addCollection]);
+    await getCollections(session.access_token,setCollections)
     setAddCollection(''); // clear input after adding
   };
 
@@ -36,7 +47,6 @@ export default function FavoritesScreen() {
     const { data: { session }, error } = await supabase.auth.getSession();
     if(!session)
       return
-    handleAddCollection();
     setModalVisible(false);
     try{
       await fetch(`${process.env.EXPO_PUBLIC_API_URL}user/collections/create`, {
@@ -52,6 +62,7 @@ export default function FavoritesScreen() {
 
           })
       })
+      await handleAddCollection()
     }catch(error){
       console.error('Fetch error:', error);
     }
@@ -72,9 +83,9 @@ export default function FavoritesScreen() {
 
 
      <View style={{ justifyContent: 'center', alignItems: 'center'}}>
-      {collections.map((title, index) => (
-        <Link href="../screens/recipeCollection" style={{padding: 10}}>
-          <CollectionCard title={collections.at(index) ?? 'Untitled'}/>
+      {collections.map((collection, index) => (
+        <Link href="../screens/recipeCollection" style={{padding: 10}} key={index}>
+          <CollectionCard key={index} title={collection.title ?? 'Untitled'}/>
           </Link>
       ))}
        
