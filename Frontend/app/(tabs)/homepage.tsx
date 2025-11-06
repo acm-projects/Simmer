@@ -13,7 +13,7 @@ export default function HomeScreen() {
   const{user}=useUser()
   console.log('yyyyyyyyyyyyyyyyyyyyyyyyyy')
   console.log(user)
-  // const favoriteRecipes=recipes?.filter((recipe)=>recipe.user_favorites.length>0)
+  const favoriteRecipes=recipes?.filter((recipe)=>recipe.user_favorites.length>0)
   return (
     
 

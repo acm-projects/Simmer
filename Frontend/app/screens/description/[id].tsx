@@ -60,7 +60,7 @@ export default function Description(){
             </Pressable>
             </View>
                
-                 {items.map((item, index) => (
+                 {items.map((item: string, index: number) => (
                         <View key={index} style={{flexDirection: 'row', alignItems: 'flex-center', paddingLeft: 20}}>
                         <Text style={[styles.bullet, { position: 'relative', top: 5,}]}>{'\u2022'}</Text>
                         <Text style={[styles.text,{paddingLeft: 2}]}>{item}</Text>
@@ -71,7 +71,7 @@ export default function Description(){
 
              <View style={styles.desBox}>
                 <Text style={styles.title1}>Steps</Text>
-                {steps.map((steps, index) => (
+                {steps.map((steps: string, index: number) => (
                         <View key={index} style={{flexDirection: 'row', alignItems: 'flex-start', paddingLeft: 20}}>
                         <Text style={[styles.bullet, { position: 'relative', top: 6,}]}>{index + 1}.</Text>
                         <Text style={[styles.text,{paddingLeft: 2}]}>{steps}</Text>

@@ -9,7 +9,7 @@ import { Nunito_400Regular } from '@expo-google-fonts/nunito/400Regular';
 
 interface Props{
   title: string;
-  image: ImageSourcePropType; 
+  image: string; 
   id: string;
 }
 const SmallCard: React.FC<Props>= ({title, image, id }) => {
