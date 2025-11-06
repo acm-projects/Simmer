@@ -13,6 +13,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Fonts } from '@/constants/theme';
+import { useSupabase } from '../contexts/SupabaseContext';
 
 
 
@@ -22,6 +23,7 @@ import { Fonts } from '@/constants/theme';
 export default function FavoritesScreen() {
   const[collections, setCollections]= useState(['Favorites', 'Midnight Snacks']);
   const[addCollection, setAddCollection] = useState('');
+  const supabase = useSupabase();
   const[modalVisible, setModalVisible] = useState(false);
 
   const handleAddCollection = () => {
@@ -29,6 +31,31 @@ export default function FavoritesScreen() {
     setCollections(prev => [...prev, addCollection]);
     setAddCollection(''); // clear input after adding
   };
+
+  const postCollection= async () => {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if(!session)
+      return
+    handleAddCollection();
+    setModalVisible(false);
+    try{
+      await fetch(`${process.env.EXPO_PUBLIC_API_URL}user/collections/create`, {
+          method: 'POST', 
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.access_token}`
+          },
+          body: JSON.stringify({
+              "title" : addCollection,
+              "description" : addCollection
+            
+
+          })
+      })
+    }catch(error){
+      console.error('Fetch error:', error);
+    }
+  }
 
 
  return (
@@ -97,10 +124,7 @@ export default function FavoritesScreen() {
             
             <TouchableOpacity 
               style={[styles.modalButton, styles.addButton]}
-              onPress={() => {
-                handleAddCollection();
-                setModalVisible(false);
-              }}
+              onPress={postCollection}
             >
               <Text style={styles.addButtonText}>Add</Text>
             </TouchableOpacity>
