@@ -6,11 +6,13 @@ import { LogOut } from 'lucide-react-native';
 import { ChevronRight } from 'lucide-react-native';
 import { Link, router } from 'expo-router';
 import { useSupabase } from '../contexts/SupabaseContext';
+import { useUser } from '../contexts/UserContext';
 
 
 
 export default function SettingScreen() {
   const supabase=useSupabase();
+  const {user}=useUser();
   const logout=async ()=>{
     console.log('logout')
     const { error } = await supabase.auth.signOut();

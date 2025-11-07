@@ -1,25 +1,56 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Modal, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import LargeCard from '@/components/largeCard';
+import { useRecipes } from './contexts/RecipeContext';
+import LargeCardModal from '@/components/largeCardModal';
+import { useSupabase } from './contexts/SupabaseContext';
 
 type AddToCollectionModalProps = {
   open: boolean;
   onClose: () => void;
+  collectionId:string;
 };
 
-export default function AddToCollectionModal({ open, onClose }: AddToCollectionModalProps) {
-  const recipes = [
-    { title: "Creamy Garlic Pasta", image: { uri: "https://images.unsplash.com/photo-1603133872878-684f208fb84b" } },
-    { title: "Avocado Toast Deluxe", image: { uri: "https://images.unsplash.com/photo-1551183053-bf91a1d81141" } },
-    { title: "Blueberry Pancakes", image: { uri: "https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b" } },
-    { title: "Classic Margherita Pizza", image: { uri: "https://images.unsplash.com/photo-1601924582971-c9a7e9d2d4b3" } },
-    { title: "Teriyaki Chicken Bowl", image: { uri: "https://images.unsplash.com/photo-1604908177522-43256d31e45a" } },
-    { title: "Beef Tacos", image: { uri: "https://images.unsplash.com/photo-1601050690597-36e95e17fd97" } },
-    { title: "Fresh Caesar Salad", image: { uri: "https://images.unsplash.com/photo-1603133873035-33263c3d9c3d" } },
-    { title: "Salmon Poke Bowl", image: { uri: "https://images.unsplash.com/photo-1617196034796-73f6d5aa1f86" } },
-    { title: "Chocolate Lava Cake", image: { uri: "https://images.unsplash.com/photo-1605470351558-330b4b88f7e5" } },
-    { title: "Veggie Stir Fry", image: { uri: "https://images.unsplash.com/photo-1605470351558-330b4b88f7e5" } },
-  ];
+export default function AddToCollectionModal({ open, onClose, collectionId }: AddToCollectionModalProps) {
+  const {recipes:recipesData}= useRecipes();
+  const [recipes,setRecipes] = useState(recipesData? recipesData?.map((recipe)=>({title:recipe.title,image:recipe.image_url,id:recipe.id})):[])
+  const supabase=useSupabase();
+  const addRecipeToCollection= async(id:string)=>{
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if(!session)
+      return
+    try{
+      await fetch(`${process.env.EXPO_PUBLIC_API_URL}user/collections/add-recipe`, {
+          method: 'POST', 
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.access_token}`
+          },
+          body: JSON.stringify({
+              "collection_id" : collectionId,
+              "recipe_id" : id
+            
+
+          })
+      })
+      setRecipes((currentRecipes:any)=>currentRecipes.filter((recipe:any)=>recipe.id!==id))
+    }catch(error){
+      console.error('Fetch error:', error);
+    }
+
+  }
+  // [
+  //   { title: "Creamy Garlic Pasta", image: { uri: "https://images.unsplash.com/photo-1603133872878-684f208fb84b" } },
+  //   { title: "Avocado Toast Deluxe", image: { uri: "https://images.unsplash.com/photo-1551183053-bf91a1d81141" } },
+  //   { title: "Blueberry Pancakes", image: { uri: "https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b" } },
+  //   { title: "Classic Margherita Pizza", image: { uri: "https://images.unsplash.com/photo-1601924582971-c9a7e9d2d4b3" } },
+  //   { title: "Teriyaki Chicken Bowl", image: { uri: "https://images.unsplash.com/photo-1604908177522-43256d31e45a" } },
+  //   { title: "Beef Tacos", image: { uri: "https://images.unsplash.com/photo-1601050690597-36e95e17fd97" } },
+  //   { title: "Fresh Caesar Salad", image: { uri: "https://images.unsplash.com/photo-1603133873035-33263c3d9c3d" } },
+  //   { title: "Salmon Poke Bowl", image: { uri: "https://images.unsplash.com/photo-1617196034796-73f6d5aa1f86" } },
+  //   { title: "Chocolate Lava Cake", image: { uri: "https://images.unsplash.com/photo-1605470351558-330b4b88f7e5" } },
+  //   { title: "Veggie Stir Fry", image: { uri: "https://images.unsplash.com/photo-1605470351558-330b4b88f7e5" } },
+  // ];
 
   return (
     <Modal
@@ -39,8 +70,8 @@ export default function AddToCollectionModal({ open, onClose }: AddToCollectionM
 
             <ScrollView contentContainerStyle={{ alignItems: 'center', paddingBottom: 20 }}>
               {recipes.map((recipe, index) => (
-                <TouchableOpacity>
-                    <LargeCard key={index} title={recipe.title} image={recipe.image} />
+                <TouchableOpacity key={index} onPress={()=>addRecipeToCollection(recipe.id)}>
+                    <LargeCardModal key={index} title={recipe.title} image={recipe.image} />
                 </TouchableOpacity>
                 
               ))}

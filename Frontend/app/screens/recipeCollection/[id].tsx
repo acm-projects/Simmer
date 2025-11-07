@@ -2,14 +2,15 @@ import React, {useState} from 'react';
 import { Image } from 'expo-image';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
-import { Link, useRouter } from 'expo-router';
+import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { ArrowLeft, Plus } from 'lucide-react-native';
-import AddToCollectionModal from '../modal';
+import AddToCollectionModal from '../../modal';
 
 import LargeCard from "@/components/largeCard";
 
 
 export default function RecipeScreen() {
+  const {id} = useLocalSearchParams<any>();
   const router = useRouter(); // 👈 for navigation control
   const[openAdd, setOpenAdd] = useState(false);
   return (
@@ -36,9 +37,10 @@ export default function RecipeScreen() {
         <Plus color={'white'} size={18}/>  
       </TouchableOpacity>
 
-      <AddToCollectionModal open={openAdd} onClose={() => setOpenAdd(false)} />
+      <AddToCollectionModal collectionId={id}open={openAdd} onClose={() => setOpenAdd(false)} />
       </View>
 
+        {/* <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
         <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
         <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
         <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
@@ -46,8 +48,7 @@ export default function RecipeScreen() {
         <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
         <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
         <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
-        <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
-        <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+        <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} /> */}
       </View>
 
       <StatusBar style="auto" />

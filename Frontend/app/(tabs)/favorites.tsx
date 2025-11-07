@@ -84,7 +84,9 @@ export default function FavoritesScreen() {
 
      <View style={{ justifyContent: 'center', alignItems: 'center'}}>
       {collections.map((collection, index) => (
-        <Link href="../screens/recipeCollection" style={{padding: 10}} key={index}>
+        <Link href={{
+          pathname: `../screens/recipeCollection/${collection.id}`,
+          params: {}}} style={{padding: 10}} key={index} >
           <CollectionCard key={index} title={collection.title ?? 'Untitled'}/>
           </Link>
       ))}
