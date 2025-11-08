@@ -17,3 +17,22 @@ export const getRecipes=async(jwt:string|undefined, setRecipes:Dispatch<SetState
         alert("Could not connect to server");
       }
     }
+
+export const getCollections=async(jwt:string|undefined, setCollections:Dispatch<SetStateAction<any[] | undefined>>)=>{
+      try{
+        const response =  await fetch(`${process.env.EXPO_PUBLIC_API_URL}user/collections`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${jwt}`
+          }
+        });
+        const data=await response.json()
+        console.log('ddddddddddg')
+        console.log(data.collections)
+        setCollections(data.collections)
+      } catch (err) {
+        console.error( err);
+        alert("Could not connect to server");
+      }
+    }

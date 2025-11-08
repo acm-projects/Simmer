@@ -2,16 +2,21 @@ import React, {useState} from 'react';
 import { Image } from 'expo-image';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
-import { Link, useRouter } from 'expo-router';
+import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { ArrowLeft, Plus } from 'lucide-react-native';
-import AddToCollectionModal from '../modal';
+import AddToCollectionModal from '../../modal';
 
 import LargeCard from "@/components/largeCard";
+import { useCollection } from '@/app/contexts/CollectionContext';
 
 
 export default function RecipeScreen() {
+  const {id} = useLocalSearchParams<any>();
   const router = useRouter(); // 👈 for navigation control
   const[openAdd, setOpenAdd] = useState(false);
+  const {collections:collectionsData}=useCollection();
+  const[collection,setCollection]=useState(collectionsData?collectionsData.find((collection:any)=>collection.id===id):[])
+  const [recipes,setRecipes]=useState<any[]|undefined>(collection.collection_recipes? collection.collection_recipes.map((recipe:any)=>({title:recipe.recipes.title,image:recipe.recipes.image_url,cook_time:recipe.recipes.cook_time,prep_time:recipe.recipes.prep_time,id:recipe.recipes.id})):[])
   return (
     <ScrollView style={styles.container}>
       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -36,9 +41,13 @@ export default function RecipeScreen() {
         <Plus color={'white'} size={18}/>  
       </TouchableOpacity>
 
-      <AddToCollectionModal open={openAdd} onClose={() => setOpenAdd(false)} />
+      <AddToCollectionModal collectionId={id}open={openAdd} onClose={() => setOpenAdd(false)} setCollectionRecipe={setRecipes} />
       </View>
+        {
+          recipes?.map((recipe,index)=>(<LargeCard key={index} title={recipe.title} image={recipe.image} cook_time={recipe.cook_time} prep_time={recipe.prep_time} id={recipe.id} />))
+        }
 
+        {/* <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
         <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
         <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
         <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
@@ -46,8 +55,7 @@ export default function RecipeScreen() {
         <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
         <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
         <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
-        <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
-        <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+        <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} /> */}
       </View>
 
       <StatusBar style="auto" />
