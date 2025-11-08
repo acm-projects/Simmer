@@ -9,7 +9,7 @@ import { Nunito_400Regular } from '@expo-google-fonts/nunito/400Regular';
 
 interface Props{
   title: string;
-  image: ImageSourcePropType; 
+  image: string; 
   id: string;
 }
 const SmallCard: React.FC<Props>= ({title, image, id }) => {
@@ -80,10 +80,13 @@ const styles = StyleSheet.create({
     
     },
   title:{
-      fontSize: 18,
+      fontSize: 17,
       color: '#262e05ff',
       fontFamily: 'Nunito_700Bold',
       flexWrap: 'wrap',
+      flexShrink: 1,
+      maxHeight: 23,
+      width: '93%',
       position: 'absolute',
       bottom: 30,
       paddingLeft: 13,

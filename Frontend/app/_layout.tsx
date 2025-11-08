@@ -92,6 +92,7 @@ export default function RootLayout() {
     <SupabaseProvider>
       <ThemeProvider value={colorScheme === 'light' ? DarkTheme : DefaultTheme}>
         <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="screens/search" options={{ headerShown: false }} />
           <Stack.Screen name="screens/settings" options={{ headerShown: false }} />
           <Stack.Screen name="screens/cookingMode" options={{ headerShown: false }} />
@@ -102,7 +103,6 @@ export default function RootLayout() {
           <Stack.Screen name="userPreference" options={{ headerShown: false }} />
           <Stack.Screen name="voiceAssistant" options={{ headerShown: false }} />
           <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
           <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal', headerShown: false }} />
         </Stack>

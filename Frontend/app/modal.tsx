@@ -4,6 +4,7 @@ import LargeCard from '@/components/largeCard';
 import { useRecipes } from './contexts/RecipeContext';
 import LargeCardModal from '@/components/largeCardModal';
 import { useSupabase } from './contexts/SupabaseContext';
+import { useUser } from './contexts/UserContext'
 
 type AddToCollectionModalProps = {
   open: boolean;

@@ -57,6 +57,42 @@ export default function UserPreference() {
     setSelectedDietRestrictions(new Set([...selectedDietRestrictions, newTag]));
     setCustomDietRestrictionInput('');
   };
+ 
+const submitPreference=async ()=>{
+    try{
+      const { data: { session }, error } = await supabase.auth.getSession();
+
+      if (error){ 
+        setMessage(error.message)
+        return;
+      }
+      if(!session){
+        setMessage(`Session doesn't exist, please try again.`)
+        return;
+      }
+
+      console.log(session.access_token)
+      console.log(session.user.id)
+
+
+      await fetch(`${process.env.EXPO_PUBLIC_API_URL}/user/set-preference`, {
+          method: 'POST', 
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.access_token}`
+          },
+          body: JSON.stringify({
+              id:session.user.id,
+              "diet_restriction":[...selectedDietRestrictions],
+
+          })
+      })
+      setMessage("Preferenced has been changed");
+    }catch(error){
+      console.error('Fetch error:', error);
+    }
+  }
+ 
 
   
 
@@ -97,7 +133,8 @@ export default function UserPreference() {
          
 
       </View>
-      <TouchableOpacity style={styles.doneButton}>
+      <TouchableOpacity style={styles.doneButton}
+      onPress={submitPreference}>
          <Link href='../homepage'> <Text style={styles.addButtonText}>Done</Text> </Link>
         </TouchableOpacity>
       

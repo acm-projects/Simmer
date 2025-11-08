@@ -1,22 +1,32 @@
-
+import {useState, useEffect} from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
 import LargeCard from "@/components/largeCard";
+import { useSupabase } from '../../app/contexts/SupabaseContext';
+import { useRecipes } from '../contexts/RecipeContext';
+import { useUser } from '../contexts/UserContext'
+
 
 
 export default function RecipeScreen() {
-  
+  const {recipes}=useRecipes();
+  const count = recipes?.length ?? 0;
+  const{user}=useUser();
+  // console.log('yyyyyyyyyyyyyyyyyyyyyyyyyy')
+  console.log(user)
+
   return (
     <ScrollView style={styles.container}>
       <View style={{ justifyContent: 'center', alignItems: 'center'}}>
      <Text style={styles.title}>Recipes</Text>
      </View>
 
+
 <View style ={{marginTop: 20}}>
-<Text style={styles.text}>11 Recipes</Text>
-
- <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
-
+  <Text style={styles.text}>{count} recipes</Text>
+ {recipes?.map((currentRecipe,index)=>{
+      return (<LargeCard key={index} title={currentRecipe.title} image={currentRecipe.image_url} cook_time={currentRecipe.cook_time} prep_time={currentRecipe.prep_time} id={currentRecipe.id} />);
+    })}
  
 
 </View>
@@ -30,7 +40,7 @@ const styles = StyleSheet.create({
    container: {
     flex: 1,
     backgroundColor: '#f5ebe6ff',
-    paddingTop: 30,
+    paddingTop: 50,
   },
   content:{
     padding: 1,

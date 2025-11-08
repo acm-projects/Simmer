@@ -30,8 +30,6 @@ const LinkPopup = ({link, setLink}: LinkPopupProps) => {
   const styles = StyleSheet.create({
     container:{
         backgroundColor: '#fff',
-
-
     },
     textBox:{
         backgroundColor: '#d7d3d3ff',

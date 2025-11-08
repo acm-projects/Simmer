@@ -21,33 +21,48 @@ export default function Description(){
 
     return(
         <ScrollView style={styles.container}>
-        <View style={{ justifyContent: 'center', alignItems: 'center'}}>
-         <Text style={styles.title1}>Recipe</Text>
-         </View>
-    
-    
-         <TouchableOpacity onPress={() => router.back()}>
-         <ArrowLeft size={20} style={styles.arrow}/>
-         </TouchableOpacity>
+            <View style={{ justifyContent: 'center', alignItems: 'center'}}>
+                <Text style={styles.toptitle}>Recipe</Text>
+                </View>
+           
+           
+                <TouchableOpacity onPress={() => router.back()}>
+                <ArrowLeft size={20} style={styles.arrow}/>
+                </TouchableOpacity>
 
         <View>
             <View style={styles.card}>
                <Image source={{uri:recipe.image_url}} style={styles.image}/>
                 <View style={styles.titleBox}>
                     <Text style={styles.title2}>{recipe.title}</Text>
-                    <View>
-                        <Text style={[styles.text, {fontSize: 15, color: '#fff'}]}>Prep: {recipe?.prep_time}min</Text>
-                        <Text style={[styles.text, {fontSize: 15, color:'#fff'}]}>Cook: {recipe?.cook_time}min</Text>
+                    <View style={{width: '100%', paddingLeft: 10,}}>
+                      <View style={{}}>
+                          <Text style={[styles.text, {fontSize: 15, color: '#fff', }]}>Prep: {recipe?.prep_time}min</Text>
+                      </View>
+                        
+                        <View style={{flex: 1, flexDirection: 'row'}}>
+                          <Text style={[styles.text, {fontSize: 15, color: '#fff', }]}>Cook: {recipe?.cook_time}min</Text>
+                      
+                      </View>
                     </View>
                 
                 </View>
             </View>
+           
 
-            <View style={styles.desBox}>
-                <Text style={styles.title1}>Ingredients</Text>
-                 {items.map((item, index) => (
-                        <View key={index} style={{flexDirection: 'row', alignItems: 'flex-end', paddingLeft: 20}}>
-                        <Text style={styles.bullet}>{'\u2022'}</Text>
+           <View style={styles.desBox}>
+            <View style={{flexDirection: 'row'}}>
+               <Text style={styles.title1}>Ingredients</Text>
+                <Pressable onPress={() => router.push('../screens/cookingMode')}>
+                <View style={styles.bubble}>
+                <Text style={styles.bubbleText}> Voice Mode </Text>
+                </View>
+            </Pressable>
+            </View>
+               
+                 {items.map((item: string, index: number) => (
+                        <View key={index} style={{flexDirection: 'row', alignItems: 'flex-center', paddingLeft: 20}}>
+                        <Text style={[styles.bullet, { position: 'relative', top: 5,}]}>{'\u2022'}</Text>
                         <Text style={[styles.text,{paddingLeft: 2}]}>{item}</Text>
                         </View>
                     ))}
@@ -56,20 +71,22 @@ export default function Description(){
 
              <View style={styles.desBox}>
                 <Text style={styles.title1}>Steps</Text>
-                {steps.map((steps, index) => (
-                        <View key={index} style={{flexDirection: 'row', alignItems: 'flex-end', paddingLeft: 20}}>
-                        <Text style={styles.bullet}>{index + 1}.</Text>
+                {steps.map((steps: string, index: number) => (
+                        <View key={index} style={{flexDirection: 'row', alignItems: 'flex-start', paddingLeft: 20}}>
+                        <Text style={[styles.bullet, { position: 'relative', top: 6,}]}>{index + 1}.</Text>
                         <Text style={[styles.text,{paddingLeft: 2}]}>{steps}</Text>
                         </View>
                     ))}
             </View>
+            
+
+          
+      
+
+           
         </View>
 
-    <Pressable onPress={() => router.push('../screens/cookingMode')}>
-      <View style={styles.bubble}>
-          <Text style={styles.bubbleText}> Voice Mode </Text>
-      </View>
-    </Pressable>
+    
 
 
              
@@ -91,9 +108,9 @@ const styles = StyleSheet.create({
     text:{
     fontSize: 16,
     color: '#000',
-    paddingLeft: 15,
     paddingTop: 5,
     fontFamily: 'Nunito_400Regular',
+    width: '90%',
 
   },
   heart:{
@@ -118,6 +135,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
     color: '#9BA760',
     fontFamily: 'Nunito_700Bold',
+    width: '65%',
   },
      title2:{
     paddingLeft: 15,
@@ -125,6 +143,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: '#fff',
     fontFamily: 'Nunito_700Bold',
+    width: '70%'
   },
   titleBox:{
     backgroundColor: '#9BA760',
@@ -165,17 +184,24 @@ const styles = StyleSheet.create({
   },
   bubble: {
    backgroundColor: '#9BA760',
-   padding: 12,
+   padding: 10,
    borderRadius: 16,
    maxWidth: "100%",
-   marginVertical: 10,
+   marginVertical: 5,
    alignSelf: "center",
-   width: 300,
+   
  },
  bubbleText: {
-   fontSize: 16,
+   fontSize: 14,
    color: "white",
    textAlign: "center",
    fontFamily: 'Nunito_600SemiBold',
  },
+ toptitle:{
+    paddingLeft: 15,
+    paddingTop: 15,
+    fontSize: 25,
+    color: '#9BA760',
+    fontFamily: 'Nunito_700Bold',
+ }
 });

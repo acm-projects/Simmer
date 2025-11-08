@@ -90,6 +90,7 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     paddingRight: 15,
     paddingBottom: 10,
+    alignItems: 'center',
   },
    title:{
     marginTop:20,

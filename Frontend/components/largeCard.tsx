@@ -2,8 +2,9 @@ import react, { useState} from 'react'
 import { StyleSheet, Text, View, Image, ImageSourcePropType, TouchableOpacity } from 'react-native';
 import { Heart } from 'lucide-react-native';
 import { Link } from 'expo-router';
+import RecipeScreen from '@/app/(tabs)/recipes';
 
-interface Props{
+interface Recipe {
   title: string;
   image: string; 
   cook_time: number;
@@ -13,8 +14,7 @@ interface Props{
 
 }
 
-
-const LargeCard: React.FC<Props>= ({title, image, cook_time, prep_time,id}) => {
+const LargeCard: React.FC<Recipe>= ({title, image, cook_time, prep_time, id}) => {
   const[favorite, setFavorite]= useState(false);
 
 
@@ -44,19 +44,30 @@ const LargeCard: React.FC<Props>= ({title, image, cook_time, prep_time,id}) => {
              
              
              </View>
-      <View style={[styles.card, {justifyContent: 'center'}]}>
+       <View style={[styles.card, {justifyContent: 'center'}]}>
         
-               <Text style={styles.title}>{title}</Text> 
+               <Text style={styles.title}>{title ?? 'No title'}</Text> 
                    <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 10, }}>
                          <Text style={styles.time}>Prep: {prep_time} min | Cook: {cook_time} min </Text>       
                     </View>
               
        </View>
+
+      {/*  <View style={[styles.card, {justifyContent: 'center'}]}>
+        
+               <Text style={styles.title}>PIzzzaaaaanad</Text> 
+                   <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 10, }}>
+                         <Text style={styles.time}>Prep: 30 min | Cook: 30 min </Text>       
+                    </View>
+              
+       </View> */}
        
     </View>
     </Link>
-  )
+  );
 }
+
+export default LargeCard;
 
 const styles = StyleSheet.create({
   container: {
@@ -95,8 +106,10 @@ const styles = StyleSheet.create({
       color: '#06402B',
       paddingTop: 5,
       marginLeft: 10,
-      width: '60%',
+      width: '55%',
       fontFamily: 'Nunito_700Bold',
+      flexWrap: 'wrap',
+      flexShrink: 1,
   },
     icon:{
     position: 'absolute',
@@ -113,7 +126,4 @@ const styles = StyleSheet.create({
   }
 });
 
-
-
-export default LargeCard
 

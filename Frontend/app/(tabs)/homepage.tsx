@@ -13,13 +13,13 @@ export default function HomeScreen() {
   const{user}=useUser()
   console.log('yyyyyyyyyyyyyyyyyyyyyyyyyy')
   console.log(user)
-  // const favoriteRecipes=recipes?.filter((recipe)=>recipe.user_favorites.length>0)
+  const favoriteRecipes=recipes?.filter((recipe)=>recipe.user_favorites.length>0)
   return (
     
 
    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
     <View style={styles.row}>
-      <Text style={styles.title}>Hi! {user?user.first_name:""} </Text>
+      <Text style={styles.title}>Hi {user?user.first_name:""}! </Text>
       <View style={styles.icons}>
 
         <CornerIcon />  
@@ -39,6 +39,7 @@ export default function HomeScreen() {
        
   
     </View>
+   
     {recipes?.map((currentRecipe,index)=>{
       return (<LargeCard key={index} title={currentRecipe.title} image={currentRecipe.image_url} cook_time={currentRecipe.cook_time} prep_time={currentRecipe.prep_time} id={currentRecipe.id} />);
     })}
@@ -68,7 +69,7 @@ const styles = StyleSheet.create({
    
   },
   content:{
-    top: 30,
+    top: 40,
   },
   gridItem: {
     flex: 1, // Ensures items take equal space in a row

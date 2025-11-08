@@ -21,8 +21,9 @@ export function InputField({ label, value, onChangeText, placeholder, secureText
 
 const styles = StyleSheet.create({
   inputContainer: {
-    marginBottom:0,
-    flex:1
+    
+    width: '100%',
+    marginBottom: 15,
 
   },
   label:{
@@ -37,8 +38,9 @@ const styles = StyleSheet.create({
     borderColor: '#9BA760',
     borderRadius: 18,
     paddingHorizontal: 20,
-    width:350,
+  
     height: 50,
+    width: 320,
   
     fontSize: 13,
   }
