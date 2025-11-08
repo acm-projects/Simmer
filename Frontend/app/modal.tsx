@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { Dispatch, SetStateAction, useState } from 'react';
 import { View, Text, Modal, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import LargeCard from '@/components/largeCard';
 import { useRecipes } from './contexts/RecipeContext';
@@ -9,15 +9,18 @@ type AddToCollectionModalProps = {
   open: boolean;
   onClose: () => void;
   collectionId:string;
+  setCollectionRecipe:Dispatch<SetStateAction<any[] | undefined>>;
 };
 
-export default function AddToCollectionModal({ open, onClose, collectionId }: AddToCollectionModalProps) {
+export default function AddToCollectionModal({ open, onClose, collectionId, setCollectionRecipe }: AddToCollectionModalProps) {
   const {recipes:recipesData}= useRecipes();
   const [recipes,setRecipes] = useState(recipesData? recipesData?.map((recipe)=>({title:recipe.title,image:recipe.image_url,id:recipe.id})):[])
   const supabase=useSupabase();
   const addRecipeToCollection= async(id:string)=>{
     const { data: { session }, error } = await supabase.auth.getSession();
     if(!session)
+      return
+    if(!recipesData)
       return
     try{
       await fetch(`${process.env.EXPO_PUBLIC_API_URL}user/collections/add-recipe`, {
@@ -33,6 +36,9 @@ export default function AddToCollectionModal({ open, onClose, collectionId }: Ad
 
           })
       })
+      const recipe=recipesData.find((recipe)=>recipe.id===id);
+      console.log(recipe)
+      setCollectionRecipe((currentRecipes)=>([{title:recipe.title,image:recipe.image_url,cook_time:recipe.cook_time,prep_time:recipe.prep_time,id:recipe.id},...currentRecipes||[]]))
       setRecipes((currentRecipes:any)=>currentRecipes.filter((recipe:any)=>recipe.id!==id))
     }catch(error){
       console.error('Fetch error:', error);

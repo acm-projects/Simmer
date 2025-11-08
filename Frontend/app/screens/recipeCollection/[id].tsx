@@ -41,7 +41,7 @@ export default function RecipeScreen() {
         <Plus color={'white'} size={18}/>  
       </TouchableOpacity>
 
-      <AddToCollectionModal collectionId={id}open={openAdd} onClose={() => setOpenAdd(false)} />
+      <AddToCollectionModal collectionId={id}open={openAdd} onClose={() => setOpenAdd(false)} setCollectionRecipe={setRecipes} />
       </View>
         {
           recipes?.map((recipe,index)=>(<LargeCard key={index} title={recipe.title} image={recipe.image} cook_time={recipe.cook_time} prep_time={recipe.prep_time} id={recipe.id} />))

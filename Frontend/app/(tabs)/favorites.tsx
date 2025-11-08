@@ -23,7 +23,7 @@ import { getCollections } from '../utils/recipe';
 
 
 export default function FavoritesScreen() {
-  const {collections:collectionResult}=useCollection();
+  const {collections:collectionResult, setCollections:setCOllectionsResult}=useCollection();
   const[collections, setCollections]= useState<any[]|undefined>([]);
   const[addCollection, setAddCollection] = useState('');
   const supabase = useSupabase();
@@ -31,7 +31,7 @@ export default function FavoritesScreen() {
   useEffect(()=>{
     if(collectionResult)
       setCollections(collectionResult);
-  },[])
+  },[collectionResult])
 
   const handleAddCollection = async () => {
     const { data: { session }, error } = await supabase.auth.getSession();
@@ -39,7 +39,7 @@ export default function FavoritesScreen() {
       return
     if (addCollection.trim() === '') return; // avoid empty names
     // setCollections(prev => [...prev, addCollection]);
-    await getCollections(session.access_token,setCollections)
+    await getCollections(session.access_token,setCOllectionsResult)
     setAddCollection(''); // clear input after adding
   };
 
