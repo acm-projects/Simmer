@@ -417,9 +417,6 @@ def get_user():
       .execute()
     )
 
-
-  
-
     return jsonify ({
       'data':user_response.data
     }), 200

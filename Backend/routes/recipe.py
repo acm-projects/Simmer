@@ -4,6 +4,7 @@ from utils.supabase import supabase
 from utils.auth import authorize_user
 from utils.createRecipe import generate_recipe, generate_ai_instructions, categorize_protein_types, upload_image
 from utils.import_videos import get_url_data
+
 recipe_bp = Blueprint('recipe', __name__)
 
 def default_quantity_to_one(value):
@@ -18,7 +19,6 @@ def add_recipe():
     user_id, error_response, status_code = authorize_user()
     if error_response:
       return error_response, status_code
-    user_id='8089f0b3-48fd-484a-8ed5-081459c556e3'
     
     data_string = request.form.get('json_data')
     user_id = request.form.get('id')
@@ -31,6 +31,7 @@ def add_recipe():
     dietary_tags = data.get('dietary_tags', [])
     type = data.get('type')
     ingredients = data.get('ingredients', [])
+
     try:
       image_url = upload_image()
     except Exception as e:
@@ -43,11 +44,12 @@ def add_recipe():
     print(str(instructions))
     if not ai_instructions:
       return jsonify({'error' : 'failed to generate AI instructions'}), 400
+    
     print(ingredients)
     protein = categorize_protein_types(ingredients)
     if not protein:
       return jsonify({'error' : 'failed to generate protein list'}), 400
-    print('protein done bruh')
+
     recipe = supabase.table('recipes').insert({
         'title' : title,
         'description' : description,
@@ -66,7 +68,6 @@ def add_recipe():
       return jsonify({'error': 'failed to create recipe'}), 400
       
     recipe_id = recipe.data[0]['id']
-
 
     for ing in ingredients:
       supabase.table('ingredients').insert({
@@ -233,40 +234,17 @@ def get_favorited_recipes():
 
 @recipe_bp.route("/recipes", methods=["GET"])
 def get_recipes():
-  # data = request.get_json()
-  # dietary_restrictions=data.get('dietary_tags')
-  # time=data.get('time')
-  # type=data.get('type')
-  # protein=data.get('protein')
   try:
     user_id, error_response, status_code = authorize_user()
     if error_response:
       return error_response, status_code
-    # query= supabase.table("recipes").select("*")
-    # if(type):
-    #   query=query.eq("type", type)
-    # if(dietary_restrictions):
-    #   query=query.overlaps("dietary_tags", dietary_restrictions)
-    # if(protein):
-    #   query=query.overlaps("protein", protein)
-    #   response = query.execute()
-        # .eq("type", type)
-        # .overlaps("dietary_tags", dietary_restrictions)
-        # .overlaps("protein", protein)
+    
     response= supabase.table("recipes").select("*,ingredients(*), user_favorites(*)").eq('created_by',user_id).execute()
 
   except Exception as e:
     return jsonify({"error": "An error occurred while updating preferences.", "details": str(e)}), 500
-  # print('bye')
-  # print(response.data)
-  data=response.data
-  # if not time == -1:
-  #   data=[
-  #     item for item in data
-  #     if isinstance(item.get('cook_time'), (int, float)) and \
-  #       isinstance(item.get('prep_time'), (int, float)) and \
-  #       (item.get('cook_time') + item.get('prep_time')) <= time
-  #   ]
+  
+  data = response.data
   return jsonify({'result' : data}), 200
 
 @recipe_bp.route('/recipe/info', methods=['GET'])
