@@ -11,6 +11,7 @@ def default_quantity_to_one(value):
     return float(value)
   except (ValueError, TypeError):
     return 1.0
+
 @recipe_bp.route('/add-recipe', methods=['POST'])
 def add_recipe():
   try:
@@ -88,9 +89,9 @@ def add_recipe():
 @recipe_bp.route('/import-recipe', methods=['POST'])
 def import_recipe():
   try:
-    # user_id, error_response, status_code = authorize_user()
-    # if error_response:
-    #   return error_response, status_code
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
     
     data = request.get_json()
     if not data or not all(key in data for key in ['content']):
@@ -116,7 +117,6 @@ def import_recipe():
 @recipe_bp.route('/toggle-favorite', methods=['POST'])
 def toggle_favorite():
   try:
-
     user_id, error_response, status_code = authorize_user()
     if error_response:
       return error_response, status_code
@@ -341,37 +341,6 @@ def delete_recipe():
   except Exception as e:
     print('error deleteing recipe ', e)
     return jsonify({'error' : 'internal server error', 'details' : str(e)}), 500
-  
-# @recipe_bp.route("/recipe/image", methods=["POST"])
-# def upload_image():
-#     if 'thumbnail' not in request.files:
-#         return jsonify({"error": "no thumbnail"}), 400
-
-#     thumbnail = request.files['thumbnail']
-
-#     if thumbnail.filename == '':
-#         return jsonify({"error": "No file selected"}), 400
-    
-#     if thumbnail:
-#       thumbnail_name= secure_filename(thumbnail.filename)
-#       thumbnail_bytes = thumbnail.read()
-
-#       bucket_name = "recipe_images"
-#       thumbnail_path = f"/{thumbnail_name}"
-#     try:
-#       supabase.storage.from_(bucket_name).upload(
-#           file=thumbnail_bytes,
-#           path=thumbnail_path,
-#           file_options={"content-type": 'image/png'} 
-#       )
-#       public_url = supabase.storage.from_(bucket_name).get_public_url(thumbnail_path)
-#       return jsonify({
-#           "public_url": public_url
-#       }), 200
-#     except AuthApiError as e:
-#             return jsonify({"error":  f"auth error:{e.message}"}), 500
-#     except Exception as e:
-#         return jsonify({"error": f"other error:{e.message}"}), 500
 
 @recipe_bp.route('/recipe/image', methods=['PUT'])
 def editImage():
