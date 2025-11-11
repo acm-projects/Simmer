@@ -7,8 +7,9 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useEffect, useState } from 'react';
 import { SupabaseProvider, useSupabase } from './contexts/SupabaseContext';
 import { RecipeProvider } from './contexts/RecipeContext';
-import { getRecipes } from './utils/recipe';
+import { getCollections, getRecipes } from './utils/recipe';
 import { UserProvider } from './contexts/UserContext';
+import { CollectionProvider } from './contexts/CollectionContext';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -20,6 +21,7 @@ export default function RootLayout() {
 
   const router= useRouter();
   const [user,setUser]=useState<any[] | undefined>(undefined)
+  const [collections,setCollections]=useState<any[] | undefined>(undefined)
   const [recipes,setRecipes]=useState<any[] | undefined>(undefined)
   const [isNavigationReady, setIsNavigationReady] = useState(false);
   useEffect(() => {
@@ -58,6 +60,7 @@ export default function RootLayout() {
       } else {
         await getUser(jwt)
         await getRecipes(jwt, setRecipes);
+        await getCollections(jwt, setCollections);
         router.navigate("/userPreference");
       }
     }
@@ -83,6 +86,7 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   return (
+    <CollectionProvider collections={collections} setCollections={setCollections}>
     <UserProvider user={user} setUser={setUser}>
     <RecipeProvider recipes={recipes} setRecipes={setRecipes}>
     <SupabaseProvider>
@@ -107,6 +111,7 @@ export default function RootLayout() {
     </SupabaseProvider>
     </RecipeProvider>
     </UserProvider>
+    </CollectionProvider>
 
   );
 }

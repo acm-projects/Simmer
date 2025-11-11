@@ -1,4 +1,4 @@
-import react, {useState} from 'react'
+import react, {useEffect, useState} from 'react'
 import { Image } from 'expo-image';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView, Modal, TextInput, KeyboardAvoidingView, Platform, TouchableOpacity} from 'react-native';
@@ -13,6 +13,9 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Fonts } from '@/constants/theme';
+import { useSupabase } from '../contexts/SupabaseContext';
+import { useCollection } from '../contexts/CollectionContext';
+import { getCollections } from '../utils/recipe';
 
 
 
@@ -20,15 +23,50 @@ import { Fonts } from '@/constants/theme';
 
 
 export default function FavoritesScreen() {
-  const[collections, setCollections]= useState(['Favorites', 'Midnight Snacks']);
+  const {collections:collectionResult, setCollections:setCOllectionsResult}=useCollection();
+  const[collections, setCollections]= useState<any[]|undefined>([]);
   const[addCollection, setAddCollection] = useState('');
+  const supabase = useSupabase();
   const[modalVisible, setModalVisible] = useState(false);
+  useEffect(()=>{
+    if(collectionResult)
+      setCollections(collectionResult);
+  },[collectionResult])
 
-  const handleAddCollection = () => {
+  const handleAddCollection = async () => {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if(!session)
+      return
     if (addCollection.trim() === '') return; // avoid empty names
-    setCollections(prev => [...prev, addCollection]);
+    // setCollections(prev => [...prev, addCollection]);
+    await getCollections(session.access_token,setCOllectionsResult)
     setAddCollection(''); // clear input after adding
   };
+
+  const postCollection= async () => {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if(!session)
+      return
+    setModalVisible(false);
+    try{
+      await fetch(`${process.env.EXPO_PUBLIC_API_URL}user/collections/create`, {
+          method: 'POST', 
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.access_token}`
+          },
+          body: JSON.stringify({
+              "title" : addCollection,
+              "description" : addCollection
+            
+
+          })
+      })
+      await handleAddCollection()
+    }catch(error){
+      console.error('Fetch error:', error);
+    }
+  }
 
 
  return (
@@ -45,9 +83,11 @@ export default function FavoritesScreen() {
 
 
      <View style={{ justifyContent: 'center', alignItems: 'center'}}>
-      {collections.map((title, index) => (
-        <Link href="../screens/recipeCollection" style={{padding: 10}}>
-          <CollectionCard title={collections.at(index) ?? 'Untitled'}/>
+      {collections.map((collection, index) => (
+        <Link href={{
+          pathname: `../screens/recipeCollection/${collection.id}`,
+          params: {}}} style={{padding: 10}} key={index} >
+          <CollectionCard key={index} title={collection.title ?? 'Untitled'}/>
           </Link>
       ))}
        
@@ -97,10 +137,7 @@ export default function FavoritesScreen() {
             
             <TouchableOpacity 
               style={[styles.modalButton, styles.addButton]}
-              onPress={() => {
-                handleAddCollection();
-                setModalVisible(false);
-              }}
+              onPress={postCollection}
             >
               <Text style={styles.addButtonText}>Add</Text>
             </TouchableOpacity>

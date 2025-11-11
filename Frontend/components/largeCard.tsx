@@ -21,8 +21,8 @@ const LargeCard: React.FC<Recipe>= ({title, image, cook_time, prep_time, id}) =>
 
   return (
     <Link href={{
-    pathname: `../screens/description/${id}`,
-    params: {}
+    pathname: `/screens/description/[id]`,
+    params: {id}
     }} style={styles.container}>
     <View style={[styles.content, {alignItems:'center'}]}>
        
