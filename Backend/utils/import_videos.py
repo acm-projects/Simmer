@@ -7,10 +7,23 @@ from utils.createRecipe import generate_blog_transcript_and_caption
 from youtube_transcript_api import YouTubeTranscriptApi, NoTranscriptFound
 from dotenv import load_dotenv
 from googleapiclient.discovery import build
+from urllib.parse import urlparse, parse_qs
 
 load_dotenv()
 SCRAPECREATORS_API_KEY: str = os.environ.get("SCRAPECREATORS_KEY")
 YOUTUBE_API_KEY: str = os.environ.get("YOUTUBE_API_KEY")
+
+def get_youtube_id(url_string: str) -> str | None:
+    parsed_url = urlparse(url_string)
+    if parsed_url.netloc in ('www.youtube.com', 'youtube.com'):
+        if parsed_url.path == '/watch':
+            query_params = parse_qs(parsed_url.query)
+            return query_params.get('v', [None])[0]  
+        if parsed_url.path.startswith('/shorts/'):
+            return parsed_url.path.split('/')[2]
+    elif parsed_url.netloc == 'youtu.be':
+        return parsed_url.path.lstrip('/')
+    return None
 
 def generate_recipe_from_tiktok(url: str):
     try:
@@ -57,10 +70,7 @@ def generate_recipe_from_tiktok(url: str):
         return None
 
 def generate_recipe_from_youtube(url: str):
-    if 'v=' in url:
-        videoId = url.split('v=')[-1]
-    elif 'shorts/' in url:
-        videoId = url.split('shorts/')[-1]
+    videoId=get_youtube_id(url)
     print('Video: ' + videoId)
     videoId = videoId.split('&')[0]
     print(videoId)

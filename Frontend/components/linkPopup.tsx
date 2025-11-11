@@ -1,16 +1,21 @@
-import React, {useState} from 'react'
+import React, {Dispatch, SetStateAction} from 'react'
 import { StyleSheet, Text, View, Image, TextInput } from 'react-native';
 
-const LinkPopup = () => {
+interface LinkPopupProps {
+  link: string | undefined;
+  setLink: Dispatch<SetStateAction<string | undefined>>;
+}
 
-    const[link, setLink] = useState('');
+const LinkPopup = ({link, setLink}: LinkPopupProps) => {
+
   return (
     <View style={styles.container}>
         <Text style={styles.text}>Recipe Link:</Text>
-        <View style={styles.textBox}>
+        <View style={[styles.textBox,]}>
         <TextInput 
         style={styles.text}
         placeholder="Link"
+        placeholderTextColor={'#abb08cff'}
         value={link}
         onChangeText={setLink}
         />
@@ -25,8 +30,6 @@ const LinkPopup = () => {
   const styles = StyleSheet.create({
     container:{
         backgroundColor: '#fff',
-
-
     },
     textBox:{
         backgroundColor: '#d7d3d3ff',
@@ -40,6 +43,7 @@ const LinkPopup = () => {
     text:{
         fontSize: 20,
         color: '#9BA760',
+        fontFamily: 'Nunito_400Regular',
     }
 
   })

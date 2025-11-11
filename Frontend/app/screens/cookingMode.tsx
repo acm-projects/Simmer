@@ -3,9 +3,13 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
 import { ArrowLeft } from 'lucide-react-native';
 import { useFonts, Orbitron_400Regular, Orbitron_700Bold} from '@expo-google-fonts/orbitron'
+//@ts-ignore
 import {Timer} from 'react-native-flip-timer-fixed';
-import { Plus } from 'lucide-react-native';
+//const Timer = require('react-native-flip-timer-fixed').default;
+//import {Timer} from 'react-native-flip-timer-fixed';
+import { Plus, Minus, Play, Pause } from 'lucide-react-native';
 import { router } from 'expo-router';
+import {Image} from 'expo-image';
 
 export default function SettingScreen() {
     let [fontsLoaded] = useFonts({
@@ -14,50 +18,109 @@ export default function SettingScreen() {
       });
       const [play, setPlay] = useState(true);
       const [seconds, setSeconds] = useState(120);
+      const [isVisible, setVisible] = useState(false);
+      const [isTalking, setIsTalking] = useState(false);
+      /// change setIsTalking when we integrate this, mascot will change to talking if isTalking is changed
       
 
   return (
     <ScrollView style={styles.container}>
-  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-
-     <TouchableOpacity onPress={() => router.back()}>
-     <ArrowLeft  size={20} style={styles.arrow}/>
-     </TouchableOpacity>
-     
-
-     <View style={{backgroundColor: '#ffff', borderRadius: 100, width: '80%', marginLeft: 10, }}>
-        <View style={{backgroundColor: '#262e05ff', width: '30%', borderRadius: 100,}}>
+      <View style={{flexDirection: 'row', alignItems: 'center'}}>
+        <TouchableOpacity onPress={() => router.back()}>
+          <ArrowLeft  size={20} style={styles.arrow}/>
+        </TouchableOpacity>
+        
+        <View style={{backgroundColor: '#ffff', borderRadius: 100, width: '80%', marginLeft: 10, }}>
+          <View style={{backgroundColor: '#262e05ff', width: '30%', borderRadius: 100,}}>
             <Text> </Text>
+          </View>
         </View>
-     </View>
-  </View>
+      </View>
   
-  <View style={{position: 'relative', top: 400}}>
-  <TouchableOpacity 
-  onPress={() => setSeconds((prev) => prev + 60)} 
-  style={{backgroundColor: '#262e05ff', borderRadius: 100, width: 30, height: 30, alignItems: 'center', justifyContent: 'center', marginBottom: 10}}>
-     <Plus color='white'/>
-    </TouchableOpacity>
+      <View style={{ marginTop: 80}}>
+        {!isTalking && (
+          <Image source={require('../../assets/Simmy/Idle_Simmy.gif')} style={styles.mascot}/>
+        )}
 
-  <Timer
-  time={seconds}
-  play={play}
-  wrapperStyle={{ 
-    flexDirection: 'row', 
-    backgroundColor: 'transparent',
-  }}
-  showCircles={true}
-  flipNumberProps={{
-          numberStyle: { color: '#ffffff', fontSize: 36 },
-          flipCardStyle: {backgroundColor: '#262e05ff', },
-          cardStyle: {backgroundColor: '#262e05ff', borderRadius: 0}
-          
-  }}
-/>
-  </View>
-</ScrollView>
+        {isTalking && (
+          <Image source={require('../../assets/Simmy/Talking_Simmy.gif')} style={styles.mascot}/>
+        )}
+        <View style={{flexDirection: 'row', width: '100%' }}>
+        {isVisible && (
+          <TouchableOpacity 
+          onPress={() => setSeconds((prev) => prev + 60)} 
+          style={[styles.timerButton,{ position: 'relative', left: '46%' }]}>
+          <Plus color='white'/>
+        </TouchableOpacity> )}
+          {isVisible && (
+          <TouchableOpacity 
+          onPress={() => setSeconds((prev) => prev + 3600)} 
+          style={[styles.timerButton, {position: 'relative', left: 11}]}>
+          <Plus color='white'/>
+        </TouchableOpacity> )}
+      
+
+          {isVisible && (  <TouchableOpacity 
+          style={[styles.editButton, {position: 'relative', left: '66%'}]}
+          onPress={() => {setVisible(false); setPlay(true)}}>
+        <Text style={styles.text}>Done</Text>
+          </TouchableOpacity>)}
+
+        </View>
+<View style={{flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 4, paddingTop: 10,}}>
+      {!play && !isVisible && (  <TouchableOpacity
+        style={styles.timerButton}
+        onPress={() => setPlay(true)}>
+          <Play color={'white'} size={18}/>
+        </TouchableOpacity>)}
+        {play && !isVisible && (
+         <TouchableOpacity
+        style={styles.timerButton}
+        onPress={() => setPlay(false)}>
+          <Pause color={'white'} size={18}/>
+        </TouchableOpacity>)}
+          {!isVisible && (  <TouchableOpacity 
+          style={[styles.editButton,]}
+          onPress={() => {setVisible(true);setPlay(false);}}>
+        <Text style={styles.text}>Edit</Text>
+          </TouchableOpacity>)}
+          </View>
+    
+       
+
+        <Timer
+          time={seconds}
+          play={play}
+          wrapperStyle={{ 
+            flexDirection: 'row', 
+            backgroundColor: 'transparent',
+          }}
+          showCircles={true}
+          flipNumberProps={{
+            numberStyle: { color: '#ffffff', fontSize: 36 },
+            flipCardStyle: {backgroundColor: '#262e05ff', },
+            cardStyle: {backgroundColor: '#262e05ff', borderRadius: 0}
+          }}
+        />
+      <View style={{flexDirection: 'row'}}>
+         {isVisible && ( <TouchableOpacity 
+          onPress={() => setSeconds((prev) => prev - 60)} 
+          style={[styles.timerButton, { position: 'relative', left: '46%' }]}>
+          <Minus color='white'/>
+        </TouchableOpacity>)}
+
+        
+          {isVisible && (
+          <TouchableOpacity 
+          onPress={() => setSeconds((prev) => prev - 3600)} 
+          style={[styles.timerButton, {position: 'relative', left: 11}]}>
+          <Minus color='white'/>
+        </TouchableOpacity>)}
+
+         </View>
+      </View>
+    </ScrollView>
   )
-
 }
 
 const styles = StyleSheet.create({
@@ -75,8 +138,8 @@ const styles = StyleSheet.create({
   },
     text:{
     fontSize: 18,
-    paddingLeft: 15,
-    padding: 10,
+    color: 'white',
+    fontFamily: 'Nunito_400Regular',
   },
     info:{
     fontSize: 18,
@@ -99,8 +162,29 @@ const styles = StyleSheet.create({
     fontSize: 25,
     color: '#9BA760',
   },
-  customText:{
-    fontFamily: 'Orbitron_400Regular',
-    fontSize: 80,
+  mascot: {
+      height: 400,
+      width: 400,
+      alignSelf: 'center',
+  },
+  timerButton:{
+    backgroundColor: '#262e05ff', 
+    borderRadius: 100, 
+    width: 30, 
+    height: 30, 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    marginBottom: 10, 
+    marginTop: 10
+  },
+  editButton:{
+    backgroundColor: '#262e05ff', 
+    borderRadius: 100, 
+    width: 60, 
+    height: 30,
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    marginBottom: 10, 
+    marginTop: 10
   }
 });
