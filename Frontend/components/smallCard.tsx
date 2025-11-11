@@ -15,6 +15,7 @@ interface Props{
 const SmallCard: React.FC<Props>= ({title, image, id }) => {
 
   const [favorite, setFavorite] = useState(false);
+  const[isLoading,setisLoading]=useState(true);
 
   return (
     <Link href={{
@@ -22,7 +23,8 @@ const SmallCard: React.FC<Props>= ({title, image, id }) => {
     params: {}}}>
        <View style={styles.container}>
         
-       <Image source={{uri:image}} style={styles.image}/>
+       <Image source={{uri:image}} style={styles.image} onLoadStart={()=>setisLoading(true)} onLoadEnd={()=>setisLoading(false)}/>
+        {isLoading&&(<Text>loading...</Text>)} 
           <View style={styles.icon}>
           {!favorite ? (
               <TouchableOpacity onPress={()=> setFavorite(true)}>

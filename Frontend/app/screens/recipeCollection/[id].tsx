@@ -17,7 +17,8 @@ export default function RecipeScreen() {
   const {collections:collectionsData}=useCollection();
   const[collection,setCollection]=useState(collectionsData?collectionsData.find((collection:any)=>collection.id===id):[])
   const [recipes,setRecipes]=useState<any[]|undefined>(collection.collection_recipes? collection.collection_recipes.map((recipe:any)=>({title:recipe.recipes.title,image:recipe.recipes.image_url,cook_time:recipe.recipes.cook_time,prep_time:recipe.recipes.prep_time,id:recipe.recipes.id})):[])
-   const count = recipes?.length ?? 0;
+  const recipesIds:string[]|undefined=recipes?.map(recipe=>recipe.id)
+  const count = recipes?.length ?? 0;
 
   return (
     <ScrollView style={styles.container}>
@@ -43,7 +44,7 @@ export default function RecipeScreen() {
         <Plus color={'white'} size={18}/>  
       </TouchableOpacity>
 
-      <AddToCollectionModal collectionId={id}open={openAdd} onClose={() => setOpenAdd(false)} setCollectionRecipe={setRecipes} />
+      <AddToCollectionModal collectionId={id}open={openAdd} onClose={() => setOpenAdd(false)} setCollectionRecipe={setRecipes} recipeIds={recipesIds} />
       </View>
         {
           recipes?.map((recipe,index)=>(<LargeCard key={index} title={recipe.title} image={recipe.image} cook_time={recipe.cook_time} prep_time={recipe.prep_time} id={recipe.id} />))

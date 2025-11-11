@@ -5,6 +5,7 @@ import { ArrowLeft } from 'lucide-react-native';
 import { Heart } from 'lucide-react-native';
 import { router,useLocalSearchParams} from 'expo-router';
 import { useRecipes } from '@/app/contexts/RecipeContext';
+import { useState } from 'react';
 
 
 
@@ -14,7 +15,7 @@ export default function Description(){
     const {recipes}=useRecipes();
     const recipe=recipes?.find((recipe)=>(recipe.id===id))
     const items = recipe.ingredients.map((ingredient:any)=>`${ingredient.quantity} ${ingredient.unit} of ${ingredient.name}`);
-    console.log(id)
+    const[isLoading,setisLoading]=useState(true);
     const steps = recipe.instructions.steps.map((step:any)=>step.description)
    
 
@@ -33,7 +34,8 @@ export default function Description(){
 
         <View>
             <View style={styles.card}>
-               <Image source={{uri:recipe.image_url}} style={styles.image}/>
+               <Image source={{uri:recipe.image_url}} style={styles.image} onLoadStart={()=>setisLoading(true)} onLoadEnd={()=>setisLoading(false)}/>
+               {isLoading&&(<Text>loading...</Text>)}
                 <View style={styles.titleBox}>
                     <Text style={styles.title2}>{recipe.title}</Text>
                     <View style={{width: '100%', paddingLeft: 10,}}>

@@ -4,16 +4,22 @@ import { ArrowLeft, Plus } from 'lucide-react-native';
 import { Link } from 'expo-router';
 import WavyBox from '@/components/wavyCollectionsBox'
 import * as ImagePicker from 'expo-image-picker';
+import { useSupabase } from '@/app/contexts/SupabaseContext';
 
 type CollectionCardProps ={
   title: string
+  cid:string
+  image:string|undefined
 };
 
-const CollectionCard = ({title}: CollectionCardProps) => {
+const CollectionCard = ({title,cid, image}: CollectionCardProps) => {
    const [selectedImage, setSelectedImage]= useState<string | undefined>(
-      undefined
+      image
     );
-    const [imageRead, setImageRead] =useState(false);
+    console.log(image)
+    const [imageRead, setImageRead] =useState(image?true:false);
+    const supabase=useSupabase();
+    const[isLoading,setisLoading]=useState(true);
   
   
     const pickImageAsync = async () => {
@@ -28,7 +34,49 @@ const CollectionCard = ({title}: CollectionCardProps) => {
         console.log(result);
       }else{
         alert("You did not select any image.");
+        return;
       }
+
+      const image = {
+          uri: result.assets[0].uri,
+          name: result.assets[0].fileName || `photo_${Date.now()}.jpg`, 
+          type: result.assets[0].mimeType || 'image/jpeg'              
+        };
+        const formData = new FormData();
+        formData.append('thumbnail', image as any);
+
+        try {
+          const { data: { session }, error } = await supabase.auth.getSession();
+      
+          if (error){ 
+            return;
+          }
+          if(!session){
+            return;
+          }
+          formData.append('cid', cid);
+      
+          const response =  await fetch(`${process.env.EXPO_PUBLIC_API_URL}collection/image`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${session.access_token}`
+            },
+            body: formData
+          });
+      
+          const data = await response.json();
+          
+      
+          if (response.ok) {
+  
+          } else {
+            alert(`Error: ${data.error || 'failed to upload image'}`);
+          }
+        } catch (err) {
+          console.error("Error upload image:", err);
+          alert("Could not connect to server");
+        }
     };
 
   return (
@@ -46,8 +94,11 @@ const CollectionCard = ({title}: CollectionCardProps) => {
               <Text style={styles.text}> Add Photo</Text>
               </TouchableOpacity>)}
               {imageRead && (
-                <Image source={{uri: selectedImage}}
-                style={styles.image}/>
+                <>
+                <Image source={{uri: selectedImage} }
+                style={styles.image} onLoadStart={()=>setisLoading(true)} onLoadEnd={()=>setisLoading(false)}/>
+                {isLoading&&(<Text>loading...</Text>)}
+                </>
               )}
       </View>
       <View style={styles.card}>

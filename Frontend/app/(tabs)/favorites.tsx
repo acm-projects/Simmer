@@ -88,7 +88,7 @@ export default function FavoritesScreen() {
         <Link href={{
           pathname: `../screens/recipeCollection/${collection.id}`,
           params: {}}} style={{padding: 10}} key={index} >
-          <CollectionCard key={index} title={collection.title ?? 'Untitled'}/>
+          <CollectionCard key={index} title={collection.title ?? 'Untitled'} cid={collection.id} image={collection.image_url}/>
           </Link>
       ))}
        

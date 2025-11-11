@@ -16,6 +16,7 @@ interface Recipe {
 
 const LargeCard: React.FC<Recipe>= ({title, image, cook_time, prep_time, id}) => {
   const[favorite, setFavorite]= useState(false);
+  const[isLoading,setisLoading]=useState(true);
 
 
 
@@ -27,7 +28,8 @@ const LargeCard: React.FC<Recipe>= ({title, image, cook_time, prep_time, id}) =>
     <View style={[styles.content, {alignItems:'center'}]}>
        
    
-    <Image source={{uri:image}} style={styles.image}/>
+    <Image source={{uri:image}} style={styles.image} onLoadStart={()=>setisLoading(true)} onLoadEnd={()=>setisLoading(false)}/>
+    {isLoading&&(<Text>loading...</Text>)}
    
       <View style={styles.icon}>
              {!favorite ? (
