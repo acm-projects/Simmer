@@ -1,11 +1,15 @@
 import React, { useState, useEffect} from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
 import { ArrowLeft } from 'lucide-react-native';
 import { useFonts, Orbitron_400Regular, Orbitron_700Bold} from '@expo-google-fonts/orbitron'
+//@ts-ignore
 import {Timer} from 'react-native-flip-timer-fixed';
+//const Timer = require('react-native-flip-timer-fixed').default;
+//import {Timer} from 'react-native-flip-timer-fixed';
 import { Plus, Minus, Play, Pause } from 'lucide-react-native';
 import { router } from 'expo-router';
+import {Image} from 'expo-image';
 
 export default function SettingScreen() {
     let [fontsLoaded] = useFonts({
@@ -15,6 +19,8 @@ export default function SettingScreen() {
       const [play, setPlay] = useState(true);
       const [seconds, setSeconds] = useState(120);
       const [isVisible, setVisible] = useState(false);
+      const [isTalking, setIsTalking] = useState(false);
+      /// change setIsTalking when we integrate this, mascot will change to talking if isTalking is changed
       
 
   return (
@@ -31,8 +37,14 @@ export default function SettingScreen() {
         </View>
       </View>
   
-      <View style={{ marginTop: 20}}>
-        <Image source={require('../../assets/images/Simmer_Mascot.png')} style={styles.mascot}/>
+      <View style={{ marginTop: 80}}>
+        {!isTalking && (
+          <Image source={require('../../assets/Simmy/Idle_Simmy.gif')} style={styles.mascot}/>
+        )}
+
+        {isTalking && (
+          <Image source={require('../../assets/Simmy/Talking_Simmy.gif')} style={styles.mascot}/>
+        )}
         <View style={{flexDirection: 'row', width: '100%' }}>
         {isVisible && (
           <TouchableOpacity 
@@ -55,7 +67,7 @@ export default function SettingScreen() {
           </TouchableOpacity>)}
 
         </View>
-<View style={{flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 4}}>
+<View style={{flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 4, paddingTop: 10,}}>
       {!play && !isVisible && (  <TouchableOpacity
         style={styles.timerButton}
         onPress={() => setPlay(true)}>
@@ -153,6 +165,7 @@ const styles = StyleSheet.create({
   mascot: {
       height: 400,
       width: 400,
+      alignSelf: 'center',
   },
   timerButton:{
     backgroundColor: '#262e05ff', 

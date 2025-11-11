@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, ScrollView, Image, Button, TextInput, Modal, TouchableOpacity, KeyboardAvoidingView, Platform} from 'react-native';
+import { StyleSheet, Text, View, ScrollView,  Button, TextInput, Modal, TouchableOpacity, KeyboardAvoidingView, Platform} from 'react-native';
 import { ArrowLeft } from 'lucide-react-native';
 import { useFonts, Orbitron_400Regular, Orbitron_700Bold} from '@expo-google-fonts/orbitron'
 import TabLayout from '../(tabs)/_layout';
@@ -11,6 +11,8 @@ import * as ImagePicker from 'expo-image-picker';
 import { useSupabase } from '../contexts/SupabaseContext';
 import { getRecipes } from '../utils/recipe';
 import { useRecipes } from '../contexts/RecipeContext';
+import {Image} from 'expo-image';
+
 
 
 interface stepsProp {
@@ -23,6 +25,7 @@ export default function ImportRecipe(){
   const supabase=useSupabase();
   const {setRecipes}=useRecipes();
   const [link, setLink]=useState<string|undefined>('');
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedImage, setSelectedImage]= useState<ImagePicker.ImagePickerAsset | undefined>(
     undefined
   );
@@ -52,6 +55,7 @@ export default function ImportRecipe(){
       });
       const data = await response.json();
       if (response.ok) {
+        setIsLoading(false);
         setTitle(data.title);
         setPrepMin(data.prep_time);
         setCookMin(data.cook_time);
@@ -89,7 +93,9 @@ export default function ImportRecipe(){
   const [step, setStep] = useState(['']);
   const[isVisible, setIsVisible] = useState(false);
   const [ingredient, setIngredient] = useState([{name: '', quantity: '', unit: ''}]);
-  // const [userToken, setUserToken] = useState("YOUR_JWT_TOKEN_HERE");
+  const [time, setTime] = useState<string[]>(['0'])
+  
+  // sent array of time to backend, backend has to parse the string array into numbers
   
 
  const updateIngredient = (index: number, field: "quantity" | "unit" | "name", value: string) => {
@@ -100,6 +106,13 @@ export default function ImportRecipe(){
 
     const addIngredient = () => {
     setIngredient([...ingredient, { name: '', quantity: '', unit: '' }]);
+  };
+
+    const updateTime = (index: number, value: string) => {
+  
+    const updated = [...time];
+    updated[index] = value;
+    setTime(updated);
   };
 
   // --- Step handlers ---
@@ -165,6 +178,7 @@ export default function ImportRecipe(){
 
     if (response.ok) {
       alert(`Recipe created successfully! ID: ${data.recipe_id}`);
+      setIsLoading(false);
       setTitle('');
       setPrepMin('');
       setCookMin('');
@@ -199,7 +213,7 @@ export default function ImportRecipe(){
         <TouchableOpacity onPress={() => router.back()}>
          <ArrowLeft size={20} style={styles.arrow}/>
          </TouchableOpacity>
-            
+            {!isLoading && (
             <View style={{position: 'relative' , top: 20}}>
             <View style={styles.greenBox}>
                 <TouchableOpacity style={{padding: 5}}
@@ -215,19 +229,28 @@ export default function ImportRecipe(){
                   <View style={styles.overlay}>
                     <View style={styles.popup}>
                       <LinkPopup link={link} setLink={setLink}/>
+                      <View style={{alignItems: 'center'}}>
+
                       <TouchableOpacity
                   style={styles.closeButton}
-                  onPress={() => importRecipeFromLink()}>
+                  onPress={() => {importRecipeFromLink(); setIsLoading(true);}}>
                     <Text style={styles.text}>OK</Text>
                   </TouchableOpacity>
+                  </View>
                     </View>
                   </View>
                   
                   </Modal>
-            </View>
-             </View>
-             
 
+               
+            </View>
+             </View> )}
+
+               {isLoading && (
+                     <Image source={require('../../assets/Simmy/Thinking_Simmy.gif')} style={styles.mascot}/>
+                  )}
+             {!isLoading && (
+              <View>
              <View>
             <View style={styles.card}>
               {!imageRead && (
@@ -286,7 +309,7 @@ export default function ImportRecipe(){
         {ingredient.map((ing, index) => (
           <View
             key={index}
-            style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 20 }}
+            style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 20, }}
           >
             <Text style={styles.bullet}>{'\u2022'}</Text>
             <TextInput
@@ -297,14 +320,14 @@ export default function ImportRecipe(){
               onChangeText={(text) => updateIngredient(index, "quantity", text)}
             />
             <TextInput
-              style={[styles.recipe, { paddingLeft: 2, }]}
+              style={[styles.recipe, {paddingLeft: 6}]}
               placeholder="unit"
               placeholderTextColor="#a1a1a1ff"
               value={ing.unit}
               onChangeText={(text) => updateIngredient(index, "unit", text)}
             />
             <TextInput
-              style={[styles.recipe, { paddingLeft: 2 }]}
+              style={[styles.recipe, { paddingLeft: 6 }]}
               placeholder="ingredient"
               placeholderTextColor="#a1a1a1ff"
               value={ing.name}
@@ -325,8 +348,21 @@ export default function ImportRecipe(){
             style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 20 }}
           >
             <Text style={[styles.bullet,{}]}>{index + 1}.</Text>
+             
+         <TextInput
+            style={[styles.recipe, { paddingLeft: 2 }]}
+            placeholder="time"
+            placeholderTextColor="#a1a1a1ff"
+            keyboardType="decimal-pad" 
+             value={time[index]?.toString() || ''} // <-- always string
+            onChangeText={(text) => updateTime(index, text)}
+              />
+          <Text style={[styles.recipe, ]}> min</Text>
+          
+         
+            
             <TextInput
-              style={[styles.recipe, { paddingLeft: 2, }]}
+              style={[styles.recipe, { paddingLeft: 6, }]}
               placeholder="Step"
               placeholderTextColor="#a1a1a1ff"
               value={stepText}
@@ -338,13 +374,19 @@ export default function ImportRecipe(){
           <Text style={styles.time}>Add Step</Text>
         </TouchableOpacity>
       </View>
-                     <View style={{alignItems: 'center', marginTop: 20}}>
-                      <TouchableOpacity
-                      style={[styles.greenBox, {width: 180}]}
-                      onPress={handleCreateRecipe}>
-                        <Text style={styles.text}>Done</Text>
-                      </TouchableOpacity>
+              
+
+                       <View style={[styles.greenBox, {width: 150, alignSelf: 'center', alignItems: 'center', marginTop: 20}]}>
+                <TouchableOpacity style={{padding: 2,}}
+               onPress={handleCreateRecipe}>
+                  <Text style={styles.text}>Done</Text>
+                </TouchableOpacity>
+                </View>
                      </View>
+
+                     
+                
+                     )}
                      </ScrollView>
                     </KeyboardAvoidingView> 
         </View>
@@ -356,8 +398,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5ebe6ff',
     paddingTop: 50,
-    paddingLeft: 15,
-    paddingRight: 15,
+    paddingLeft: 10,
+    paddingRight: 10,
     paddingBottom: 10,
     
   },
@@ -369,12 +411,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#fff',
     fontFamily: 'Nunito_400Regular',
+    width: '80%',
+    flexShrink: 1,
+    flexWrap: "wrap",
 
   },
     recipe:{
     fontSize: 16,
     color: '#000',
     paddingVertical: 5,
+    flexShrink: 1,
+    flexWrap: "wrap",
 
   },
     time:{
@@ -406,6 +453,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
     color: '#9BA760',
     fontFamily: 'Nunito_700Bold',
+    
   },
   greenBox:{
     borderRadius: 100,
@@ -437,15 +485,17 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
     marginTop: 10,
     width: 100,
+    justifyContent: 'center',
     
 
   },
-    title1:{
+     title1:{
     paddingLeft: 15,
     paddingTop: 5,
     fontSize: 25,
     color: '#9BA760',
     fontFamily: 'Nunito_700Bold',
+    width: '65%',
   },
      title2:{
     paddingLeft: 15,
@@ -453,6 +503,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: '#fff',
     fontFamily: 'Nunito_700Bold',
+    width: '70%'
   },
   titleBox:{
     backgroundColor: '#9BA760',
@@ -473,6 +524,7 @@ const styles = StyleSheet.create({
     paddingTop: 5,
     paddingBottom: 15,
     marginHorizontal: 5,
+    
 
   },
   card:{
@@ -507,6 +559,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 15,
     alignItems: 'center',
+  },
+   mascot: {
+      height: 400,
+      width: 400,
+      alignSelf: 'center',
+      marginTop: 60,
   },
   
 });

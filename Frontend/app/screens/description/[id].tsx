@@ -53,7 +53,7 @@ export default function Description(){
            <View style={styles.desBox}>
             <View style={{flexDirection: 'row'}}>
                <Text style={styles.title1}>Ingredients</Text>
-                <Pressable onPress={() => router.push('../screens/cookingMode')}>
+                <Pressable onPress={() => router.push('../../screens/cookingMode')}>
                 <View style={styles.bubble}>
                 <Text style={styles.bubbleText}> Voice Mode </Text>
                 </View>

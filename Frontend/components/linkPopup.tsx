@@ -11,7 +11,7 @@ const LinkPopup = ({link, setLink}: LinkPopupProps) => {
   return (
     <View style={styles.container}>
         <Text style={styles.text}>Recipe Link:</Text>
-        <View style={styles.textBox}>
+        <View style={[styles.textBox,]}>
         <TextInput 
         style={styles.text}
         placeholder="Link"
