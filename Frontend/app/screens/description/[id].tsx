@@ -16,6 +16,7 @@ export default function Description(){
     const items = recipe.ingredients.map((ingredient:any)=>`${ingredient.quantity} ${ingredient.unit} of ${ingredient.name}`);
     console.log(id)
     const steps = recipe.instructions.steps.map((step:any)=>step.description)
+   
 
     const navigation = useNavigation();
 

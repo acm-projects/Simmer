@@ -17,6 +17,8 @@ export default function RecipeScreen() {
   const {collections:collectionsData}=useCollection();
   const[collection,setCollection]=useState(collectionsData?collectionsData.find((collection:any)=>collection.id===id):[])
   const [recipes,setRecipes]=useState<any[]|undefined>(collection.collection_recipes? collection.collection_recipes.map((recipe:any)=>({title:recipe.recipes.title,image:recipe.recipes.image_url,cook_time:recipe.recipes.cook_time,prep_time:recipe.recipes.prep_time,id:recipe.recipes.id})):[])
+   const count = recipes?.length ?? 0;
+
   return (
     <ScrollView style={styles.container}>
       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -26,7 +28,7 @@ export default function RecipeScreen() {
       </TouchableOpacity>
 
       <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 10, width: '100%' }}>
-        <Text style={styles.title}>Favorites</Text>
+        <Text style={styles.title}>{collection.title}</Text>
       </View>
 
 
@@ -34,7 +36,7 @@ export default function RecipeScreen() {
 
       <View style={{ marginTop: 30 }}>
         <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end'}}>
-        <Text style={styles.text}>11 Recipes</Text>
+        <Text style={styles.text}>{count} Recipes</Text>
         
       <TouchableOpacity style={styles.icons} onPress={() => setOpenAdd(true)}>
       
@@ -67,7 +69,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5ebe6ff',
-    paddingTop: 50,
+    paddingTop: 60,
   },
   title: {
     fontSize: 25,

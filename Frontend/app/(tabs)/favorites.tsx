@@ -78,8 +78,9 @@ export default function FavoritesScreen() {
             >
       <ScrollView>
      <View style={{ justifyContent: 'center', alignItems: 'center'}}>
-     <Text style={styles.text}>Favorites</Text>
+     <Text style={styles.text}>Collections</Text>
      </View>
+
 
 
      <View style={{ justifyContent: 'center', alignItems: 'center'}}>

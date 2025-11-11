@@ -98,6 +98,7 @@ export default function RootLayout() {
           <Stack.Screen name="screens/cookingMode" options={{ headerShown: false }} />
           <Stack.Screen name="screens/importRecipe" options={{ headerShown: false }} />
           <Stack.Screen name="screens/description/[id]" options={{ headerShown: false }} />
+          <Stack.Screen name="screens/recipeCollection/[id]" options={{ headerShown: false }} />
           <Stack.Screen name="screens/recipeCollection" options={{ headerShown: false }} />
           <Stack.Screen name="screens/profilePage" options={{ headerShown: false }} />
           <Stack.Screen name="userPreference" options={{ headerShown: false }} />
