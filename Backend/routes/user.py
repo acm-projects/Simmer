@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from utils.auth import authorize_user
 from utils.supabase import supabase
 from postgrest.exceptions import APIError as AuthApiError
+from utils.createRecipe import  upload_image
 
 user_bp = Blueprint('main', __name__)
 @user_bp.route('/user/create-user', methods=['POST'])
@@ -425,3 +426,23 @@ def get_user():
     print( e)
     return jsonify({'error' : 'internal server error', 'details' : str(e)}), 500
   
+@user_bp.route('/collection/image', methods=['PUT'])
+def editImage():
+  try:
+      user_id, error_response, status_code = authorize_user()
+      if error_response:
+        return error_response, status_code
+      cid=request.form.get('cid')
+      image_url=upload_image()
+
+      response = supabase.table("collections").update({
+          "image_url": image_url
+      }).eq("id", cid).execute()
+
+      if not response.data:
+          return jsonify({"error": f"collection not found"}), 404
+
+      return jsonify(image_url), 200
+  
+  except Exception as e:
+      return jsonify({"error": e.message}), 500
