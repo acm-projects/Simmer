@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { View, Text, Modal, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import LargeCard from '@/components/largeCard';
 import { useRecipes } from './contexts/RecipeContext';
@@ -11,11 +11,17 @@ type AddToCollectionModalProps = {
   onClose: () => void;
   collectionId:string;
   setCollectionRecipe:Dispatch<SetStateAction<any[] | undefined>>;
+  recipeIds:string[]|undefined;
 };
 
-export default function AddToCollectionModal({ open, onClose, collectionId, setCollectionRecipe }: AddToCollectionModalProps) {
+export default function AddToCollectionModal({ open, onClose, collectionId, setCollectionRecipe, recipeIds }: AddToCollectionModalProps) {
   const {recipes:recipesData}= useRecipes();
   const [recipes,setRecipes] = useState(recipesData? recipesData?.map((recipe)=>({title:recipe.title,image:recipe.image_url,id:recipe.id})):[])
+  useEffect(()=>{
+    if(!recipeIds)
+      return
+    setRecipes((recipes).filter((recipe)=>!recipeIds.includes(recipe.id)))
+  },[])
   const supabase=useSupabase();
   const addRecipeToCollection= async(id:string)=>{
     const { data: { session }, error } = await supabase.auth.getSession();
