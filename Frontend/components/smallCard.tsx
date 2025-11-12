@@ -11,10 +11,11 @@ interface Props{
   title: string;
   image: string; 
   id: string;
+  fav:boolean;
 }
-const SmallCard: React.FC<Props>= ({title, image, id }) => {
+const SmallCard: React.FC<Props>= ({title, image, id ,fav}) => {
 
-  const [favorite, setFavorite] = useState(false);
+  const [favorite, setFavorite] = useState(fav);
   const[isLoading,setisLoading]=useState(true);
 
   return (

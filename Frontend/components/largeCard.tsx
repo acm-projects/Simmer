@@ -10,12 +10,13 @@ interface Recipe {
   cook_time: number;
   prep_time:number;
   id:string;
+  fav:boolean;
   
 
 }
 
-const LargeCard: React.FC<Recipe>= ({title, image, cook_time, prep_time, id}) => {
-  const[favorite, setFavorite]= useState(false);
+const LargeCard: React.FC<Recipe>= ({title, image, cook_time, prep_time, id,fav}) => {
+  const[favorite, setFavorite]= useState(fav);
   const[isLoading,setisLoading]=useState(true);
 
 

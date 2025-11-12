@@ -41,7 +41,7 @@ export default function HomeScreen() {
     </View>
    
     {recipes?.map((currentRecipe,index)=>{
-      return (<LargeCard key={index} title={currentRecipe.title} image={currentRecipe.image_url} cook_time={currentRecipe.cook_time} prep_time={currentRecipe.prep_time} id={currentRecipe.id} />);
+      return (<LargeCard key={index} title={currentRecipe.title} image={currentRecipe.image_url} cook_time={currentRecipe.cook_time} prep_time={currentRecipe.prep_time} id={currentRecipe.id} fav={currentRecipe.user_favorites.length>0} />);
     })}
   
     {/* <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} /> */}
