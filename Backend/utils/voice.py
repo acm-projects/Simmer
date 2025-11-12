@@ -351,7 +351,6 @@ from gtts import gTTS
 from google.oauth2 import service_account
 from google.cloud import speech
 from google.cloud import texttospeech
-import pyaudio
 
 # Load credentials from sttKey.json
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -360,15 +359,6 @@ credentials = service_account.Credentials.from_service_account_file(key_path)
 
 # Initialize Google Cloud Speech client with credentials
 client = speech.SpeechClient(credentials=credentials)
-
-# Initialize Text-to-Speech client with credentials
-clientSpeaker = texttospeech.TextToSpeechClient(credentials=credentials)
-voice = texttospeech.VoiceSelectionParams(
-    language_code="en-US", name="Archenar"
-)
-audio_config = texttospeech.AudioConfig(
-    audio_encoding=texttospeech.AudioEncoding.MP3
-)
 
 # Audio recording parameters
 RATE = 16000
@@ -421,6 +411,7 @@ def stt_stream(audio_chunks, rate=RATE):
     Returns:
         str: Complete transcribed text
     """
+    print("Received")
     print(f"[STT_STREAM] Starting with {len(audio_chunks)} chunks")
     total_bytes = sum(len(chunk) for chunk in audio_chunks)
     print(f"[STT_STREAM] Total audio: {total_bytes} bytes ({total_bytes/32000:.2f} seconds)")
@@ -469,6 +460,7 @@ def stt_stream(audio_chunks, rate=RATE):
         return ""
 
 def stt_stream_realtime(audio_chunks, rate=RATE):
+    print("Received")
     """
     Real-time streaming STT for WebSocket chunks.
     Handles chunks received over network in real-time.
@@ -573,6 +565,17 @@ def stt_stream_realtime(audio_chunks, rate=RATE):
             print(f"{'='*60}\n")
             return ""
 
+
+##################### TTS ############################
+
+clientSpeaker = texttospeech.TextToSpeechClient(credentials=credentials)
+voice = texttospeech.VoiceSelectionParams(
+    language_code="en-US", name="Achernar", model_name = "gemini-2.5-flash-tts"
+)
+audio_config = texttospeech.AudioConfig(
+    audio_encoding=texttospeech.AudioEncoding.MP3
+)
+
 def speak(words):
     """
     Generate speech using gTTS and save to file.
@@ -595,7 +598,7 @@ def speaks(text):
     Args:
         text: Text to convert to speech
     """
-    print(f"[TTS_CLOUD] Generating speech with Google Cloud TTS: '{text[:50]}...'")
+    # print(f"[TTS_CLOUD] Generating speech with Google Cloud TTS: '{text[:50]}...'")
     try:
         synthesis_input = texttospeech.SynthesisInput(text=text)
         response = clientSpeaker.synthesize_speech(
@@ -603,6 +606,6 @@ def speaks(text):
         )
         with open("output.mp3", "wb") as out:
             out.write(response.audio_content)
-            print('[TTS_CLOUD] ✓ Audio content written to file "output.mp3"')
+            # print('[TTS_CLOUD] ✓ Audio content written to file "output.mp3"')
     except Exception as e:
         print(f"[TTS_CLOUD] ✗ Error: {type(e).__name__}: {str(e)}")
