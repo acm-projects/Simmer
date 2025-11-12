@@ -70,7 +70,7 @@
 #     amplitude = audio_segment.dBFS
 #     if amplitude == float('-inf'):
 #        continue
-#     bar_length = int((60 + amplitude) / 2) 
+#     bar_length = int((60 + amplitude) / 2)
 #     bar = "#" * bar_length
     
 

@@ -267,6 +267,7 @@ from utils.supabase import supabase
 import base64
 import traceback
 
+from utils.auth import authorize_user
 load_dotenv()
 
 # Prompt for Google API key if not set
@@ -298,71 +299,73 @@ HARDCODED_CID = "test12345"
 
 @chat_bp.route("/create_chat", methods=["POST"])
 def create_chat():
-    data = request.get_json()
-    if not data or not all(key in data for key in ['rid', 'uid', 'recipe']):
-        return jsonify({'message': 'Missing data: recipe, uid, rid'}), 400
+  data = request.get_json()
+  if not data or not all(key in data for key in ['rid', 'uid', 'recipe']):
+    return jsonify({'message': 'Missing data: recipe, uid, rid'}), 400
+  uid=data.get('uid')
+  rid=data.get('rid')
+  
 
-    uid = data.get('uid')
-    rid = data.get('rid')
+  response = (
+      supabase.table("conversations")
+      .insert({
+        "user_id":uid,
+        "recipe_id":rid,
+      })
+      .execute()
+  )
+  
+  data=response.data[0]
+  cid=data['chat_id']
+  config = {"configurable": {"thread_id": cid}}
+  recipes_response = (
+      supabase.table('recipes')
+      .select('*')
+      .eq('id', rid)
+      .single()
+      .execute()
+  )
+  recipe=recipes_response.data
+  # print(str(recipe))
 
-    try:
-        response = supabase.table("conversations").insert({
-            "user_id": uid,
-            "recipe_id": rid,
-            "state": 1
-        }).execute()
-        cid = response.data[0]['chat_id']
+  instructions=(
+  f"For the following recipe in json... {recipe}, analyze it"
+  "youll will first introduce yourself, describe the recipe"
+  "then user will be transversing through the instructions" \
+  "but that isnt your responasbility as the"
+  "code has prerecorded messages for each step and"
+  "keywords to signify when to go to the next step, previous step, or to repeat a step"
+  "your focus is outside of that where you are gonna help the user when they have issues"
+  "like providing ingredient alternatives, when they mess up, confusion clarification, etc"
+  "you will be given the user step for context etc")
+  
+  initial_messages = [
+      SystemMessage(content=instructions),
+      HumanMessage(content="Hi! Please start teaching me the recipe.")
+  ]
 
-        recipes_response = supabase.table('recipes').select('*').eq('id', rid).single().execute()
-        recipe = recipes_response.data
-    except Exception as e:
-        return jsonify({'message': f'Database error: {str(e)}'}), 500
-
-    instructions = (
-        f"For the following recipe in json: {recipe}, analyze it. "
-        "You will introduce yourself, describe the recipe, and help the user with any questions "
-        "outside the predefined steps (like ingredient alternatives, mistakes, or clarifications)."
-    )
-
-    initial_messages = [
-        SystemMessage(content=instructions),
-        HumanMessage(content="Hi! Please start teaching me the recipe.")
-    ]
-
-    config = {"configurable": {"thread_id": cid}}
-    first_response = app.invoke({"messages": initial_messages}, config)
-
-    mp3_fp = io.BytesIO()
-    try:
-        tts = gTTS(first_response["messages"][-1].content, lang='en')
-        tts.write_to_fp(mp3_fp)
-    except Exception:
-        return jsonify({"message": "Speech could not be generated"}), 500
-
-    mp3_fp.seek(0)
-    return send_file(
-        mp3_fp,
-        mimetype='audio/mpeg',
-        as_attachment=True,
-        download_name='intro.mp3'
-    ), 200
+  first_response = app.invoke({"messages": initial_messages}, config)
+  mp3_fp = io.BytesIO()
+  try:
+    tts = gTTS(first_response["messages"][-1].content, lang='en')
+    tts.write_to_fp(mp3_fp)
+  except Exception as e:
+    return jsonify({"message":"Speech could not be generated"}), 500
+  
+  mp3_fp.seek(0)
+  
+  return send_file(
+    mp3_fp,
+    mimetype='audio/mpeg',
+    as_attachment=True,
+    download_name='intro.mp3'
+  ), 200
 
 @chat_bp.route("/chat", methods=["POST"])
 def chat():
-    # return jsonify({"uplaoded":"true"})
-    cid = request.form.get('cid')
-    if 'audio' not in request.files or not cid:
-        return jsonify({'message': 'Missing data: audio file or cid'}), 400
-
-    file = request.files['audio']
-    try:
-        userAudio = AudioSegment.from_file(file)
-        userAudio = userAudio.set_frame_rate(16000).set_channels(1)
-        buffer = io.BytesIO()
-        userAudio.export(buffer, format="raw")
-        userAudioBytes = buffer.getvalue()
-    except Exception:
-        return jsonify({'message': 'Could not process audio file.'}), 500
+  user_id, error_response, status_code = authorize_user()
+  if error_response:
+    return error_response, status_code
 
     try:
         userMessage = stt(userAudioBytes)
@@ -505,7 +508,7 @@ import base64
 import traceback
 from threading import Thread
 from flask_socketio import emit
-
+import io
 # Store active streaming sessions
 active_sessions = {}
 HARDCODED_CID = "test12345"
@@ -517,30 +520,21 @@ def process_audio_chunk(audio_bytes, sid):
         return
 
     try:
-        # Calculate loudness of the audio chunk
-        audio_segment = AudioSegment(
-            audio_bytes,
-            sample_width=2,  # 16-bit = 2 bytes
-            frame_rate=16000,  # Assuming 16kHz sample rate
-            channels=1  # Mono
-        )
-        
-        amplitude = audio_segment.dBFS
-        
-        if amplitude == float('-inf'):
-            print(f"[PROCESS_CHUNK] Session {sid}: Chunk of {len(audio_bytes)} bytes - SILENT")
-        else:
-            # Create visual bar (60 dBFS is very quiet, 0 dBFS is max)
-            bar_length = int((60 + amplitude) / 2)
-            bar_length = max(0, min(bar_length, 30))  # Clamp between 0-30
-            bar = "#" * bar_length
-            
-            print(f"[PROCESS_CHUNK] Session {sid}: {len(audio_bytes)} bytes | {amplitude:.1f} dBFS | {bar}")
-        
+        text = stt(audio_bytes)
+        print("Text: ",text)
+        # Now send pcm_bytes to your speech model
     except Exception as e:
-        print(f"[PROCESS_CHUNK] ✗ Error processing chunk for {sid}: {e}")
-        traceback.print_exc()
-
+        print(f"[PROCESS_CHUNK] Error processing chunk for {sid}: {e}")
+        
+        # if amplitude == float('-inf'):
+        #     print(f"[PROCESS_CHUNK] Session {sid}: Chunk of {len(audio_bytes)} bytes - SILENT")
+        # else:
+        #     # Create visual bar (60 dBFS is very quiet, 0 dBFS is max)
+        #     bar_length = int((60 + amplitude) / 2)
+        #     bar_length = max(0, min(bar_length, 30))  # Clamp between 0-30
+        #     bar = "#" * bar_length
+            
+        #     print(f"[PROCESS_CHUNK] Session {sid}: {len(audio_bytes)} bytes | {amplitude:.1f} dBFS | {bar}")
 
 def register_socketio_handlers(socketio):
     """Register all WebSocket event handlers"""
