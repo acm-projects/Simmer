@@ -291,7 +291,7 @@ def get_user_collections():
 
     response = (
         supabase.table('collections')
-        .select('*, collection_recipes(recipe_id, recipes(id, title, prep_time, cook_time, image_url))')
+        .select('*, collection_recipes(recipe_id, recipes(id, title, prep_time, cook_time, image_url,user_favorites(*)))')
         .eq('user_id', user_id)
         .execute()
     )

@@ -10,6 +10,8 @@ import { RecipeProvider } from './contexts/RecipeContext';
 import { getCollections, getRecipes } from './utils/recipe';
 import { UserProvider } from './contexts/UserContext';
 import { CollectionProvider } from './contexts/CollectionContext';
+import { FavoriteRecipeProvider } from './contexts/FavoriteRecipeContext';
+import { SearchRecipeProvider } from './contexts/SearchRecipeContext';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -23,10 +25,17 @@ export default function RootLayout() {
   const [user,setUser]=useState<any[] | undefined>(undefined)
   const [collections,setCollections]=useState<any[] | undefined>(undefined)
   const [recipes,setRecipes]=useState<any[] | undefined>(undefined)
+  const [favriteRecipes,setFavoriteRecipes]=useState<any[] | undefined>([])
+  const [searchRecipes,setSearchRecipes]=useState<any[] | undefined>([])
   const [isNavigationReady, setIsNavigationReady] = useState(false);
   useEffect(() => {
     setIsNavigationReady(true);
   }, []); 
+  useEffect(()=>{
+    if(recipes)
+      setFavoriteRecipes(recipes?recipes.filter((recipe)=>recipe.user_favorites.length>0):[])
+      setSearchRecipes(recipes);
+  },[recipes])
 
   useEffect(()=>{
     if (!isNavigationReady) {
@@ -61,6 +70,9 @@ export default function RootLayout() {
         await getUser(jwt)
         await getRecipes(jwt, setRecipes);
         await getCollections(jwt, setCollections);
+        console.log('fffffffffffffffffffff')
+        console.log(recipes?.length)
+        
         router.navigate("/userPreference");
       }
     }
@@ -86,6 +98,8 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   return (
+    <SearchRecipeProvider searchRecipes={searchRecipes} setSearchRecipes={setSearchRecipes}>
+    <FavoriteRecipeProvider favoriteRecipes={favriteRecipes} setFavoriteRecipes={setFavoriteRecipes}>
     <CollectionProvider collections={collections} setCollections={setCollections}>
     <UserProvider user={user} setUser={setUser}>
     <RecipeProvider recipes={recipes} setRecipes={setRecipes}>
@@ -113,6 +127,8 @@ export default function RootLayout() {
     </RecipeProvider>
     </UserProvider>
     </CollectionProvider>
+    </FavoriteRecipeProvider>
+    </SearchRecipeProvider>
 
   );
 }

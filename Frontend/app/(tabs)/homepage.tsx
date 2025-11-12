@@ -7,13 +7,16 @@ import CornerIcon from "@/components/cornerIcon";
 import { useRecipes } from '../contexts/RecipeContext';
 import MyCarousel from "@/components/carousel";
 import { useUser } from '../contexts/UserContext';
+import { useEffect, useState } from 'react';
+import { useSearchRecipes } from '../contexts/SearchRecipeContext';
 
 export default function HomeScreen() {
   const {recipes}=useRecipes();
+  const{searchRecipes,setSearchRecipes}=useSearchRecipes()
+
   const{user}=useUser()
   console.log('yyyyyyyyyyyyyyyyyyyyyyyyyy')
   console.log(user)
-  const favoriteRecipes=recipes?.filter((recipe)=>recipe.user_favorites.length>0)
   return (
     
 
@@ -40,8 +43,8 @@ export default function HomeScreen() {
   
     </View>
    
-    {recipes?.map((currentRecipe,index)=>{
-      return (<LargeCard key={index} title={currentRecipe.title} image={currentRecipe.image_url} cook_time={currentRecipe.cook_time} prep_time={currentRecipe.prep_time} id={currentRecipe.id} />);
+    {searchRecipes?.map((currentRecipe,index)=>{
+      return (<LargeCard key={index} title={currentRecipe.title} image={currentRecipe.image_url} cook_time={currentRecipe.cook_time} prep_time={currentRecipe.prep_time} id={currentRecipe.id} fav={currentRecipe.user_favorites.length>0} />);
     })}
   
     {/* <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} /> */}

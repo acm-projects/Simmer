@@ -16,7 +16,7 @@ export default function RecipeScreen() {
   const[openAdd, setOpenAdd] = useState(false);
   const {collections:collectionsData}=useCollection();
   const[collection,setCollection]=useState(collectionsData?collectionsData.find((collection:any)=>collection.id===id):[])
-  const [recipes,setRecipes]=useState<any[]|undefined>(collection.collection_recipes? collection.collection_recipes.map((recipe:any)=>({title:recipe.recipes.title,image:recipe.recipes.image_url,cook_time:recipe.recipes.cook_time,prep_time:recipe.recipes.prep_time,id:recipe.recipes.id})):[])
+  const [recipes,setRecipes]=useState<any[]|undefined>(collection.collection_recipes? collection.collection_recipes.map((recipe:any)=>({title:recipe.recipes.title,image:recipe.recipes.image_url,cook_time:recipe.recipes.cook_time,prep_time:recipe.recipes.prep_time,id:recipe.recipes.id,fav:recipe.recipes.user_favorites.length>0})):[])
   const recipesIds:string[]|undefined=recipes?.map(recipe=>recipe.id)
   const count = recipes?.length ?? 0;
 
@@ -47,7 +47,7 @@ export default function RecipeScreen() {
       <AddToCollectionModal collectionId={id}open={openAdd} onClose={() => setOpenAdd(false)} setCollectionRecipe={setRecipes} recipeIds={recipesIds} />
       </View>
         {
-          recipes?.map((recipe,index)=>(<LargeCard key={index} title={recipe.title} image={recipe.image} cook_time={recipe.cook_time} prep_time={recipe.prep_time} id={recipe.id} />))
+          recipes?.map((recipe,index)=>(<LargeCard key={index} title={recipe.title} image={recipe.image} cook_time={recipe.cook_time} prep_time={recipe.prep_time} id={recipe.id} fav={recipe.fav} />))
         }
 
         {/* <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />

@@ -1,8 +1,11 @@
-import react, { useState} from 'react'
+import react, { useEffect, useState} from 'react'
 import { StyleSheet, Text, View, Image, ImageSourcePropType, TouchableOpacity } from 'react-native';
 import { Heart } from 'lucide-react-native';
 import { Link } from 'expo-router';
-import RecipeScreen from '@/app/(tabs)/recipes';
+import { useSupabase } from '@/app/contexts/SupabaseContext';
+import { getRecipes } from '@/app/utils/recipe';
+import { useFavoriteRecipes } from '@/app/contexts/FavoriteRecipeContext';
+import { useRecipes } from '@/app/contexts/RecipeContext';
 
 interface Recipe {
   title: string;
@@ -10,13 +13,63 @@ interface Recipe {
   cook_time: number;
   prep_time:number;
   id:string;
+  fav:boolean;
   
 
 }
 
-const LargeCard: React.FC<Recipe>= ({title, image, cook_time, prep_time, id}) => {
-  const[favorite, setFavorite]= useState(false);
-  const[isLoading,setisLoading]=useState(true);
+const LargeCard: React.FC<Recipe>= ({title, image, cook_time, prep_time, id,fav}) => {
+  const[favorite, setFavorite]= useState(fav);
+  const[isLoading,setisLoading]=useState(false);
+  const supabase=useSupabase()
+  const {setFavoriteRecipes}= useFavoriteRecipes();
+  const{recipes,setRecipes}=useRecipes();
+  useEffect(() => {
+    setFavorite(fav);
+  }, [fav]);
+    
+
+  const toggleFavorite= async()=>{
+    // if(favorite)
+    //   setFavoriteRecipes((recipes)=>recipes?.filter((recipe)=>recipe.id!==id))
+    // else
+    //   setFavoriteRecipes((favoriteRecipes:any[] | undefined)=>[recipes?.find((recipe=>recipe.id===id)),...(favoriteRecipes??[])])
+    setFavorite((favorite)=>!favorite)
+
+
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+
+      if (error){ 
+        return;
+      }
+      if(!session){
+        return;
+      }
+
+      const response =  await fetch(`${process.env.EXPO_PUBLIC_API_URL}toggle-favorite`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({'recipe_id':id})
+      });
+      const data = await response.json();
+      if (response.ok) {
+        await getRecipes(session.access_token,setRecipes)
+
+
+      } else {
+        alert(`Error: ${data.error || 'Failed to toggle favorite'}`);
+      }
+    } catch (err) {
+      console.error("Error toggling favorite:", err);
+      alert("Could not connect to server");
+    }
+
+
+  }
 
 
 
@@ -33,12 +86,12 @@ const LargeCard: React.FC<Recipe>= ({title, image, cook_time, prep_time, id}) =>
    
       <View style={styles.icon}>
              {!favorite ? (
-                 <TouchableOpacity onPress={()=> setFavorite(true)}>
+                 <TouchableOpacity onPress={()=> toggleFavorite()}>
                     <Heart size={20} color="#9BA760"/>
                  </TouchableOpacity>
                 
              ) : (
-               <TouchableOpacity onPress={()=> setFavorite(false)}>
+               <TouchableOpacity onPress={()=> toggleFavorite()}>
              <Heart size={20} color="#9BA760" fill="#9BA760"/>
              </TouchableOpacity>
            )}

@@ -5,11 +5,12 @@ import LargeCard from "@/components/largeCard";
 import { useSupabase } from '../../app/contexts/SupabaseContext';
 import { useRecipes } from '../contexts/RecipeContext';
 import { useUser } from '../contexts/UserContext'
+import { useFavoriteRecipes } from '../contexts/FavoriteRecipeContext';
 
 
 
 export default function RecipeScreen() {
-  const {recipes}=useRecipes();
+  const {favoriteRecipes:recipes}=useFavoriteRecipes();
   const count = recipes?.length ?? 0;
   const{user}=useUser();
   // console.log('yyyyyyyyyyyyyyyyyyyyyyyyyy')
@@ -25,7 +26,7 @@ export default function RecipeScreen() {
 <View style ={{marginTop: 20}}>
   <Text style={styles.text}>{count} recipes</Text>
  {recipes?.map((currentRecipe,index)=>{
-      return (<LargeCard key={index} title={currentRecipe.title} image={currentRecipe.image_url} cook_time={currentRecipe.cook_time} prep_time={currentRecipe.prep_time} id={currentRecipe.id} />);
+      return (<LargeCard key={index} title={currentRecipe.title} image={currentRecipe.image_url} cook_time={currentRecipe.cook_time} prep_time={currentRecipe.prep_time} id={currentRecipe.id} fav={currentRecipe.user_favorites.length>0} />);
     })}
  
 

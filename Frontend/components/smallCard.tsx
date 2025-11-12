@@ -1,21 +1,81 @@
-import react, {useState} from 'react'
+import react, {useEffect, useRef, useState} from 'react'
 import { StyleSheet, Text, View, Image, ImageSourcePropType, TouchableOpacity,  } from 'react-native';
 import FavoriteIcon from '@/components/favoriteIcon';
 import WavyBox from '@/components/wavyBox'
 import { Heart } from 'lucide-react-native';
 import { Link } from 'expo-router';
 import { Nunito_400Regular } from '@expo-google-fonts/nunito/400Regular';
+import { useFavoriteRecipes } from '@/app/contexts/FavoriteRecipeContext';
+import { useSupabase } from '@/app/contexts/SupabaseContext';
+import { useRecipes } from '@/app/contexts/RecipeContext';
+import { getRecipes } from '@/app/utils/recipe';
 
 
 interface Props{
   title: string;
   image: string; 
   id: string;
+  fav:boolean;
 }
-const SmallCard: React.FC<Props>= ({title, image, id }) => {
+const SmallCard: React.FC<Props>= ({title, image, id ,fav}) => {
 
-  const [favorite, setFavorite] = useState(false);
-  const[isLoading,setisLoading]=useState(true);
+  const [favorite, setFavorite] = useState(fav);
+  const hasLoadedOnce = useRef(false);
+  const[isLoading,setisLoading]=useState(!hasLoadedOnce.current);
+  const supabase=useSupabase()
+  const {setFavoriteRecipes}= useFavoriteRecipes();
+  const{recipes,setRecipes}=useRecipes();
+  const handleLoadEnd = () => {
+   if (!hasLoadedOnce.current) {
+      hasLoadedOnce.current = true;
+    }
+    setisLoading(false);
+  }
+  useEffect(() => {
+      setFavorite(fav);
+    }, [fav]);
+   const toggleFavorite= async()=>{
+    // if(favorite)
+    //   setFavoriteRecipes((recipes)=>recipes?.filter((recipe)=>recipe.id!==id))
+    // else
+    //   setFavoriteRecipes((favoriteRecipes:any[] | undefined)=>[recipes?.find((recipe=>recipe.id===id)),...(favoriteRecipes??[])])
+    setFavorite((favorite)=>!favorite)
+    
+
+
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+
+      if (error){ 
+        return;
+      }
+      if(!session){
+        return;
+      }
+
+      const response =  await fetch(`${process.env.EXPO_PUBLIC_API_URL}toggle-favorite`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({'recipe_id':id})
+      });
+      const data = await response.json();
+      if (response.ok) {
+        await getRecipes(session.access_token,setRecipes);
+
+
+      } else {
+        alert(`Error: ${data.error || 'Failed to toggle favorite'}`);
+      }
+    } catch (err) {
+      console.error("Error toggling favorite:", err);
+      alert("Could not connect to server");
+    }
+
+
+  }
 
   return (
     <Link href={{
@@ -23,16 +83,16 @@ const SmallCard: React.FC<Props>= ({title, image, id }) => {
     params: {}}}>
        <View style={styles.container}>
         
-       <Image source={{uri:image}} style={styles.image} onLoadStart={()=>setisLoading(true)} onLoadEnd={()=>setisLoading(false)}/>
+       <Image source={{uri:image}} style={styles.image} onLoadStart={() => {if (!hasLoadedOnce.current) setisLoading(true);}} onLoadEnd={()=>handleLoadEnd()}/>
         {isLoading&&(<Text>loading...</Text>)} 
           <View style={styles.icon}>
           {!favorite ? (
-              <TouchableOpacity onPress={()=> setFavorite(true)}>
+              <TouchableOpacity onPress={()=> toggleFavorite()}>
                  <Heart size={20} color="#9BA760"/>
               </TouchableOpacity>
              
           ) : (
-            <TouchableOpacity onPress={()=> setFavorite(false)}>
+            <TouchableOpacity onPress={()=> toggleFavorite()}>
           <Heart size={20} color="#9BA760" fill="#9BA760"/>
           </TouchableOpacity>
         )}
