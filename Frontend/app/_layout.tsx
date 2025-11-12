@@ -11,6 +11,7 @@ import { getCollections, getRecipes } from './utils/recipe';
 import { UserProvider } from './contexts/UserContext';
 import { CollectionProvider } from './contexts/CollectionContext';
 import { FavoriteRecipeProvider } from './contexts/FavoriteRecipeContext';
+import { SearchRecipeProvider } from './contexts/SearchRecipeContext';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -25,6 +26,7 @@ export default function RootLayout() {
   const [collections,setCollections]=useState<any[] | undefined>(undefined)
   const [recipes,setRecipes]=useState<any[] | undefined>(undefined)
   const [favriteRecipes,setFavoriteRecipes]=useState<any[] | undefined>([])
+  const [searchRecipes,setSearchRecipes]=useState<any[] | undefined>([])
   const [isNavigationReady, setIsNavigationReady] = useState(false);
   useEffect(() => {
     setIsNavigationReady(true);
@@ -32,6 +34,7 @@ export default function RootLayout() {
   useEffect(()=>{
     if(recipes)
       setFavoriteRecipes(recipes?recipes.filter((recipe)=>recipe.user_favorites.length>0):[])
+      setSearchRecipes(recipes);
   },[recipes])
 
   useEffect(()=>{
@@ -95,6 +98,7 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   return (
+    <SearchRecipeProvider searchRecipes={searchRecipes} setSearchRecipes={setSearchRecipes}>
     <FavoriteRecipeProvider favoriteRecipes={favriteRecipes} setFavoriteRecipes={setFavoriteRecipes}>
     <CollectionProvider collections={collections} setCollections={setCollections}>
     <UserProvider user={user} setUser={setUser}>
@@ -124,6 +128,7 @@ export default function RootLayout() {
     </UserProvider>
     </CollectionProvider>
     </FavoriteRecipeProvider>
+    </SearchRecipeProvider>
 
   );
 }

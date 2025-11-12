@@ -8,13 +8,12 @@ import { useRecipes } from '../contexts/RecipeContext';
 import MyCarousel from "@/components/carousel";
 import { useUser } from '../contexts/UserContext';
 import { useEffect, useState } from 'react';
+import { useSearchRecipes } from '../contexts/SearchRecipeContext';
 
 export default function HomeScreen() {
-  const {recipes:recipesData}=useRecipes();
-  const [recipes,setRecipes]=useState<any[]|undefined>([]);
-  useEffect(()=>{
-    setRecipes(recipesData);
-  },[recipesData])
+  const {recipes}=useRecipes();
+  const{searchRecipes,setSearchRecipes}=useSearchRecipes()
+
   const{user}=useUser()
   console.log('yyyyyyyyyyyyyyyyyyyyyyyyyy')
   console.log(user)
@@ -44,7 +43,7 @@ export default function HomeScreen() {
   
     </View>
    
-    {recipes?.map((currentRecipe,index)=>{
+    {searchRecipes?.map((currentRecipe,index)=>{
       return (<LargeCard key={index} title={currentRecipe.title} image={currentRecipe.image_url} cook_time={currentRecipe.cook_time} prep_time={currentRecipe.prep_time} id={currentRecipe.id} fav={currentRecipe.user_favorites.length>0} />);
     })}
   

@@ -1,15 +1,17 @@
-import {useState } from 'react'
+import {Dispatch, SetStateAction, useState } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { ArrowLeft } from 'lucide-react-native';
 import { router } from 'expo-router';
 import CollapsibleSection from '@/components/collapsibleSection'
 import { Plus } from 'lucide-react-native';
+import { useRecipes } from '../contexts/RecipeContext';
+import { useSearchRecipes } from '../contexts/SearchRecipeContext';
 
 export default function SearchScreen() {
     const [search, setSearch] = useState('');
     const time = [
-        { item: '5 min'},{ item: '1 hour'}, { item: '30 min'}, {item: 'Breakfast'},{ item: 'Lunch' }, {item: "Dinner"}];
+        { item: '5 min', time:5},{ item: '1 hour', time: 60}, { item: '30 min', time:30}];
     const protein = [
         { item: 'Chicken'}, {item: 'Beef'},{ item: 'Pork' }, {item: "Seafood"}, { item: 'Vegan'}, {item: 'Vegetarian'}];
     const type = [
@@ -17,13 +19,78 @@ export default function SearchScreen() {
     const allergen = [
         { item: 'Eggs'}, {item: 'Peanuts'},{ item: 'Treenuts' }, {item: "Sesame"}, {item: "Milk"}, {item: "Wheat"}, {item: "Soy"}, {item: "Fish"}, {item: "Shelfish"}];
 
-const [selected, setSelected] = useState<string[]>([]);
+// const [selected, setSelected] = useState<string[]>([]);
+const [selectedTimes,setSelectedTimes]=useState<any[] | undefined>([]);
+const [selectedProteins,setSelectedProteins]=useState<any[] | undefined>([]);
+const [selectedTypes,setSelectedTypes]=useState<any[] | undefined>([]);
+const [selectedAllergens,setSelectedAllergens]=useState<any[] | undefined>([]);
+const {recipes}=useRecipes();
+const{searchRecipes,setSearchRecipes}=useSearchRecipes()
+const searchItems= ()=>{
+  
+  const timeAr=selectedTimes?.map(time=>time)
+  const proteinAr=selectedProteins?.map(protein=>protein.toLowerCase())
+  const typeAr=selectedTypes?.map(type=>type.toLowerCase())
+  const allergenAr=selectedAllergens?.map(allergen=>allergen.toLowerCase())
+  console.log('8888888888888888888')
+  console.log(recipes)
+  let filterRecipes=recipes?.filter(recipe=>{
+    for(const time of timeAr)
+      if(recipe.cook_time+recipe.prep_time>time)
+        return false;
+    return true
+  })
+  console.log('99999999999999999999')
+  console.log(filterRecipes)
+  filterRecipes=filterRecipes?.filter(recipe=>{
+    console.log('pppppppppppppppppppp')
+    console.log(recipe.protein)
+    if(!proteinAr||proteinAr?.length===0)
+      return true
+    for(const protein of proteinAr){
+      if(recipe.protein.some(item => {
+        console.log('ffffffffffffffffffffff')
+        console.log(item)
+        console.log(protein)
+        return item.toLowerCase().includes(protein.toLowerCase())}))
+        return true;
+    }
+    return false;
+  })
+  console.log('uuuuuuuuuuuuuuuuuuu')
+    console.log(filterRecipes)
+  filterRecipes=filterRecipes?.filter(recipe=>{
+    if(!typeAr||typeAr?.length===0)
+      return true
+    for(const type of typeAr)
+      if(recipe.type.toLowerCase()===type.toLowerCase())
+        return true;
+    return false;
+  })
+  filterRecipes=filterRecipes?.filter(recipe=>{
+    if(!allergenAr||allergenAr?.length===0)
+      return true
+    for(const allergen of allergenAr)
+      if(recipe.ingredients.some(item => item.name.toLowerCase().includes(allergen.toLowerCase())))
+        return true;
+    return false;
+  })
+  filterRecipes=filterRecipes?.filter(recipe=>{
+    if(search==='')
+      return true;
+    if(recipe.title.toLowerCase().includes(search.toLowerCase()))
+      return true
+  })
+  setSearchRecipes(filterRecipes);
 
-const toggle = (item: string) => {
+
+}
+
+const toggle = (item: any,setSelected:Dispatch<SetStateAction<any[] | undefined>>) => {
   setSelected((prev) =>
-    prev.includes(item)
+    prev?.includes(item)
       ? prev.filter((p) => p !== item) // remove if already selected
-      : [...prev, item] // add if not selected
+      : [...(prev||[]), item] // add if not selected
   );
 };
 
@@ -70,11 +137,11 @@ const [newAllergen, setNewAllergen] = useState('');
         {rowItems.map((item, index) => (
           <TouchableOpacity
             key={index}
-            style={[{flexDirection: 'row'}, styles.gridItem, selected.includes(item.item) && styles.gridItemSelected]}
-            onPress={() => toggle(item.item)}>
+            style={[{flexDirection: 'row'}, styles.gridItem, selectedTimes.includes(item.item) && styles.gridItemSelected]}
+            onPress={() => toggle(item.time,setSelectedTimes)}>
                
            <Text style={[styles.text]}>{item.item}</Text>
-                {selected.includes(item.item) && (
+                {selectedTimes.includes(item.item) && (
                 <Text style={[styles.text, styles.x]}>x</Text>
                 )}  
           </TouchableOpacity>
@@ -95,11 +162,11 @@ const [newAllergen, setNewAllergen] = useState('');
         {rowItems.map((item, index) => (
            <TouchableOpacity
             key={index}
-            style={[{flexDirection: 'row'}, styles.gridItem, selected.includes(item.item) && styles.gridItemSelected]}
-            onPress={() => toggle(item.item)}>
+            style={[{flexDirection: 'row'}, styles.gridItem, selectedProteins.includes(item.item) && styles.gridItemSelected]}
+            onPress={() => toggle(item.item,setSelectedProteins)}>
                
            <Text style={[styles.text]}>{item.item}</Text>
-                {selected.includes(item.item) && (
+                {selectedProteins.includes(item.item) && (
                 <Text style={[styles.text, styles.x]}>x</Text>
                 )}  
           </TouchableOpacity>
@@ -120,11 +187,11 @@ const [newAllergen, setNewAllergen] = useState('');
         {rowItems.map((item, index) => (
             <TouchableOpacity
             key={index}
-            style={[{flexDirection: 'row'}, styles.gridItem, selected.includes(item.item) && styles.gridItemSelected]}
-            onPress={() => toggle(item.item)}>
+            style={[{flexDirection: 'row'}, styles.gridItem, selectedTypes.includes(item.item) && styles.gridItemSelected]}
+            onPress={() => toggle(item.item,setSelectedTypes)}>
                
            <Text style={[styles.text]}>{item.item}</Text>
-                {selected.includes(item.item) && (
+                {selectedTypes.includes(item.item) && (
                 <Text style={[styles.text, styles.x]}>x</Text>
                 )}  
           </TouchableOpacity>
@@ -145,11 +212,11 @@ const [newAllergen, setNewAllergen] = useState('');
         {rowItems.map((item, index) => (
           <TouchableOpacity
             key={index}
-            style={[{flexDirection: 'row'}, styles.gridItem, selected.includes(item.item) && styles.gridItemSelected]}
-            onPress={() => toggle(item.item)}>
+            style={[{flexDirection: 'row'}, styles.gridItem, selectedAllergens.includes(item.item) && styles.gridItemSelected]}
+            onPress={() => toggle(item.item,setSelectedAllergens)}>
                
            <Text style={[styles.text]}>{item.item}</Text>
-                {selected.includes(item.item) && (
+                {selectedAllergens.includes(item.item) && (
                 <Text style={[styles.text, styles.x]}>x</Text>
                 )}  
           </TouchableOpacity>
@@ -175,7 +242,7 @@ const [newAllergen, setNewAllergen] = useState('');
     </View>
     </CollapsibleSection>
     <View style={{alignItems: 'center', width: '100%'}}>
-    <TouchableOpacity style={[styles.greenBox,{marginTop: 10, paddingLeft: 0, width: 115, alignItems:'center', backgroundColor: '#262e05ff'}]}>
+    <TouchableOpacity style={[styles.greenBox,{marginTop: 10, paddingLeft: 0, width: 115, alignItems:'center', backgroundColor: '#262e05ff'}]} onPress={searchItems}>
     <Text style={[styles.text, {paddingLeft: 0}]}>Search</Text>
     </TouchableOpacity>
     </View>
