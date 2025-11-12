@@ -11,7 +11,7 @@ export function InputField({ label, value, onChangeText, placeholder, secureText
         <TextInput style={styles.input}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor='#fffbfbff'
+          placeholderTextColor='#9BA760'
           secureTextEntry={secureTextEntry}
           value={value}
         />
@@ -21,21 +21,28 @@ export function InputField({ label, value, onChangeText, placeholder, secureText
 
 const styles = StyleSheet.create({
   inputContainer: {
-    marginBottom:0,
-    flex:1
+    
+    width: '100%',
+    marginBottom: 15,
 
   },
   label:{
-    margin:10
+    marginBottom:7,
+    fontSize: 15,
+    color:'#262e05ff'
 
   },
   input:{
-    backgroundColor: '#9BA760',
-    borderRadius: 20,
+    backgroundColor: '',
+    borderWidth: 1,
+    borderColor: '#9BA760',
+    borderRadius: 18,
     paddingHorizontal: 20,
-    width:350,
+  
     height: 50,
-    color:'#FFFFFF',
+    width: 320,
+  
+    fontSize: 13,
   }
 
 });

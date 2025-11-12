@@ -1,35 +1,32 @@
-import { Image } from 'expo-image';
+import {useState, useEffect} from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
 import LargeCard from "@/components/largeCard";
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
-import { ArrowLeft } from 'lucide-react-native';
+import { useSupabase } from '../../app/contexts/SupabaseContext';
+import { useRecipes } from '../contexts/RecipeContext';
+import { useUser } from '../contexts/UserContext'
+
 
 
 export default function RecipeScreen() {
+  const {recipes}=useRecipes();
+  const count = recipes?.length ?? 0;
+  const{user}=useUser();
+  // console.log('yyyyyyyyyyyyyyyyyyyyyyyyyy')
+  console.log(user)
+
   return (
     <ScrollView style={styles.container}>
       <View style={{ justifyContent: 'center', alignItems: 'center'}}>
      <Text style={styles.title}>Recipes</Text>
      </View>
 
-<View style ={{marginTop: 30}}>
-<Text style={styles.text}>11 Recipes</Text>
 
- <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
- <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
- <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
- <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
- <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
- <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
- <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
- <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
- <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+<View style ={{marginTop: 20}}>
+  <Text style={styles.text}>{count} recipes</Text>
+ {recipes?.map((currentRecipe,index)=>{
+      return (<LargeCard key={index} title={currentRecipe.title} image={currentRecipe.image_url} cook_time={currentRecipe.cook_time} prep_time={currentRecipe.prep_time} id={currentRecipe.id} />);
+    })}
  
 
 </View>
@@ -47,7 +44,7 @@ const styles = StyleSheet.create({
   },
   content:{
     padding: 1,
-    top: 50,
+    top: 30,
   },
   gridItem: {
     flex: 1, // Ensures items take equal space in a row
@@ -66,11 +63,13 @@ const styles = StyleSheet.create({
     paddingTop: 15,
     fontSize: 25,
     color: '#9BA760',
+    fontFamily: 'Nunito_700Bold',
   },
   text:{
     fontSize: 16,
     paddingLeft: 25,
     paddingBottom: 5,
+    fontFamily: 'Nunito_400Regular'
   },
   subtitle:{
     fontSize: 20,

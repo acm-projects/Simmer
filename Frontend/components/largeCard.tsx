@@ -1,56 +1,99 @@
-
-import { StyleSheet, Text, View, Image, ImageSourcePropType, } from 'react-native';
-import FavoriteIcon from '@/components/favoriteIcon';
-import { AlarmClock } from 'lucide-react-native'
+import react, { useState} from 'react'
+import { StyleSheet, Text, View, Image, ImageSourcePropType, TouchableOpacity } from 'react-native';
 import { Heart } from 'lucide-react-native';
 import { Link } from 'expo-router';
+import RecipeScreen from '@/app/(tabs)/recipes';
 
-interface Props{
+interface Recipe {
   title: string;
-  image: ImageSourcePropType; 
+  image: string; 
+  cook_time: number;
+  prep_time:number;
+  id:string;
+  
+
 }
 
-const LargeCard: React.FC<Props>= ({title, image}) => {
+const LargeCard: React.FC<Recipe>= ({title, image, cook_time, prep_time, id}) => {
+  const[favorite, setFavorite]= useState(false);
+  const[isLoading,setisLoading]=useState(true);
+
+
+
   return (
-    <Link href='/screens/description'>
-    <View style={styles.container}>
+    <Link href={{
+    pathname: `/screens/description/[id]`,
+    params: {id}
+    }} style={styles.container}>
+    <View style={[styles.content, {alignItems:'center'}]}>
        
    
-    <Image source={image} style={styles.image}/>
+    <Image source={{uri:image}} style={styles.image} onLoadStart={()=>setisLoading(true)} onLoadEnd={()=>setisLoading(false)}/>
+    {isLoading&&(<Text>loading...</Text>)}
    
-   <View style={styles.icon}>
-         <Heart size={22} color="black"/>
-         </View>
-      <View style={styles.card}>
+      <View style={styles.icon}>
+             {!favorite ? (
+                 <TouchableOpacity onPress={()=> setFavorite(true)}>
+                    <Heart size={20} color="#9BA760"/>
+                 </TouchableOpacity>
+                
+             ) : (
+               <TouchableOpacity onPress={()=> setFavorite(false)}>
+             <Heart size={20} color="#9BA760" fill="#9BA760"/>
+             </TouchableOpacity>
+           )}
+   
+             
+             
+             </View>
+       <View style={[styles.card, {justifyContent: 'center'}]}>
         
-               <Text style={styles.title}>{title}</Text> 
+               <Text style={styles.title}>{title ?? 'No title'}</Text> 
+                   <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 10, }}>
+                         <Text style={styles.time}>Prep: {prep_time} min | Cook: {cook_time} min </Text>       
+                    </View>
+              
        </View>
+
+      {/*  <View style={[styles.card, {justifyContent: 'center'}]}>
+        
+               <Text style={styles.title}>PIzzzaaaaanad</Text> 
+                   <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 10, }}>
+                         <Text style={styles.time}>Prep: 30 min | Cook: 30 min </Text>       
+                    </View>
+              
+       </View> */}
        
     </View>
     </Link>
-  )
+  );
 }
+
+export default LargeCard;
 
 const styles = StyleSheet.create({
   container: {
     margin: 5,
+    borderRadius: 20,
     marginHorizontal: 10,
     backgroundColor: 'white',
-    borderRadius: 20,
+    shadowColor: "#303030ff",
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    alignItems: 'center',
+  },
+  content:{
+        
     flexDirection: 'row',
     height: 110,
     alignItems: 'center',
     padding: 10,
-    shadowColor: "#303030ff",
-    shadowOffset:{width: 0, height: 0},
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
   },
   image:{
   
     width: 90,
     height: 90,
-    borderRadius: 20,
+    borderRadius: 15,
   
 
   },
@@ -58,13 +101,17 @@ const styles = StyleSheet.create({
     height: 70,
     width: 347,
     borderRadius: 15,
+    alignItems: 'flex-start'
   },
   title:{
-      fontSize: 20,
+      fontSize: 25,
       color: '#06402B',
-      paddingTop: 15,
+      paddingTop: 5,
       marginLeft: 10,
-      width: '60%',
+      width: '55%',
+      fontFamily: 'Nunito_700Bold',
+      flexWrap: 'wrap',
+      flexShrink: 1,
   },
     icon:{
     position: 'absolute',
@@ -72,9 +119,13 @@ const styles = StyleSheet.create({
     right: 15,
     zIndex: 2
   },
+  time:{
+    fontSize: 15,
+    marginLeft: 4,
+    marginTop: 6,
+    fontFamily: 'Nunito_400Regular',
+   
+  }
 });
 
-
-
-export default LargeCard
 
