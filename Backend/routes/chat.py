@@ -505,7 +505,7 @@ import base64
 import traceback
 from threading import Thread
 from flask_socketio import emit
-
+import io
 # Store active streaming sessions
 active_sessions = {}
 HARDCODED_CID = "test12345"
@@ -517,30 +517,21 @@ def process_audio_chunk(audio_bytes, sid):
         return
 
     try:
-        # Calculate loudness of the audio chunk
-        audio_segment = AudioSegment(
-            audio_bytes,
-            sample_width=2,  # 16-bit = 2 bytes
-            frame_rate=16000,  # Assuming 16kHz sample rate
-            channels=1  # Mono
-        )
-        
-        amplitude = audio_segment.dBFS
-        
-        if amplitude == float('-inf'):
-            print(f"[PROCESS_CHUNK] Session {sid}: Chunk of {len(audio_bytes)} bytes - SILENT")
-        else:
-            # Create visual bar (60 dBFS is very quiet, 0 dBFS is max)
-            bar_length = int((60 + amplitude) / 2)
-            bar_length = max(0, min(bar_length, 30))  # Clamp between 0-30
-            bar = "#" * bar_length
-            
-            print(f"[PROCESS_CHUNK] Session {sid}: {len(audio_bytes)} bytes | {amplitude:.1f} dBFS | {bar}")
-        
+        text = stt(audio_bytes)
+        print("Text: ",text)
+        # Now send pcm_bytes to your speech model
     except Exception as e:
-        print(f"[PROCESS_CHUNK] ✗ Error processing chunk for {sid}: {e}")
-        traceback.print_exc()
-
+        print(f"[PROCESS_CHUNK] Error processing chunk for {sid}: {e}")
+        
+        # if amplitude == float('-inf'):
+        #     print(f"[PROCESS_CHUNK] Session {sid}: Chunk of {len(audio_bytes)} bytes - SILENT")
+        # else:
+        #     # Create visual bar (60 dBFS is very quiet, 0 dBFS is max)
+        #     bar_length = int((60 + amplitude) / 2)
+        #     bar_length = max(0, min(bar_length, 30))  # Clamp between 0-30
+        #     bar = "#" * bar_length
+            
+        #     print(f"[PROCESS_CHUNK] Session {sid}: {len(audio_bytes)} bytes | {amplitude:.1f} dBFS | {bar}")
 
 def register_socketio_handlers(socketio):
     """Register all WebSocket event handlers"""
