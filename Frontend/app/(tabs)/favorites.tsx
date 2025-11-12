@@ -16,6 +16,8 @@ import { Fonts } from '@/constants/theme';
 import { useSupabase } from '../contexts/SupabaseContext';
 import { useCollection } from '../contexts/CollectionContext';
 import { getCollections } from '../utils/recipe';
+import { useFavoriteRecipes } from '../contexts/FavoriteRecipeContext';
+import { Heart } from 'lucide-react-native';
 
 
 
@@ -24,6 +26,9 @@ import { getCollections } from '../utils/recipe';
 
 export default function FavoritesScreen() {
   const {collections:collectionResult, setCollections:setCOllectionsResult}=useCollection();
+  const {favoriteRecipes:recipes}=useFavoriteRecipes();
+    const count = recipes?.length ?? 0;
+
   const[collections, setCollections]= useState<any[]|undefined>([]);
   const[addCollection, setAddCollection] = useState('');
   const supabase = useSupabase();
@@ -81,7 +86,15 @@ export default function FavoritesScreen() {
      <Text style={styles.text}>Collections</Text>
      </View>
 
-
+     <View style={{ justifyContent: 'center', alignItems: 'center'}}>
+      
+        <Link href={{
+          pathname: `../screens/recipeCollection/favoriteCollection`,
+          params: {}}} style={{padding: 10}} >
+          <CollectionCard  title={'Favorites'} cid={'0'} image={''}/>
+          </Link>
+       
+     </View>
 
      <View style={{ justifyContent: 'center', alignItems: 'center'}}>
       {collections.map((collection, index) => (

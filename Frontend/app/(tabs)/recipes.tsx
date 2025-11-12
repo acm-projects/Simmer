@@ -9,8 +9,10 @@ import { useFavoriteRecipes } from '../contexts/FavoriteRecipeContext';
 
 
 
+
 export default function RecipeScreen() {
-  const {favoriteRecipes:recipes}=useFavoriteRecipes();
+ // const {favoriteRecipes:recipes}=useFavoriteRecipes();
+  const {recipes} = useRecipes();
   const count = recipes?.length ?? 0;
   const{user}=useUser();
   // console.log('yyyyyyyyyyyyyyyyyyyyyyyyyy')

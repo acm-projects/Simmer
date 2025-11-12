@@ -1,11 +1,12 @@
 
-import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity, Pressable } from 'react-native';
+import { StyleSheet, Text, View, ScrollView,  TouchableOpacity, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ArrowLeft } from 'lucide-react-native';
 import { Heart } from 'lucide-react-native';
 import { router,useLocalSearchParams} from 'expo-router';
 import { useRecipes } from '@/app/contexts/RecipeContext';
 import { useState } from 'react';
+import {Image} from 'expo-image'
 
 
 
@@ -35,7 +36,7 @@ export default function Description(){
         <View>
             <View style={styles.card}>
                <Image source={{uri:recipe.image_url}} style={styles.image} onLoadStart={()=>setisLoading(true)} onLoadEnd={()=>setisLoading(false)}/>
-               {isLoading&&(<Text>loading...</Text>)}
+               {isLoading&&(<Text style={styles.text}>loading...</Text>)}
                 <View style={styles.titleBox}>
                     <Text style={styles.title2}>{recipe.title}</Text>
                     <View style={{width: '100%', paddingLeft: 10,}}>

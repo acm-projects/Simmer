@@ -1,5 +1,5 @@
 import react, {useEffect, useRef, useState} from 'react'
-import { StyleSheet, Text, View, Image, ImageSourcePropType, TouchableOpacity,  } from 'react-native';
+import { StyleSheet, Text, View, ImageSourcePropType, TouchableOpacity,  } from 'react-native';
 import FavoriteIcon from '@/components/favoriteIcon';
 import WavyBox from '@/components/wavyBox'
 import { Heart } from 'lucide-react-native';
@@ -9,6 +9,7 @@ import { useFavoriteRecipes } from '@/app/contexts/FavoriteRecipeContext';
 import { useSupabase } from '@/app/contexts/SupabaseContext';
 import { useRecipes } from '@/app/contexts/RecipeContext';
 import { getRecipes } from '@/app/utils/recipe';
+import {Image} from 'expo-image'
 
 
 interface Props{
@@ -84,7 +85,7 @@ const SmallCard: React.FC<Props>= ({title, image, id ,fav}) => {
        <View style={styles.container}>
         
        <Image source={{uri:image}} style={styles.image} onLoadStart={() => {if (!hasLoadedOnce.current) setisLoading(true);}} onLoadEnd={()=>handleLoadEnd()}/>
-        {isLoading&&(<Text>loading...</Text>)} 
+        {isLoading&&(<Text style={styles.text}>loading...</Text>)} 
           <View style={styles.icon}>
           {!favorite ? (
               <TouchableOpacity onPress={()=> toggleFavorite()}>

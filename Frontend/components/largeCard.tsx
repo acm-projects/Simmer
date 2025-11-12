@@ -1,11 +1,12 @@
 import react, { useEffect, useState} from 'react'
-import { StyleSheet, Text, View, Image, ImageSourcePropType, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View,  ImageSourcePropType, TouchableOpacity } from 'react-native';
 import { Heart } from 'lucide-react-native';
 import { Link } from 'expo-router';
 import { useSupabase } from '@/app/contexts/SupabaseContext';
 import { getRecipes } from '@/app/utils/recipe';
 import { useFavoriteRecipes } from '@/app/contexts/FavoriteRecipeContext';
 import { useRecipes } from '@/app/contexts/RecipeContext';
+import {Image} from 'expo-image';
 
 interface Recipe {
   title: string;
@@ -82,7 +83,7 @@ const LargeCard: React.FC<Recipe>= ({title, image, cook_time, prep_time, id,fav}
        
    
     <Image source={{uri:image}} style={styles.image} onLoadStart={()=>setisLoading(true)} onLoadEnd={()=>setisLoading(false)}/>
-    {isLoading&&(<Text>loading...</Text>)}
+    {isLoading&&(<Text style={[styles.time, {alignSelf: 'flex-start'}]}>loading...</Text>)}
    
       <View style={styles.icon}>
              {!favorite ? (

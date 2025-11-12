@@ -93,7 +93,7 @@ export default function ImportRecipe(){
   const [step, setStep] = useState(['']);
   const[isVisible, setIsVisible] = useState(false);
   const [ingredient, setIngredient] = useState([{name: '', quantity: '', unit: ''}]);
-  const [time, setTime] = useState<string[]>(['0'])
+  const [time, setTime] = useState<string[]>(['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'])
   
   // sent array of time to backend, backend has to parse the string array into numbers
   
@@ -354,7 +354,7 @@ export default function ImportRecipe(){
             placeholder="time"
             placeholderTextColor="#a1a1a1ff"
             keyboardType="decimal-pad" 
-             value={time[index]?.toString() || ''} // <-- always string
+            value={time[index]?.toString() || ''} // <-- always string
             onChangeText={(text) => updateTime(index, text)}
               />
           <Text style={[styles.recipe, ]}> min</Text>

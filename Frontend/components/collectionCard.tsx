@@ -1,10 +1,11 @@
 import React, {useState} from 'react'
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { ArrowLeft, Plus } from 'lucide-react-native';
 import { Link } from 'expo-router';
 import WavyBox from '@/components/wavyCollectionsBox'
 import * as ImagePicker from 'expo-image-picker';
 import { useSupabase } from '@/app/contexts/SupabaseContext';
+import { Image } from 'expo-image'
 
 type CollectionCardProps ={
   title: string
@@ -97,7 +98,7 @@ const CollectionCard = ({title,cid, image}: CollectionCardProps) => {
                 <>
                 <Image source={{uri: selectedImage} }
                 style={styles.image} onLoadStart={()=>setisLoading(true)} onLoadEnd={()=>setisLoading(false)}/>
-                {isLoading&&(<Text>loading...</Text>)}
+                {isLoading&&(<Text style={styles.text}>loading...</Text>)}
                 </>
               )}
       </View>
