@@ -7,13 +7,17 @@ import CornerIcon from "@/components/cornerIcon";
 import { useRecipes } from '../contexts/RecipeContext';
 import MyCarousel from "@/components/carousel";
 import { useUser } from '../contexts/UserContext';
+import { useEffect, useState } from 'react';
 
 export default function HomeScreen() {
-  const {recipes}=useRecipes();
+  const {recipes:recipesData}=useRecipes();
+  const [recipes,setRecipes]=useState<any[]|undefined>([]);
+  useEffect(()=>{
+    setRecipes(recipesData);
+  },[recipesData])
   const{user}=useUser()
   console.log('yyyyyyyyyyyyyyyyyyyyyyyyyy')
   console.log(user)
-  const favoriteRecipes=recipes?.filter((recipe)=>recipe.user_favorites.length>0)
   return (
     
 

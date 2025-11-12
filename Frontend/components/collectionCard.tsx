@@ -20,7 +20,7 @@ const CollectionCard = ({title,cid, image}: CollectionCardProps) => {
     const [imageRead, setImageRead] =useState(image?true:false);
     const supabase=useSupabase();
     const[isLoading,setisLoading]=useState(true);
-  
+    
   
     const pickImageAsync = async () => {
       let result = await ImagePicker.launchImageLibraryAsync({

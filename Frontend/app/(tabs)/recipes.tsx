@@ -5,11 +5,12 @@ import LargeCard from "@/components/largeCard";
 import { useSupabase } from '../../app/contexts/SupabaseContext';
 import { useRecipes } from '../contexts/RecipeContext';
 import { useUser } from '../contexts/UserContext'
+import { useFavoriteRecipes } from '../contexts/FavoriteRecipeContext';
 
 
 
 export default function RecipeScreen() {
-  const {recipes}=useRecipes();
+  const {favoriteRecipes:recipes}=useFavoriteRecipes();
   const count = recipes?.length ?? 0;
   const{user}=useUser();
   // console.log('yyyyyyyyyyyyyyyyyyyyyyyyyy')
