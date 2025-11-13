@@ -4,14 +4,18 @@ import { router } from 'expo-router'
 import {ArrowLeft, Pencil, Plus} from 'lucide-react-native'
 import { useRecipes } from '../contexts/RecipeContext';
 import { useUser } from '../contexts/UserContext';
+import { updateUserName, updateUserAllergens } from '../api/userApi'
+
 export default function profilePage() {
-  const {user}=useUser();
-  const[isEditing, setIsEditing] = useState(false);
-   const[firstName, setFirstName] = useState(user?user.first_name:'');
-   const[lastName, setLastName] = useState(user?user.last_name:'');
-   const[allergens, setAllergens] =useState(['Eggs', 'Peanuts', 'Tree Nuts', 'Milk', 'Sesame']);
-   const[allAllergens, setAllAllergens] = useState(['Eggs', 'Peanuts', 'Tree Nuts', 'Milk', 'Sesame', 'Wheat', 'Soy', 'Shellfish', 'Fish']);
-   const[newAllergen, setNewAllergen] = useState('');
+  const { user, refreshUser } = useUser();
+  const [isEditing, setIsEditing] = useState(false);
+  const [firstName, setFirstName] = useState(user?.first_name || '');
+  const [lastName, setLastName] = useState(user?.last_name || '');
+  const [allergens, setAllergens] = useState<string[]>(user?.allergens || []);
+  const [allAllergens, setAllAllergens] = useState([
+    'Eggs', 'Peanuts', 'Tree Nuts', 'Milk', 'Sesame', 'Wheat', 'Soy', 'Shellfish', 'Fish'
+  ]);
+  const [newAllergen, setNewAllergen] = useState('');
 
    const toggleAllergen = (item: string) => {
   setAllergens((prev) =>
@@ -33,6 +37,17 @@ const handleAddAllergen = () => {
     setAllAllergens([...allAllergens, trimmed]);
   }
 };
+
+const handleSave = async () => {
+    try {
+      await updateUserName(firstName, lastName);
+      await updateUserAllergens(allergens);
+      await refreshUser();
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+    }
+  };
     
   return (
 
@@ -74,7 +89,7 @@ const handleAddAllergen = () => {
     {isEditing && (
            <TouchableOpacity 
     style={styles.button}
-    onPress={() => setIsEditing(false)}>
+    onPress={handleSave}>
         <Text style={styles.buttonText}>Done</Text></TouchableOpacity> )}
 
 
@@ -138,7 +153,7 @@ const handleAddAllergen = () => {
     ) : (
     <View style={[{width:350,}, styles.allergenContainer]}>
         {allergens.map((item, index) => (
-            <View style={styles.allergen}>
+            <View style={styles.allergen} key={index}>
             <Text key={index} style={styles.allergenText}>{item}</Text>
             </View>
         ))}

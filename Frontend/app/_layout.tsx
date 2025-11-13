@@ -12,6 +12,7 @@ import { UserProvider } from './contexts/UserContext';
 import { CollectionProvider } from './contexts/CollectionContext';
 import { FavoriteRecipeProvider } from './contexts/FavoriteRecipeContext';
 import { SearchRecipeProvider } from './contexts/SearchRecipeContext';
+import { fetchUser } from './api/userApi';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -28,6 +29,14 @@ export default function RootLayout() {
   const [favriteRecipes,setFavoriteRecipes]=useState<any[] | undefined>([])
   const [searchRecipes,setSearchRecipes]=useState<any[] | undefined>([])
   const [isNavigationReady, setIsNavigationReady] = useState(false);
+  const refreshUser = async () => {
+      try {
+        const data = await fetchUser();
+        setUser(data);
+      } catch (err) {
+        console.error("Error fetching user:", err);
+      }
+    };
   useEffect(() => {
     setIsNavigationReady(true);
   }, []); 
@@ -97,7 +106,7 @@ export default function RootLayout() {
     <SearchRecipeProvider searchRecipes={searchRecipes} setSearchRecipes={setSearchRecipes}>
     <FavoriteRecipeProvider favoriteRecipes={favriteRecipes} setFavoriteRecipes={setFavoriteRecipes}>
     <CollectionProvider collections={collections} setCollections={setCollections}>
-    <UserProvider user={user} setUser={setUser}>
+    <UserProvider user={user} setUser={setUser} refreshUser={fetchUser}>
     <RecipeProvider recipes={recipes} setRecipes={setRecipes}>
     <SupabaseProvider>
       <ThemeProvider value={colorScheme === 'light' ? DarkTheme : DefaultTheme}>
