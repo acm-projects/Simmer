@@ -167,8 +167,8 @@ def update_dietary_restrictions():
       .execute()
     )
 
-    cur_restrictions = user_response.data.get('diet_restriction') or []
-    updated_restrictions = list(set(cur_restrictions + new_restrictions))
+    # cur_restrictions = user_response.data.get('diet_restriction') or []
+    updated_restrictions = list(set(new_restrictions))
 
     supabase.table('users').update({
       'diet_restriction' : updated_restrictions
