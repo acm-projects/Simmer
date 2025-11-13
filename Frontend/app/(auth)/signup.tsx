@@ -119,12 +119,9 @@ const styles = StyleSheet.create({
   
   },
   forum:{
-    height:400,
-<<<<<<< Updated upstream
+    height: 370,
    width: '90%',
-=======
-    right: -18
->>>>>>> Stashed changes
+    right: 0,
 
   },
   header:{

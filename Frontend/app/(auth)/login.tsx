@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     mascot: {
       height: 300,
       width: 300,
-      right: -20,
+      right: 0,
       shadowColor:'#000',
       shadowRadius: 4,
       shadowOpacity: 1,

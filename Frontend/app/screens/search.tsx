@@ -11,7 +11,7 @@ import { useSearchRecipes } from '../contexts/SearchRecipeContext';
 export default function SearchScreen() {
     const [search, setSearch] = useState('');
     const time = [
-        { item: '5 min', time:5},{ item: '1 hour', time: 60}, { item: '30 min', time:30}];
+        { item: '5 min', time:5},{ item: '30 min', time: 30}, { item: '1 hour', time:60}];
     const protein = [
         { item: 'Chicken'}, {item: 'Beef'},{ item: 'Pork' }, {item: "Seafood"}, { item: 'Vegan'}, {item: 'Vegetarian'}];
     const type = [
@@ -137,11 +137,11 @@ const [newAllergen, setNewAllergen] = useState('');
         {rowItems.map((item, index) => (
           <TouchableOpacity
             key={index}
-            style={[{flexDirection: 'row'}, styles.gridItem, selectedTimes.includes(item.item) && styles.gridItemSelected]}
+            style={[{flexDirection: 'row'}, styles.gridItem, selectedTimes.includes(item.time) && styles.gridItemSelected]}
             onPress={() => toggle(item.time,setSelectedTimes)}>
                
            <Text style={[styles.text]}>{item.item}</Text>
-                {selectedTimes.includes(item.item) && (
+                {selectedTimes.includes(item.time) && (
                 <Text style={[styles.text, styles.x]}>x</Text>
                 )}  
           </TouchableOpacity>
@@ -225,20 +225,6 @@ const [newAllergen, setNewAllergen] = useState('');
     );
   })}
 
-<View style={{flexDirection: 'row', alignItems: 'center', width: '90%'}}>
-    <Plus color={'white'} size={22}style={styles.plus}/>
-    <View style={[styles.lightGreenBox, {width: '90%', marginTop: 10,}]}>
-        
-        <TextInput 
-        style={[styles.text, {margin: 3,}]}
-        placeholder='Add Other'
-        placeholderTextColor="#e0e0e0ff"
-        value={newAllergen}
-        onChangeText={setNewAllergen}
-        ></TextInput>
-      
-    </View>
-    </View>
     </View>
     </CollapsibleSection>
     <View style={{alignItems: 'center', width: '100%'}}>
