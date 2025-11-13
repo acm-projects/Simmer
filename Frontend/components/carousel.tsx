@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Dimensions } from "react-native";
+import { View, Dimensions, TouchableOpacity, Text } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import SmallCard from "../components/smallCard";
 import { ImageSourcePropType } from "react-native";

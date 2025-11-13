@@ -88,6 +88,7 @@ const styles = StyleSheet.create({
     fontSize: 40,
     paddingLeft: 15,
     paddingTop: 15,
+    left: 10000,
     color: '#262e05ff',
     fontFamily: 'Nunito_700Bold',
   },

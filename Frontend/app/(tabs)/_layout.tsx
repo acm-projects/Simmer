@@ -38,8 +38,19 @@ export default function TabLayout() {
         tabBarButton: HapticTab,
         tabBarStyle:{
           backgroundColor: '#9BA760',
-          height: 57,
+          height: 50,
+          width: 350,
+          alignSelf:'center',
           borderTopWidth: 0,
+          borderRadius: 15,
+          bottom: 15,
+          left: 20,
+          right: 20,
+          top: -25,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 10 },
+          shadowOpacity: 0.25,
+          shadowRadius: 3.5,
         },
       }}>
 
