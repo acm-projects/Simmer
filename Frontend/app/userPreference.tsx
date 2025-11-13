@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, Button, View, TextInput, Text, TouchableOpacity , StyleSheet, ScrollView, Image} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context'
 import { useSupabase } from '../app/contexts/SupabaseContext';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
+import { useUser } from './contexts/UserContext';
 
 const DEFAULT_DIET_RESTRICTIONS = [
   'Wheat',
@@ -17,12 +18,29 @@ const DEFAULT_DIET_RESTRICTIONS = [
 ];
 
 export default function UserPreference() {
+  const router=useRouter();
   const supabase=useSupabase();
   const [selectedDietRestrictions, setSelectedDietRestrictions] = useState<Set<string>>(new Set([]));
   const [dietRestrictionTags, setDietRestrictionTags] = useState<string[]>(() => {
     const combined = new Set([... DEFAULT_DIET_RESTRICTIONS]);
     return Array.from(combined);
   });
+  const {user} =useUser();
+  useEffect(()=>{
+    if(!user||!user.diet_restriction)
+      return;
+    setDietRestrictionTags((currentDietRestrictionTags)=>{
+      const dietTags=[...currentDietRestrictionTags];
+      for(const diet of user.diet_restriction){
+        if(!currentDietRestrictionTags.includes(diet)){
+          dietTags.push(diet);         
+        }
+      }
+      return dietTags;
+    })
+    setSelectedDietRestrictions(new Set(user.diet_restriction))
+    
+  },[user])
   const [customDietRestrictionInput, setCustomDietRestrictionInput] = useState('');
   const [message,setMessage]=useState<string|null>(null);
 
@@ -59,6 +77,9 @@ export default function UserPreference() {
   };
  
 const submitPreference=async ()=>{
+
+  //../homepage
+    router.navigate('../homepage')
     try{
       const { data: { session }, error } = await supabase.auth.getSession();
 
@@ -75,14 +96,13 @@ const submitPreference=async ()=>{
       console.log(session.user.id)
 
 
-      await fetch(`${process.env.EXPO_PUBLIC_API_URL}/user/set-preference`, {
-          method: 'POST', 
+      await fetch(`${process.env.EXPO_PUBLIC_API_URL}/user/dietary-restrictions`, {
+          method: 'PUT', 
           headers: {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${session.access_token}`
           },
           body: JSON.stringify({
-              id:session.user.id,
               "diet_restriction":[...selectedDietRestrictions],
 
           })
@@ -135,7 +155,7 @@ const submitPreference=async ()=>{
       </View>
       <TouchableOpacity style={styles.doneButton}
       onPress={submitPreference}>
-         <Link href='../homepage'> <Text style={styles.addButtonText}>Done</Text> </Link>
+        <Text style={styles.addButtonText}>Done</Text>
         </TouchableOpacity>
       
     </ScrollView>

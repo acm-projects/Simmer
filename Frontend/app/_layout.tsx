@@ -67,13 +67,6 @@ export default function RootLayout() {
         router.navigate("/signup");
         return;
       } else {
-        await getUser(jwt)
-        await getRecipes(jwt, setRecipes);
-        await getCollections(jwt, setCollections);
-        console.log('fffffffffffffffffffff')
-        console.log(recipes?.length)
-        
-        router.navigate("/userPreference");
       }
     }
 
@@ -82,7 +75,10 @@ export default function RootLayout() {
     if (event === 'INITIAL_SESSION') {
       await authenticateUser(session?.access_token)
     } else if (event === 'SIGNED_IN') {
-      router.navigate('/userPreference');
+      await getUser(session?.access_token)
+      await getRecipes(session?.access_token, setRecipes);
+      await getCollections(session?.access_token, setCollections);
+      router.navigate("/userPreference");
     } else if (event === 'SIGNED_OUT') {
       router.navigate('/signup')
     } else if (event === 'PASSWORD_RECOVERY') {
