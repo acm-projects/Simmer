@@ -1241,6 +1241,77 @@ export default function VoiceAssistant() {
       setStatusMessage('Connected to server');
     });
 
+    socket.on('audio_response', async (data) => {
+      console.log('[audio length', data.audio.length);
+      const base64Content=data.audio
+      //console.log(base64Content)
+      // const reader = new FileReader();
+      // reader.readAsDataURL(responseBlob);
+      
+      // const base64Data:string = await new Promise((resolve, reject) => {
+      //   reader.onloadend = () => resolve(reader.result as string);
+      //   reader.onerror = reject;
+      // });
+      // const base64Content = base64Data.split(',')[1];
+      // console.log(base64Content.length)
+      
+
+
+  
+      const fileUri = `${FileSystem.cacheDirectory}response-audio.mp3`;
+      await FileSystem.writeAsStringAsync(fileUri, base64Content, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+      const info = await FileSystem.getInfoAsync(fileUri);
+      console.log(info.exists);
+      console.log(fileUri)
+      const file2 = {
+        uri: fileUri,
+        name: `recording-${Date.now()}2.mp3`, 
+        type: 'audio/mp3', 
+      };
+      const formData2 = new FormData();
+      formData2.append('audio', file2 as any);
+      console.log(fileUri)
+      await audioRecorder.stop();
+      isStreamingLoopRef.current=false;
+      setIsStreamingLoop(false);
+      await setAudioModeAsync({
+          playsInSilentMode: true,
+          shouldPlayInBackground: true,
+          interruptionModeAndroid: 'duckOthers',
+          interruptionMode: 'mixWithOthers',
+          allowsRecording: false
+        });
+
+      const player = createAudioPlayer({uri:fileUri});
+      player.addListener('playbackStatusUpdate',async (status)=>{
+        if(status.didJustFinish){
+          isStreamingLoopRef.current=true;
+          setIsStreamingLoop(true);
+          await setAudioModeAsync({
+            playsInSilentMode: true,
+            shouldPlayInBackground: true,
+            interruptionModeAndroid: 'duckOthers',
+            interruptionMode: 'mixWithOthers',
+            allowsRecording: true
+          });
+          await streamingLoop()
+        
+
+        }
+      })
+      console.log('about to play auido')
+      console.log(player.volume)
+
+      player.play();
+      console.log('audio')
+      // const audioUri = `data:audio/mp3;base64,${data.audio}`;
+      // const newPlayer = createAudioPlayer({ uri: audioUri });
+      // newPlayer.play();
+    });
+
+
     socket.on('disconnect', () => {
       console.log('[WebSocket] ✗ Disconnected');
       setStatusMessage('Disconnected from server');
@@ -1321,7 +1392,7 @@ export default function VoiceAssistant() {
           shouldPlayInBackground: true,
           interruptionModeAndroid: 'duckOthers',
           interruptionMode: 'mixWithOthers',
-          allowsRecording: true,
+          allowsRecording: true
         });
         console.log('[Audio] ✓ Audio mode configured');
       } catch (e) {
@@ -1474,6 +1545,8 @@ async function startWebSocketStream() {
 
 async function streamingLoop() {
   const CHUNK_DURATION_MS = 2000; // 2-second chunks
+  // ✨ NEW: Add chunk counter
+  let chunkCounter = 0;
 
   try {
     while (isStreamingLoopRef.current) {
@@ -1516,19 +1589,17 @@ async function streamingLoop() {
           encoding: FileSystem.EncodingType.Base64,
         });
 
-        // Send in smaller sub-chunks for smoother streaming
-        const CHUNK_SIZE = 8192;
-        for (let i = 0; i < audioData.length; i += CHUNK_SIZE) {
-          if (!isStreamingLoopRef.current) {
-            console.log('[Streaming] Stopped mid-send');
-            break;
-          }
-          socketRef.current?.emit('audio_chunk', {
-            chunk: audioData.substring(i, i + CHUNK_SIZE),
-          });
-        }
+        // ✨ CHANGED: Send the ENTIRE 2-second recording as one chunk
+        // ❌ REMOVED: The sub-chunking loop that split into 8KB pieces
+        chunkCounter++;
+        socketRef.current?.emit('audio_chunk', {
+          chunk: audioData,
+          chunk_id: chunkCounter,
+          is_complete: true
+        });
 
-        console.log(`[Streaming] Sent 2s chunk, size: ${audioData.length} chars`);
+        // ✨ CHANGED: Updated log message
+        console.log(`[Streaming] Sent complete 2s chunk #${chunkCounter}, size: ${audioData.length} chars`);
       } catch (err) {
         console.error('[Streaming] Error in streamingLoop iteration:', err);
         // Don't break on error, just continue to next iteration if still active
@@ -1546,10 +1617,10 @@ async function streamingLoop() {
 
     // Always tell the server to stop processing
     try {
-      if (socketRef.current?.connected) {
-        socketRef.current.emit('stop_stream');
-        console.log('[Streaming] Emitted stop_stream to server');
-      }
+      // if (socketRef.current?.connected) {
+      //   socketRef.current.emit('stop_stream');
+      //   console.log('[Streaming] Emitted stop_stream to server');
+      // }
     } catch (err) {
       console.warn('[Streaming] Failed to emit stop_stream:', err);
     }

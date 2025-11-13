@@ -351,6 +351,7 @@ from gtts import gTTS
 from google.oauth2 import service_account
 from google.cloud import speech
 from google.cloud import texttospeech
+import time
 
 # Load credentials from sttKey.json
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -392,7 +393,7 @@ def stt(audio_bytes):
             transcript += result.alternatives[0].transcript + " "
         
         final_transcript = transcript.strip()
-        print(f"[STT] Standard STT result: '{final_transcript}'")
+        # print(f"[STT] Standard STT result: '{final_transcript}'")
         return final_transcript
         
     except Exception as e:
@@ -600,12 +601,19 @@ def speaks(text):
     """
     # print(f"[TTS_CLOUD] Generating speech with Google Cloud TTS: '{text[:50]}...'")
     try:
+        start_time = time.perf_counter()
         synthesis_input = texttospeech.SynthesisInput(text=text)
         response = clientSpeaker.synthesize_speech(
             input=synthesis_input, voice=voice, audio_config=audio_config
         )
-        with open("output.mp3", "wb") as out:
-            out.write(response.audio_content)
+        end_time = time.perf_counter()
+        print(f"Time by TTS: {end_time - start_time:.6f}s")
+        return response.audio_content
+        # with open("output.mp3", "wb") as out:
+            # out.write(response.audio_content)
+            #return response.audio_content
             # print('[TTS_CLOUD] ✓ Audio content written to file "output.mp3"')
     except Exception as e:
         print(f"[TTS_CLOUD] ✗ Error: {type(e).__name__}: {str(e)}")
+
+    
