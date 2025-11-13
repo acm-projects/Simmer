@@ -1,20 +1,28 @@
-import { Image } from 'expo-image';
+
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
 
-import SmallCard from "@/components/smallCard";
 import LargeCard from "@/components/largeCard";
 import CornerIcon from "@/components/cornerIcon";
-import { Link } from 'expo-router';
+import { useRecipes } from '../contexts/RecipeContext';
 import MyCarousel from "@/components/carousel";
-
+import { useUser } from '../contexts/UserContext';
+import { useEffect, useState } from 'react';
+import { useSearchRecipes } from '../contexts/SearchRecipeContext';
 
 export default function HomeScreen() {
+  const {recipes}=useRecipes();
+  const{searchRecipes,setSearchRecipes}=useSearchRecipes()
+
+  const{user}=useUser()
+  console.log('yyyyyyyyyyyyyyyyyyyyyyyyyy')
+  console.log(user)
   return (
+    
 
    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
     <View style={styles.row}>
-      <Text style={styles.title}>Hi! Dianne </Text>
+      <Text style={styles.title}>Hi {user?user.first_name:""}! </Text>
       <View style={styles.icons}>
 
         <CornerIcon />  
@@ -25,31 +33,27 @@ export default function HomeScreen() {
     <Text style={styles.text}>What are you cooking today?</Text>
 
       
-<Text style={styles.subtitle}>Favorites</Text>
-      <View style={styles.greenBox}>
+    <Text style={styles.subtitle}>Favorites</Text>
+    <View style={styles.greenBox}>
         
         
-        <View style={styles.grid}>
-          <MyCarousel />
+      <MyCarousel />
         
-        </View>
        
   
-      </View>
+    </View>
    
-<LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+    {searchRecipes?.map((currentRecipe,index)=>{
+      return (<LargeCard key={index} title={currentRecipe.title} image={currentRecipe.image_url} cook_time={currentRecipe.cook_time} prep_time={currentRecipe.prep_time} id={currentRecipe.id} fav={currentRecipe.user_favorites.length>0} />);
+    })}
+  
+    {/* <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} /> */}
 
   
      
 
-    <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
+    
 
-
-    <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
-
-    <LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
-
-<LargeCard title="Chicken Tacos" image={require('../../assets/images/tacos.jpg')} />
 
 
 
@@ -68,7 +72,7 @@ const styles = StyleSheet.create({
    
   },
   content:{
-    top: 50,
+    top: 40,
   },
   gridItem: {
     flex: 1, // Ensures items take equal space in a row
@@ -84,20 +88,24 @@ const styles = StyleSheet.create({
     fontSize: 40,
     paddingLeft: 15,
     paddingTop: 15,
+    left: 10000,
     color: '#262e05ff',
+    fontFamily: 'Nunito_700Bold',
   },
   text:{
     fontSize: 15,
     paddingLeft: 15,
     color: 'black',
+    fontFamily: 'Nunito_400Regular',
   
   },
   subtitle:{
     fontSize: 25,
     paddingLeft: 30,
     paddingTop: 15,
-    color: 'black',
+    color: '#262e05ff',
     alignSelf:'flex-start',
+    fontFamily: 'Nunito_600SemiBold',
   },  
   row: {
     flexDirection: 'row',
@@ -113,8 +121,8 @@ const styles = StyleSheet.create({
   greenBox:{
     backgroundColor: '#9BA760', 
     borderRadius: 0, 
-    paddingBottom: 15,
-    paddingTop: 10,
+    paddingBottom: 1,
+    paddingTop: 1,
   
     alignItems: 'center',
     justifyContent: 'center',

@@ -4,11 +4,19 @@ import { ArrowLeft } from 'lucide-react-native';
 import { User } from 'lucide-react-native';
 import { LogOut } from 'lucide-react-native';
 import { ChevronRight } from 'lucide-react-native';
-import { router } from 'expo-router';
+import { Link, router } from 'expo-router';
+import { useSupabase } from '../contexts/SupabaseContext';
+import { useUser } from '../contexts/UserContext';
 
 
 
 export default function SettingScreen() {
+  const supabase=useSupabase();
+  const {user}=useUser();
+  const logout=async ()=>{
+    console.log('logout')
+    const { error } = await supabase.auth.signOut();
+  }
   return (
 <ScrollView style={styles.container}>
   <View>
@@ -22,16 +30,20 @@ export default function SettingScreen() {
         </TouchableOpacity>
 
 <View style={{paddingTop: 50}}>
-    <View style={styles.info}>
-      
-      <User />
+    <Link href='./profilePage' style={{width: '100%'}}>
+      <View style={styles.info}>
+      <User color={'#9BA760'}/>
      <Text style={styles.text}>Profile</Text>
-     <ChevronRight style={{position: 'absolute', right: 20}}/>
+     <ChevronRight color={'#9BA760'} style={{position: 'relative', right: '-160%'}}/>
      </View>
+     </Link>
+
+     
      <View style={styles.info}>
-     <LogOut/>
+     <LogOut color={'#9BA760'}/>
+     <TouchableOpacity onPress={logout}>
      <Text style={styles.text}>Log Out</Text>
-     <ChevronRight style={{position: 'absolute', right: 20}}/>
+     </TouchableOpacity>
       </View>
      <Text style={styles.delete}>Delete Account</Text>
     </View>
@@ -59,6 +71,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     paddingLeft: 15,
     padding: 10,
+    fontFamily: 'Nunito_400Regular',
   },
     info:{
     fontSize: 18,
@@ -69,8 +82,9 @@ const styles = StyleSheet.create({
      delete:{
     fontSize: 15,
     paddingLeft: 25,
-    padding: 10,
-    color: 'red'
+    padding: 5,
+    color: 'red',
+    fontFamily: 'Nunito_400Regular',
   },
     arrow: {
         color: "#9BA760",
@@ -83,5 +97,6 @@ const styles = StyleSheet.create({
     paddingTop: 15,
     fontSize: 25,
     color: '#9BA760',
+    fontFamily: 'Nunito_700Bold',
   },
 });

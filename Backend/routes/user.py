@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from utils.auth import authorize_user
 from utils.supabase import supabase
 from postgrest.exceptions import APIError as AuthApiError
+from utils.createRecipe import  upload_image
 
 user_bp = Blueprint('main', __name__)
 @user_bp.route('/user/create-user', methods=['POST'])
@@ -166,8 +167,8 @@ def update_dietary_restrictions():
       .execute()
     )
 
-    cur_restrictions = user_response.data.get('diet_restriction') or []
-    updated_restrictions = list(set(cur_restrictions + new_restrictions))
+    # cur_restrictions = user_response.data.get('diet_restriction') or []
+    updated_restrictions = list(set(new_restrictions))
 
     supabase.table('users').update({
       'diet_restriction' : updated_restrictions
@@ -290,7 +291,7 @@ def get_user_collections():
 
     response = (
         supabase.table('collections')
-        .select('*, collection_recipes(recipe_id, recipes(id, title, prep_time, cook_time, image_url))')
+        .select('*, collection_recipes(recipe_id, recipes(id, title, prep_time, cook_time, image_url,user_favorites(*)))')
         .eq('user_id', user_id)
         .execute()
     )
@@ -375,62 +376,11 @@ def delete_collection():
     print('error deleting user collection', e)
     return jsonify({'error' : 'internal server error', 'details' : str(e)}), 500 
   
-
-@user_bp.route("/user/name", methods=["PUT"])
-def update_user_name():
-
-  data = request.get_json()
-
-  if not data or not all(key in data for key in ['id', 'first_name', 'last_name']):
-    return jsonify({'message': 'Missing data: name and id missing.'}), 400
-
-  first_name=data['first_name']
-  last_name=data['last_name']
-  id= data['id']
-
-  try:
-      update_response = supabase.table("users").update(
-        {
-          "first_name":first_name,
-          "last_name":last_name
-        }
-      ).eq("id", id).execute()
-
-      if not update_response.data:
-          return jsonify({"error": "user not found"}), 404
-
-      return jsonify(update_response.data[0]), 200
-  
-  except Exception as e:
-      return jsonify({"error": f"An error occurred: {str(e)}"}), 500
-
-@user_bp.route("/user/diet_restriction", methods=["PUT"])
-def update_diet_restriction():
-  data = request.get_json()
-
-  if not data or not all(key in data for key in ['id', 'diet_restriction']):
-    return jsonify({'message': 'Missing data: allergies and id missing.'}), 400
-
-  diet_restriction=data['diet_restriction']
-  id= data['id']
-
-  try:
-      update_response = supabase.table("users").update(
-        {
-          "diet_restriction":diet_restriction,
-        }
-      ).eq("id", id).execute()
-
-      if not update_response.data:
-          return jsonify({"error": "user not found"}), 404
-
-      return jsonify(update_response.data[0]), 200
-  
-  except Exception as e:
-      return jsonify({"error": f"An error occurred: {str(e)}"}), 500
-  
 @user_bp.route("/user", methods=["DELETE"])
 def delete_user():
+  user_id, error_response, status_code = authorize_user()
+  if error_response:
+    return error_response, status_code
   data = request.get_json()
   if not data or not all(key in data for key in ['id']):
     return jsonify({'message': 'Missing data: id missing.'}), 400
@@ -452,4 +402,47 @@ def delete_user():
   
   except Exception as e:
       return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
-    
+
+@user_bp.route('/user', methods=['GET'])
+def get_user():
+  try: 
+    user_id, error_response, status_code = authorize_user()
+    if error_response:
+      return error_response, status_code
+
+    user_response = (
+      supabase.table('users')
+      .select('*')
+      .eq('id', user_id)
+      .single()
+      .execute()
+    )
+
+    return jsonify ({
+      'data':user_response.data
+    }), 200
+  
+  except Exception as e:
+    print( e)
+    return jsonify({'error' : 'internal server error', 'details' : str(e)}), 500
+  
+@user_bp.route('/collection/image', methods=['PUT'])
+def editImage():
+  try:
+      user_id, error_response, status_code = authorize_user()
+      if error_response:
+        return error_response, status_code
+      cid=request.form.get('cid')
+      image_url=upload_image()
+
+      response = supabase.table("collections").update({
+          "image_url": image_url
+      }).eq("id", cid).execute()
+
+      if not response.data:
+          return jsonify({"error": f"collection not found"}), 404
+
+      return jsonify(image_url), 200
+  
+  except Exception as e:
+      return jsonify({"error": e.message}), 500

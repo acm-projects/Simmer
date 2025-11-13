@@ -5,20 +5,16 @@ import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-nati
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { ArrowLeft, Plus } from 'lucide-react-native';
 import AddToCollectionModal from '../../modal';
+import { useFavoriteRecipes } from '../../contexts/FavoriteRecipeContext';
 
 import LargeCard from "@/components/largeCard";
 import { useCollection } from '@/app/contexts/CollectionContext';
 
-
-export default function RecipeScreen() {
-  const {id} = useLocalSearchParams<any>();
-  const router = useRouter(); // 👈 for navigation control
-  const[openAdd, setOpenAdd] = useState(false);
-  const {collections:collectionsData}=useCollection();
-  const[collection,setCollection]=useState(collectionsData?collectionsData.find((collection:any)=>collection.id===id):[])
-  const [recipes,setRecipes]=useState<any[]|undefined>(collection.collection_recipes? collection.collection_recipes.map((recipe:any)=>({title:recipe.recipes.title,image:recipe.recipes.image_url,cook_time:recipe.recipes.cook_time,prep_time:recipe.recipes.prep_time,id:recipe.recipes.id,fav:recipe.recipes.user_favorites.length>0})):[])
-  const recipesIds:string[]|undefined=recipes?.map(recipe=>recipe.id)
-  const count = recipes?.length ?? 0;
+export default function favoriteCollection() {
+    const {favoriteRecipes:recipes}=useFavoriteRecipes();
+      const router = useRouter(); // 👈 for navigation control
+      const[openAdd, setOpenAdd] = useState(false);
+      const count = recipes?.length ?? 0;
 
   return (
     <ScrollView style={styles.container}>
@@ -29,7 +25,7 @@ export default function RecipeScreen() {
       </TouchableOpacity>
 
       <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 10, width: '100%' }}>
-        <Text style={styles.title}>{collection.title}</Text>
+        <Text style={styles.title}>Favorites</Text>
       </View>
 
 
@@ -38,16 +34,10 @@ export default function RecipeScreen() {
       <View style={{ marginTop: 30 }}>
         <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end'}}>
         <Text style={styles.text}>{count} Recipes</Text>
-        
-      <TouchableOpacity style={styles.icons} onPress={() => setOpenAdd(true)}>
-      
-        <Plus color={'white'} size={18}/>  
-      </TouchableOpacity>
-
-      <AddToCollectionModal collectionId={id}open={openAdd} onClose={() => setOpenAdd(false)} setCollectionRecipe={setRecipes} recipeIds={recipesIds} />
+    
       </View>
         {
-          recipes?.map((recipe,index)=>(<LargeCard key={index} title={recipe.title} image={recipe.image} cook_time={recipe.cook_time} prep_time={recipe.prep_time} id={recipe.id} fav={recipe.fav} />))
+          recipes?.map((recipe,index)=>(<LargeCard key={index} title={recipe.title} image={recipe.image} cook_time={recipe.cook_time} prep_time={recipe.prep_time} id={recipe.id} fav={true} />))
         }
 
       </View>
@@ -94,3 +84,5 @@ const styles = StyleSheet.create({
   },
 
 });
+
+

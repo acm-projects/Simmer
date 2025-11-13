@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, Button, TextInput, Text , StyleSheet,View,TouchableOpacity} from 'react-native';
+import { Alert, Button, TextInput, Text , StyleSheet,View,TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Image} from 'react-native';
 import { useSupabase } from '../contexts/SupabaseContext';
 import { validateSignupInfo } from '../utils/validateSignupInfo';
 import {SafeAreaView} from 'react-native-safe-area-context'
@@ -68,77 +68,93 @@ export default function Signup() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+         <KeyboardAvoidingView 
+         style={{flex: 1}}
+         behavior={Platform.OS === "ios" ? "padding": undefined}
+         keyboardVerticalOffset={0}
+         >
+           <ScrollView>
       <View style={styles.header}>
+        <Image source={require('../../assets/images/Simmer_Mascot.png')} style={styles.mascot}/>
         <Text style={styles.title}>Sign Up</Text>
       </View>
       <View style={styles.forum}>
         <InputField label="First Name" placeholder='First Name' secureTextEntry={false} value={userSignupInfo.first_name} onChangeText={(first_name: string)=>setUserSignupInfo((currentUserSignupInfo)=>({...currentUserSignupInfo, first_name}))}/>
         <InputField label="Last Name" placeholder='Last Name' secureTextEntry={false} value={userSignupInfo.last_name} onChangeText={(last_name: string)=>setUserSignupInfo((currentUserSignupInfo)=>({...currentUserSignupInfo, last_name}))}/>
-        <InputField label="Email" placeholder='email' secureTextEntry={false} value={userSignupInfo.email} onChangeText={(email: string)=>setUserSignupInfo((currentUserSignupInfo)=>({...currentUserSignupInfo, email}))}/>
-        <InputField label='Password' placeholder='password' secureTextEntry={true} value={userSignupInfo.password} onChangeText={(password: string)=>setUserSignupInfo((currentUserSignupInfo)=>({...currentUserSignupInfo, password}))}/>
+        <InputField label="Email" placeholder='Email' secureTextEntry={false} value={userSignupInfo.email} onChangeText={(email: string)=>setUserSignupInfo((currentUserSignupInfo)=>({...currentUserSignupInfo, email}))}/>
+        <InputField label='Password' placeholder='Password' secureTextEntry={true} value={userSignupInfo.password} onChangeText={(password: string)=>setUserSignupInfo((currentUserSignupInfo)=>({...currentUserSignupInfo, password}))}/>
       </View>
       <View style={styles.footer}>
-        <View style={styles.policyContainer}>
+       {/* <View style={styles.policyContainer}>
           <Text style={styles.policyText}>By continuing, you agree to </Text>
           <Text style={styles.policyText}><Text style={styles.bold}>Terms of Use</Text> and <Text style={styles.bold}>Privacy Policy.</Text></Text>
-        </View>
+        </View> */}
         <TouchableOpacity onPress={signUpWithEmail} style={styles.submitButton}>
-          <Text style={styles.submitText} >Submit</Text>
+          <Text style={styles.submitText} >Sign Up</Text>
         </TouchableOpacity>
         {error&&<Text>{error}</Text>}
-        <Link href="/login" style={styles.noAccountText}>already have an account? <Text style={styles.loginText}>Log In</Text></Link>
+        <Link href="/login" style={styles.noAccountText}>Already have an account? <Text style={styles.loginText}>Log In</Text></Link>
       </View>
-    </SafeAreaView>
+    </ScrollView>
+    </KeyboardAvoidingView>
+    </View>
+ 
   )
 }
 const styles = StyleSheet.create({
    container: {
     flex: 1,
-    backgroundColor: '#FFECE2',
-    alignItems: 'center',
-    justifyContent:'center',
-    display:'flex',
+    backgroundColor: '#f5ebe6ff',
+    paddingTop: 70,
+    paddingBottom: 10,
+    alignItems: 'center'
   
-    paddingHorizontal: 24,
-    paddingVertical: 20,
   },
   title:{
     marginTop:5,
-    fontSize:20,
+    fontSize:25,
     color: '#9BA760',
-
+    fontWeight: 'bold',
+  
   },
   forum:{
-    height:500
+    height:400,
+<<<<<<< Updated upstream
+   width: '90%',
+=======
+    right: -18
+>>>>>>> Stashed changes
 
   },
   header:{
-    flex:1
+    alignItems: 'center'
 
   },
   footer:{
     textAlign:'center',
     alignItems: 'center',
     justifyContent:'center',
-    flex:6
   },
   submitButton:{
     backgroundColor: '#9BA760',
     borderRadius: 100,
     paddingHorizontal: 20,
-    width:250,
+    width:200,
     height: 50,
     textAlign: 'center',
     alignItems: 'center',
     justifyContent:'center',
+    marginTop: 20,
 
   },
   submitText:{
     color:'#FFFFFF',
+    fontSize: 17,
+    fontWeight: 'bold',
   },
   policyContainer:{
-    marginTop:-150,
+    marginTop:20,
     textAlign: 'center',
     alignItems: 'center',
     justifyContent:'center',
@@ -158,5 +174,13 @@ const styles = StyleSheet.create({
   },
   loginText:{
     color:'#EC888D'
-  }
+  },
+   mascot: {
+      height: 200,
+      width: 200,
+      shadowColor:'#000',
+      shadowRadius: 4,
+      shadowOpacity: 1,
+      shadowOffset: {width: 0, height: 2},
+  },
 });
