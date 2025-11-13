@@ -1,4 +1,4 @@
-import {Dispatch, SetStateAction, useState } from 'react'
+import {Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { ArrowLeft } from 'lucide-react-native';
@@ -7,6 +7,7 @@ import CollapsibleSection from '@/components/collapsibleSection'
 import { Plus } from 'lucide-react-native';
 import { useRecipes } from '../contexts/RecipeContext';
 import { useSearchRecipes } from '../contexts/SearchRecipeContext';
+import { useUser } from '../contexts/UserContext';
 
 export default function SearchScreen() {
     const [search, setSearch] = useState('');
@@ -16,9 +17,8 @@ export default function SearchScreen() {
         { item: 'Chicken'}, {item: 'Beef'},{ item: 'Pork' }, {item: "Seafood"}, { item: 'Vegan'}, {item: 'Vegetarian'}];
     const type = [
         { item: 'Sides'}, {item: 'Drinks'},{ item: 'Entrees' }, {item: "Desserts"}, { item: 'Soups' }, {item: "Salads"}];
-    const allergen = [
-        { item: 'Eggs'}, {item: 'Peanuts'},{ item: 'Treenuts' }, {item: "Sesame"}, {item: "Milk"}, {item: "Wheat"}, {item: "Soy"}, {item: "Fish"}, {item: "Shelfish"}];
-
+    const [allergen,setAllergen] =useState( [
+        { item: 'Eggs'}, {item: 'Peanuts'},{ item: 'Treenuts' }, {item: "Sesame"}, {item: "Milk"}, {item: "Wheat"}, {item: "Soy"}, {item: "Fish"}, {item: "Shelfish"}])
 // const [selected, setSelected] = useState<string[]>([]);
 const [selectedTimes,setSelectedTimes]=useState<any[] | undefined>([]);
 const [selectedProteins,setSelectedProteins]=useState<any[] | undefined>([]);
@@ -26,6 +26,24 @@ const [selectedTypes,setSelectedTypes]=useState<any[] | undefined>([]);
 const [selectedAllergens,setSelectedAllergens]=useState<any[] | undefined>([]);
 const {recipes}=useRecipes();
 const{searchRecipes,setSearchRecipes}=useSearchRecipes()
+const {user}=useUser();
+useEffect(()=>{
+    if(!user||!user.diet_restriction)
+      return;
+    setAllergen((currentDietRestrictionTags)=>{
+      const dietTags=[...currentDietRestrictionTags];
+      outerLoop:
+      for(const diet of user.diet_restriction){
+       for(const diet2 of currentDietRestrictionTags )
+        if(diet2.item===diet)
+          continue outerLoop;
+        dietTags.push({item:diet})
+      }
+      return dietTags;
+    })
+
+    
+  },[user])
 const searchItems= ()=>{
   
   const timeAr=selectedTimes?.map(time=>time)
