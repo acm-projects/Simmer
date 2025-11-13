@@ -262,7 +262,7 @@ from gtts import gTTS
 import io
 import time
 from pydub import AudioSegment
-from utils.voice import stt, stt_stream, stt_stream_realtime
+from utils.voice import stt, speaks
 from utils.supabase import supabase
 import base64
 import traceback
@@ -278,6 +278,9 @@ chat_bp = Blueprint('chat', __name__)
 model = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.7)
 workflow = StateGraph(state_schema=MessagesState)
 
+HARDCODED_RID = "47190fe1-d415-416b-abee-0016abd49555"
+HARDCODED_UID = "52f22f9b-0f7f-4f54-befa-629850b9019a"
+HARDCODED_CID = "test12345"
 def call_model(state: MessagesState):
     response = model.invoke(state["messages"])
     return {"messages": response}
@@ -361,22 +364,15 @@ def create_chat():
     download_name='intro.mp3'
   ), 200
 
-@chat_bp.route("/chat", methods=["POST"])
-def chat():
-  user_id, error_response, status_code = authorize_user()
-  if error_response:
-    return error_response, status_code
+# @chat_bp.route("/chat", methods=["POST"])
+def chat(userMessage):
 
     try:
-        userMessage = stt(userAudioBytes)
-    except Exception:
-        return jsonify({'message': 'Speech-to-text failed'}), 500
-
-    try:
-        chat_response = supabase.table('conversations').select('*').eq('chat_id', cid).single().execute()
+        
+        rid = HARDCODED_RID
+        # uid = HARDCODED_UID
+        chat_response = supabase.table('conversations').select('*').eq('recipe_id', rid).single().execute()
         chat = chat_response.data
-        rid = chat['recipe_id']
-        uid = chat['user_id']
 
         recipes_response = supabase.table('recipes').select('*').eq('id', rid).single().execute()
         recipe = recipes_response.data
@@ -389,41 +385,52 @@ def chat():
     if "next" in userMessage.lower():
         if chat_state >= len(recipe['ai_instructions']['ai_steps']):
             chat_message = "The recipe has been completed. Please feel free to restart or check other recipes."
+            print("Chat Message: ", chat_message)
         else:
             chat_message = recipe['ai_instructions']['ai_steps'][chat_state]['description']
-            supabase.table('conversations').update({'state': chat_state + 1}).eq('chat_id', cid).execute()
+            print("Chat Message: ", chat_message)
+            supabase.table('conversations').update({'state': chat_state + 1}).eq('recipe_id', rid).execute()
     elif "previous" in userMessage.lower():
         if chat_state <= 1:
             chat_message = "You are on the first step. You cannot go back any further."
+            print("Chat Message: ", chat_message)
         else:
             chat_message = recipe['ai_instructions']['ai_steps'][chat_state - 2]['description']
+            print("Chat Message: ", chat_message)
     elif "repeat" in userMessage.lower():
         if chat_state <= 1:
             chat_message = "We have not started yet, please say next to continue."
+            print("Chat Message: ", chat_message)
         else:
             chat_message = recipe['ai_instructions']['ai_steps'][chat_state - 1]['description']
-    else:
-        config = {"configurable": {"thread_id": cid}}
+            print("Chat Message: ", chat_message)
+    elif "hey" in userMessage.lower():
+        config = {"configurable": {"thread_id": rid}}
         start_time = time.perf_counter()
         response = app.invoke({"messages": [HumanMessage(content=userMessage)]}, config)
         end_time = time.perf_counter()
         print(f"Model response time: {end_time - start_time:.6f}s")
         chat_message = response["messages"][-1].content
+        print("Chat Message: ", chat_message)
 
-    wav_fp = io.BytesIO()
-    try:
-        tts = gTTS(chat_message, lang='en')
-        tts.write_to_fp(wav_fp)
-    except Exception:
-        return jsonify({"message": "Speech could not be generated"}), 500
+    return chat_message
+    # try:
+    #     audio_bytes = speaks(chat_message)  # returns raw audio bytes
+    # except Exception as e:
+    #     print(f"[TTS] Error generating speech: {e}")
+    #     return jsonify({"message": "Speech could not be generated"}), 500
 
-    wav_fp.seek(0)
-    return send_file(
-        wav_fp,
-        mimetype='audio/mpeg',
-        as_attachment=True,
-        download_name='response.mp3'
-    ), 200
+    # # Put into BytesIO so Flask can serve it
+    # wav_fp = io.BytesIO(audio_bytes)
+    # wav_fp.seek(0)
+
+    # return send_file(
+    #     wav_fp,
+    #     mimetype='audio/mpeg',
+    #     as_attachment=True,
+    #     download_name='response.mp3'
+    # )
+
 
 @chat_bp.route("/ping", methods=["GET"])
 def ping():
@@ -509,32 +516,110 @@ import traceback
 from threading import Thread
 from flask_socketio import emit
 import io
+finalText = ""
+# ✨ NEW: Import for audio amplitude detection
+from pydub import AudioSegment
+
 # Store active streaming sessions
 active_sessions = {}
 HARDCODED_CID = "test12345"
 
-def process_audio_chunk(audio_bytes, sid):
+# ✨ NEW: Loudness threshold configuration
+AMPLITUDE_THRESHOLD = -32  # dBFS - adjust based on your needs
+# Typical values:
+# -60 dBFS = very quiet (might catch whispers)
+# -50 dBFS = moderate threshold (good default)
+# -40 dBFS = only louder speech
+# -30 dBFS = loud speech only
+
+def check_audio_loudness(audio_bytes):
+    """
+    Check if audio chunk meets minimum loudness threshold
+    Returns: (is_loud_enough: bool, amplitude: float)
+    """
+    try:
+        # Create AudioSegment from raw bytes
+        # Assuming 16-bit PCM, mono, 16kHz (matching your React Native config)
+        audio_segment = AudioSegment(
+            data=audio_bytes,
+            sample_width=2,  # 16-bit = 2 bytes
+            frame_rate=16000,
+            channels=1
+        )
+        
+        amplitude = audio_segment.dBFS
+        
+        # Check if silent (returns -inf for complete silence)
+        if amplitude == float('-inf'):
+            return False, amplitude
+        
+        # Check against threshold
+        is_loud_enough = amplitude > AMPLITUDE_THRESHOLD
+        
+        return is_loud_enough, amplitude
+        
+    except Exception as e:
+        print(f"[LOUDNESS_CHECK] Error checking amplitude: {e}")
+        # If we can't check, assume it's valid to avoid dropping audio
+        return True, 0.0
+
+def process_audio_chunk(socketio,audio_bytes, sid):
+    global finalText
     session = active_sessions.get(sid)
     if not session or not session.get("is_streaming", False):
         print(f"[PROCESS_CHUNK] Session {sid} is no longer streaming, skipping chunk")
         return
 
     try:
+        # ✨ NEW: Check loudness before processing
+        is_loud_enough, amplitude = check_audio_loudness(audio_bytes)
+        
+        if amplitude == float('-inf'):
+            print(f"[PROCESS_CHUNK] Session {sid}: Chunk of {len(audio_bytes)} bytes - SILENT (skipped)")
+            return
+        
+        if not is_loud_enough:
+            # ✨ NEW: Create visual bar for rejected audio
+            bar_length = int((60 + amplitude) / 2)
+            bar_length = max(0, min(bar_length, 30))
+            bar = "." * bar_length  # Use dots for rejected audio
+            print(f"[PROCESS_CHUNK] Session {sid}: {len(audio_bytes)} bytes | {amplitude:.1f} dBFS | {bar} (TOO QUIET - skipped)")
+            if finalText != "":
+                print(finalText)
+                Thread(target=generate_and_emit_response, args=(socketio,sid, finalText)).start()
+                # chat(finalText)
+                finalText = ""
+            return
+        
+        # ✨ NEW: Visual feedback for accepted audio
+        bar_length = int((60 + amplitude) / 2)
+        bar_length = max(0, min(bar_length, 30))
+        bar = "#" * bar_length
+        print(f"[PROCESS_CHUNK] Session {sid}: {len(audio_bytes)} bytes | {amplitude:.1f} dBFS | {bar} ✓ Processing")
+        
+        # Only call STT if audio is loud enough
         text = stt(audio_bytes)
-        print("Text: ",text)
+        
+        finalText = finalText + " " + text
         # Now send pcm_bytes to your speech model
+        
     except Exception as e:
         print(f"[PROCESS_CHUNK] Error processing chunk for {sid}: {e}")
+
+def generate_and_emit_response(socketio,sid, phrase):
+    try:
+        chat_message = chat(phrase)
+        print(f"[CHAT] {phrase} -> {chat_message}")
+
+        # TTS
+        audio_bytes = speaks(chat_message)
+        b64_audio = base64.b64encode(audio_bytes).decode('utf-8')
+
+        socketio.emit('audio_response', {'text': chat_message, 'audio': b64_audio}, to=sid)
+        print(f"[EMIT] Sent response to {sid}")
         
-        # if amplitude == float('-inf'):
-        #     print(f"[PROCESS_CHUNK] Session {sid}: Chunk of {len(audio_bytes)} bytes - SILENT")
-        # else:
-        #     # Create visual bar (60 dBFS is very quiet, 0 dBFS is max)
-        #     bar_length = int((60 + amplitude) / 2)
-        #     bar_length = max(0, min(bar_length, 30))  # Clamp between 0-30
-        #     bar = "#" * bar_length
-            
-        #     print(f"[PROCESS_CHUNK] Session {sid}: {len(audio_bytes)} bytes | {amplitude:.1f} dBFS | {bar}")
+    except Exception as e:
+        print(f"[GEN/EMIT] Error: {e}")
 
 def register_socketio_handlers(socketio):
     """Register all WebSocket event handlers"""
@@ -556,15 +641,19 @@ def register_socketio_handlers(socketio):
         cid = HARDCODED_CID
         active_sessions[request.sid] = {
             'cid': cid,
-            'audio_chunks': [],
             'is_streaming': True
         }
         print(f'[WebSocket] ✓ Started stream for session {request.sid}, cid: {cid}')
-        emit('stream_started', {'status': 'ready', 'cid': cid})
+        # ✨ NEW: Include threshold in response
+        emit('stream_started', {
+            'status': 'ready', 
+            'cid': cid,
+            'amplitude_threshold': AMPLITUDE_THRESHOLD
+        })
 
     @socketio.on('audio_chunk')
     def handle_audio_chunk(data):
-        """Receive audio chunk from client and process immediately"""
+        """Receive complete 2-second audio chunk from client and process"""
         if request.sid not in active_sessions:
             print(f'[WebSocket] ✗ No active session for {request.sid}')
             emit('error', {'message': 'No active session'})
@@ -572,15 +661,18 @@ def register_socketio_handlers(socketio):
 
         try:
             audio_bytes = base64.b64decode(data['chunk'])
-            session = active_sessions[request.sid]
-            session['audio_chunks'].append(audio_bytes)
-            chunk_count = len(session['audio_chunks'])
-            print(f"[AUDIO_CHUNK] Session {request.sid}: Chunk received ({chunk_count} total)")
+            chunk_id = data.get('chunk_id', 'unknown')
+            is_complete = data.get('is_complete', False)
             
-            # Process chunk asynchronously
-            Thread(target=process_audio_chunk, args=(audio_bytes, request.sid)).start()
+            session = active_sessions[request.sid]
+            
+            print(f"[AUDIO_CHUNK] Session {request.sid}: Received chunk #{chunk_id}")
+            print(f"[AUDIO_CHUNK] Size: {len(audio_bytes)} bytes, Complete: {is_complete}")
+            
+            # Process the complete 2-second chunk asynchronously
+            Thread(target=process_audio_chunk, args=(socketio,audio_bytes, request.sid)).start()
 
-            emit('chunk_received', {'count': chunk_count})
+            emit('chunk_received', {'chunk_id': chunk_id, 'size': len(audio_bytes)})
         except Exception as e:
             print(f'[AUDIO_CHUNK] ✗ ERROR: {str(e)}')
             traceback.print_exc()
@@ -595,13 +687,9 @@ def register_socketio_handlers(socketio):
             return
 
         session = active_sessions[request.sid]
-        audio_chunks = session['audio_chunks']
-        print(f"[STOP_STREAM] Session {request.sid} stopped. Total chunks: {len(audio_chunks)}")
-        total_bytes = sum(len(c) for c in audio_chunks)
-        print(f"[STOP_STREAM] Total audio size: {total_bytes} bytes")
-        emit('stop_stream_confirm', {'chunks_received': len(audio_chunks)})
+        print(f"[STOP_STREAM] Session {request.sid} stopped.")
+        emit('stop_stream_confirm', {'status': 'stopped'})
 
         # Clean up session
-        session['audio_chunks'] = []
         session['is_streaming'] = False
         print(f"[STOP_STREAM] Session {request.sid} cleaned up")
