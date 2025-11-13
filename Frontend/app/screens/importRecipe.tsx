@@ -128,6 +128,7 @@ export default function ImportRecipe(){
 
  const handleCreateRecipe = async () => {
   // Create recipe data object from state
+  setIsLoading(true);
   console.log('start')
   const formattedSteps=step.map((currentStep,index)=>({"step":index+1,"description":currentStep}))
   //const formattedIngredients=ingredient.map((currentIngredients,index)=>( {"name": "Potatoes", "quantity": "500", "unit": "g", "is_allergen": false},))
@@ -175,7 +176,7 @@ export default function ImportRecipe(){
     console.log('reqest sent')
     const data = await response.json();
     
-
+    setIsLoading(false);
     if (response.ok) {
       alert(`Recipe created successfully! ID: ${data.recipe_id}`);
       setIsLoading(false);
@@ -378,7 +379,7 @@ export default function ImportRecipe(){
 
                        <View style={[styles.greenBox, {width: 150, alignSelf: 'center', alignItems: 'center', marginTop: 20}]}>
                 <TouchableOpacity style={{padding: 2,}}
-               onPress={handleCreateRecipe}>
+                  onPress={handleCreateRecipe}>
                   <Text style={styles.text}>Done</Text>
                 </TouchableOpacity>
                 </View>
