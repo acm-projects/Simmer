@@ -365,7 +365,15 @@ def create_chat():
   ), 200
 
 # @chat_bp.route("/chat", methods=["POST"])
-def chat(userMessage):
+def chat(userMessage,socketio,sid):
+    next="next" in userMessage.lower()
+    previous="previous" in userMessage.lower()
+    repeat="repeat" in userMessage.lower()
+    hey="hey" in userMessage.lower()
+    if next or previous or repeat or hey:
+        socketio.emit('thinking', {}, to=sid)
+    else:
+        return ""
 
     try:
         
@@ -382,7 +390,7 @@ def chat(userMessage):
     chat_state = chat.get('state', 1)
     chat_message = ""
 
-    if "next" in userMessage.lower():
+    if next:
         if chat_state >= len(recipe['ai_instructions']['ai_steps']):
             chat_message = "The recipe has been completed. Please feel free to restart or check other recipes."
             print("Chat Message: ", chat_message)
@@ -390,21 +398,21 @@ def chat(userMessage):
             chat_message = recipe['ai_instructions']['ai_steps'][chat_state]['description']
             print("Chat Message: ", chat_message)
             supabase.table('conversations').update({'state': chat_state + 1}).eq('recipe_id', rid).execute()
-    elif "previous" in userMessage.lower():
+    elif previous:
         if chat_state <= 1:
             chat_message = "You are on the first step. You cannot go back any further."
             print("Chat Message: ", chat_message)
         else:
             chat_message = recipe['ai_instructions']['ai_steps'][chat_state - 2]['description']
             print("Chat Message: ", chat_message)
-    elif "repeat" in userMessage.lower():
+    elif repeat:
         if chat_state <= 1:
             chat_message = "We have not started yet, please say next to continue."
             print("Chat Message: ", chat_message)
         else:
             chat_message = recipe['ai_instructions']['ai_steps'][chat_state - 1]['description']
             print("Chat Message: ", chat_message)
-    elif "hey" in userMessage.lower():
+    elif hey:
         config = {"configurable": {"thread_id": rid}}
         start_time = time.perf_counter()
         response = app.invoke({"messages": [HumanMessage(content=userMessage)]}, config)
@@ -412,6 +420,7 @@ def chat(userMessage):
         print(f"Model response time: {end_time - start_time:.6f}s")
         chat_message = response["messages"][-1].content
         print("Chat Message: ", chat_message)
+    
 
     return chat_message
     # try:
@@ -608,7 +617,7 @@ def process_audio_chunk(socketio,audio_bytes, sid):
 
 def generate_and_emit_response(socketio,sid, phrase):
     try:
-        chat_message = chat(phrase)
+        chat_message = chat(phrase,socketio,sid)
         print(f"[CHAT] {phrase} -> {chat_message}")
 
         # TTS
