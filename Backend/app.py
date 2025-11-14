@@ -1,10 +1,10 @@
 
-# from flask import Flask, jsonify
-# from flask_cors import CORS # Import the CORS extension
-# from utils.supabase import supabase
-# import os
-# import pyaudio
-# from pydub import AudioSegment
+from flask import Flask, jsonify
+from flask_cors import CORS # Import the CORS extension
+from utils.supabase import supabase
+import os
+#import pyaudio
+from pydub import AudioSegment
 
 # app = Flask(__name__)
 # UPLOAD_FOLDER = os.path.join(app.root_path, '..', 'uploads')
