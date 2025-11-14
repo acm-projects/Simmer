@@ -29,16 +29,7 @@ const LargeCardModal: React.FC<Props>= ({title, image, cook_time, prep_time,id})
     {isLoading&&(<Text>loading...</Text>)}
    
       <View style={styles.icon}>
-             {!favorite ? (
-                 <TouchableOpacity onPress={()=> setFavorite(true)}>
-                    <Heart size={20} color="#9BA760"/>
-                 </TouchableOpacity>
-                
-             ) : (
-               <TouchableOpacity onPress={()=> setFavorite(false)}>
-             <Heart size={20} color="#9BA760" fill="#9BA760"/>
-             </TouchableOpacity>
-           )}
+            
    
              
              
