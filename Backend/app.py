@@ -6,32 +6,32 @@ import os
 #import pyaudio
 from pydub import AudioSegment
 
-app = Flask(__name__)
-UPLOAD_FOLDER = os.path.join(app.root_path, '..', 'uploads')
+# app = Flask(__name__)
+# UPLOAD_FOLDER = os.path.join(app.root_path, '..', 'uploads')
 
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-
-
-
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-CORS(app) 
+# if not os.path.exists(UPLOAD_FOLDER):
+#     os.makedirs(UPLOAD_FOLDER)
 
 
-@app.route("/")
-def home():
-  response = supabase.table('users').select('*').execute()
-  return jsonify(response.data)
+
+# app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# CORS(app) 
 
 
-from routes.recipe import recipe_bp
-from routes.user import user_bp
-from routes.chat import chat_bp
+# @app.route("/")
+# def home():
+#   response = supabase.table('users').select('*').execute()
+#   return jsonify(response.data)
 
-app.register_blueprint(recipe_bp)
-app.register_blueprint(user_bp)
-app.register_blueprint(chat_bp)
+
+# from routes.recipe import recipe_bp
+# from routes.user import user_bp
+# from routes.chat import chat_bp
+
+# app.register_blueprint(recipe_bp)
+# app.register_blueprint(user_bp)
+# app.register_blueprint(chat_bp)
 
 
 
@@ -70,7 +70,7 @@ app.register_blueprint(chat_bp)
 #     amplitude = audio_segment.dBFS
 #     if amplitude == float('-inf'):
 #        continue
-#     bar_length = int((60 + amplitude) / 2) 
+#     bar_length = int((60 + amplitude) / 2)
 #     bar = "#" * bar_length
     
 
@@ -83,7 +83,45 @@ app.register_blueprint(chat_bp)
 
 # audio.terminate()
 
+# if __name__ == "__main__":
+#   app.run(host='0.0.0.0', port=5000, debug=True)
+
+
+from flask import Flask, jsonify
+from flask_cors import CORS
+from flask_socketio import SocketIO
+from utils.supabase import supabase
+import os
+
+app = Flask(__name__)
+UPLOAD_FOLDER = os.path.join(app.root_path, '..', 'uploads')
+
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key')
+
+CORS(app)
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+
+@app.route("/")
+def home():
+    response = supabase.table('users').select('*').execute()
+    return jsonify(response.data)
+
+# Register blueprints
+from routes.recipe import recipe_bp
+from routes.user import user_bp
+from routes.chat import chat_bp
+
+app.register_blueprint(recipe_bp)
+app.register_blueprint(user_bp)
+app.register_blueprint(chat_bp)
+
+# Import WebSocket handlers after socketio is initialized
+from routes.chat import register_socketio_handlers
+register_socketio_handlers(socketio)
+
 if __name__ == "__main__":
-  app.run(host='0.0.0.0', port=5001, debug=True)
-
-
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
