@@ -3,7 +3,7 @@ from flask import Flask, jsonify
 from flask_cors import CORS # Import the CORS extension
 from utils.supabase import supabase
 import os
-import pyaudio
+#import pyaudio
 from pydub import AudioSegment
 
 app = Flask(__name__)
@@ -84,6 +84,6 @@ app.register_blueprint(chat_bp)
 # audio.terminate()
 
 if __name__ == "__main__":
-  app.run(host='0.0.0.0', port=5000, debug=True)
+  app.run(host='0.0.0.0', port=5001, debug=True)
 
 
