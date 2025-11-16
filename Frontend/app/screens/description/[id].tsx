@@ -57,7 +57,13 @@ export default function Description(){
            <View style={styles.desBox}>
             <View style={{flexDirection: 'row'}}>
                <Text style={styles.title1}>Ingredients</Text>
-                <Pressable onPress={() => router.push('../../screens/cookingMode')}>
+                <Pressable onPress={() => router.push({
+                  // 1. The path to your file, using the dynamic route name
+                  pathname: '../../screens/cookingMode/[id]', 
+                  
+                  // 2. The parameters to pass
+                  params: { id: id } 
+                })}>
                 <View style={styles.bubble}>
                 <Text style={styles.bubbleText}> Voice Mode </Text>
                 </View>
