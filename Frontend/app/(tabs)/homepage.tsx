@@ -23,7 +23,7 @@ export default function HomeScreen() {
 <SafeAreaView style={{flex: 1, backgroundColor: '#f5ebe6ff'}}>
    <ScrollView style={styles.container}>
     <View style={styles.row}>
-      <Text style={styles.title}>Hi {user?.first_name}</Text>
+      <Text style={styles.title}>Hi, {user?.first_name}!</Text>
       <View style={styles.icons}>
 
         <CornerIcon />  

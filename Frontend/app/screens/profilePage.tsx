@@ -12,6 +12,7 @@ export default function ProfilePage() {
   const[isEditing, setIsEditing] = useState(false);
    const[firstName, setFirstName] = useState(user?user.first_name:'');
    const[lastName, setLastName] = useState(user?user.last_name:'');
+   const[email] = useState(user?user.email:'');
    const[allergens, setAllergens] =useState<string[]>([]);
    const[allAllergens, setAllAllergens] = useState(['Wheat',
   'Dairy',
@@ -183,7 +184,7 @@ const handleAddAllergen = () => {
     <View>
     <Text style={styles.label}>Email</Text>
     <View style={ {width:350, height: 50,}}>
-        <Text style={[styles.text]}>abc@gmail.com</Text>
+        <Text style={[styles.text]}>{email}</Text>
     </View>
     </View>
 
