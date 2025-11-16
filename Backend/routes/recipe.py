@@ -47,9 +47,9 @@ def add_recipe():
       return jsonify({'error' : 'failed to generate AI instructions'}), 400
     
     print(ingredients)
-    protein = categorize_protein_types(ingredients)
-    if not protein:
-      return jsonify({'error' : 'failed to generate protein list'}), 400
+    # protein = categorize_protein_types(ingredients)
+    # if not protein:
+    #   return jsonify({'error' : 'failed to generate protein list'}), 400
 
     recipe = supabase.table('recipes').insert({
         'title' : title,
@@ -59,7 +59,7 @@ def add_recipe():
         'prep_time' : prep_time,
         'cook_time' : cook_time,
         'dietary_tags' : dietary_tags,
-        'protein' : protein,
+        'protein' : [],
         'type' : type,
         'image_url' : image_url,
         'created_by' : user_id

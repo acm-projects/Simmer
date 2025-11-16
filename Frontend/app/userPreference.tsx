@@ -25,7 +25,7 @@ export default function UserPreference() {
     const combined = new Set([... DEFAULT_DIET_RESTRICTIONS]);
     return Array.from(combined);
   });
-  const {user} =useUser();
+  const {user,refreshUser} =useUser();
   useEffect(()=>{
     if(!user||!user.diet_restriction)
       return;
@@ -107,6 +107,7 @@ const submitPreference=async ()=>{
 
           })
       })
+      await refreshUser(session.access_token)
       setMessage("Preferenced has been changed");
     }catch(error){
       console.error('Fetch error:', error);

@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
   },
   forum:{
     height:400,
-    right: -18
+     width: '90%',
 
   },
   header:{

@@ -6,6 +6,11 @@ interface UserContextType {
   setUser: Dispatch<SetStateAction<any | undefined>>;
   refreshUser: () => Promise<void>;
 }
+interface UserContextProp {
+  user: any | undefined;
+  setUser: Dispatch<SetStateAction<any | undefined>>;
+  children:ReactNode
+}
 
 const UserContext = createContext<UserContextType>({
   user: undefined,
@@ -17,21 +22,20 @@ export function useUser() {
   return useContext(UserContext);
 }
 
-export function UserProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<any | undefined>(undefined);
+export function UserProvider({user,setUser, children }: UserContextProp) {
 
-  const refreshUser = async () => {
+  const refreshUser = async (token:string) => {
     try {
-      const data = await fetchUser();
-      setUser(data);
+      const data = await fetchUser(token);
+      setUser(data.data);
     } catch (error) {
       console.error("Failed to refresh user:", error);
     }
   };
 
-  useEffect(() => {
-    refreshUser();
-  }, []);
+  // useEffect(() => {
+  //   refreshUser();
+  // }, []);
 
   return (
     <UserContext.Provider value={{ user, setUser, refreshUser }}>

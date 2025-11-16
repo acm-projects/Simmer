@@ -23,7 +23,7 @@ export default function HomeScreen() {
 <SafeAreaView style={{flex: 1, backgroundColor: '#f5ebe6ff'}}>
    <ScrollView style={styles.container}>
     <View style={styles.row}>
-      <Text style={styles.title}>Hi {user?user.first_name:""}! </Text>
+      <Text style={styles.title}>Hi {user?.first_name}</Text>
       <View style={styles.icons}>
 
         <CornerIcon />  
@@ -88,7 +88,6 @@ const styles = StyleSheet.create({
     fontSize: 40,
     paddingLeft: 15,
     paddingTop: 15,
-    left: 10000,
     color: '#262e05ff',
     fontFamily: 'Nunito_700Bold',
   },
