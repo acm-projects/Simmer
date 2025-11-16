@@ -57,10 +57,10 @@ export default function ImportRecipe(){
       if (response.ok) {
         setIsLoading(false);
         setTitle(data.title);
-        setPrepMin(data.prep_time);
-        setCookMin(data.cook_time);
+        setPrepMin(""+data.prep_time);
+        setCookMin(""+data.cook_time);
         setIngredient(data.ingredients);
-        setStep(data.instructions.steps.map((currentStep:stepsProp)=>currentStep.description));
+        setStep(data.instructions.steps);
       } else {
         alert(`Error: ${data.error || 'Failed to create recipe'}`);
       }
@@ -90,10 +90,10 @@ export default function ImportRecipe(){
    const [title, setTitle] = useState('');
   const [prepMin, setPrepMin] = useState('');
   const [cookMin, setCookMin] = useState('');
-  const [step, setStep] = useState(['']);
+  const [step, setStep] = useState<any[]>([{"description":"",time:""}]);
   const[isVisible, setIsVisible] = useState(false);
   const [ingredient, setIngredient] = useState([{name: '', quantity: '', unit: ''}]);
-  const [time, setTime] = useState<string[]>(['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'])
+
   
   // sent array of time to backend, backend has to parse the string array into numbers
   
@@ -110,27 +110,27 @@ export default function ImportRecipe(){
 
     const updateTime = (index: number, value: string) => {
   
-    const updated = [...time];
-    updated[index] = value;
-    setTime(updated);
+      const updated = [...step];
+      updated[index].time=parseInt(value)||0;
+      setStep(updated);
   };
 
   // --- Step handlers ---
   const updateStep = (index: number, value: string) => {
     const updated = [...step];
-    updated[index] = value;
+    updated[index]['description'] = value;
     setStep(updated);
   };
 
   const addStep = () => {
-    setStep([...step, '']);
+    setStep([...step, {"description":"",time:""}]);
   };
 
  const handleCreateRecipe = async () => {
   // Create recipe data object from state
   setIsLoading(true);
   console.log('start')
-  const formattedSteps=step.map((currentStep,index)=>({"step":index+1,"description":currentStep}))
+  const formattedSteps=step.map((currentStep,index)=>({"step":index+1,"description":currentStep.description,"time":currentStep.time}))
   //const formattedIngredients=ingredient.map((currentIngredients,index)=>( {"name": "Potatoes", "quantity": "500", "unit": "g", "is_allergen": false},))
   const recipeData = {
     title: title,
@@ -178,7 +178,6 @@ export default function ImportRecipe(){
     
     setIsLoading(false);
     if (response.ok) {
-      alert(`Recipe created successfully! ID: ${data.recipe_id}`);
       setIsLoading(false);
       setTitle('');
       setPrepMin('');
@@ -283,7 +282,7 @@ export default function ImportRecipe(){
                       placeholder="__"
                       placeholderTextColor="#e0e0e0ff"
                       value={prepMin}
-                      onChangeText={setPrepMin}
+                      onChangeText={(value)=>setPrepMin(value)}
                     />
                     <Text style={styles.time}> min</Text>
                   </View>
@@ -295,7 +294,7 @@ export default function ImportRecipe(){
                       placeholder="__"
                       placeholderTextColor="#e0e0e0ff"
                       value={cookMin}
-                      onChangeText={setCookMin}
+                      onChangeText={(value)=>setCookMin(value)}
                     />
                     <Text style={styles.time}> min</Text>
                   </View>
@@ -343,7 +342,7 @@ export default function ImportRecipe(){
              
                          <View style={styles.desBox}>
         <Text style={styles.title1}>Steps</Text>
-        {step.map((stepText, index) => (
+        {step.map((instruct, index) => (
           <View
             key={index}
             style={{ flexDirection: 'row', alignItems: 'flex-start', paddingLeft: 20 }}
@@ -355,7 +354,7 @@ export default function ImportRecipe(){
             placeholder="time"
             placeholderTextColor="#a1a1a1ff"
             keyboardType="decimal-pad" 
-            value={time[index]?.toString() || ''} // <-- always string
+            value={instruct.time?.toString() || ''} // <-- always string
             onChangeText={(text) => updateTime(index, text)}
               />
           <Text style={[styles.recipe, {padding: 3}]}> min</Text>
@@ -366,8 +365,8 @@ export default function ImportRecipe(){
               style={[styles.recipe, { paddingLeft: 6, flexWrap: 'wrap', width: '75%' }]}
               placeholder="Step"
               placeholderTextColor="#a1a1a1ff"
+              value={instruct.description}
               multiline={true}
-              value={stepText}
               onChangeText={(text) => updateStep(index, text)}
             />
           </View>

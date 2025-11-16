@@ -1,253 +1,3 @@
-# # import getpass
-# # import os
-# # from dotenv import load_dotenv
-# # from langchain_core.messages import HumanMessage, SystemMessage
-# # from langgraph.checkpoint.sqlite import SqliteSaver
-# # from langgraph.graph import START, MessagesState, StateGraph
-# # from langchain_google_genai import ChatGoogleGenerativeAI
-# # import sqlite3
-# # from flask import Blueprint, request, jsonify, send_file, current_app
-# # from gtts import gTTS
-# # import io
-# # import time
-# # from pydub import AudioSegment
-# # from utils.voice import stt, stt_stream
-# # from utils.supabase import supabase
-
-# # load_dotenv()
-
-# # # Prompt for Google API key if not set
-# # if not os.environ.get("GOOGLE_API_KEY"):
-# #     os.environ["GOOGLE_API_KEY"] = getpass.getpass("Enter API key for Google Gemini: ")
-
-# # chat_bp = Blueprint('chat', __name__)
-# # model = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.7)
-# # workflow = StateGraph(state_schema=MessagesState)
-
-# # def call_model(state: MessagesState):
-# #     response = model.invoke(state["messages"])
-# #     return {"messages": response}
-
-# # workflow.add_edge(START, "model")
-# # workflow.add_node("model", call_model)
-
-# # conn = sqlite3.connect("conversations.db", check_same_thread=False)
-# # memory = SqliteSaver(conn=conn)
-# # app = workflow.compile(checkpointer=memory)
-
-# # # -------------------- ROUTES -------------------- #
-
-# # @chat_bp.route("/create_chat", methods=["POST"])
-# # def create_chat():
-# #     data = request.get_json()
-# #     if not data or not all(key in data for key in ['rid', 'uid', 'recipe']):
-# #         return jsonify({'message': 'Missing data: recipe, uid, rid'}), 400
-
-# #     uid = data.get('uid')
-# #     rid = data.get('rid')
-
-# #     try:
-# #         response = supabase.table("conversations").insert({
-# #             "user_id": uid,
-# #             "recipe_id": rid,
-# #             "state": 1  # initialize state
-# #         }).execute()
-# #         cid = response.data[0]['chat_id']
-
-# #         recipes_response = supabase.table('recipes').select('*').eq('id', rid).single().execute()
-# #         recipe = recipes_response.data
-# #     except Exception as e:
-# #         return jsonify({'message': f'Database error: {str(e)}'}), 500
-
-# #     instructions = (
-# #         f"For the following recipe in json: {recipe}, analyze it. "
-# #         "You will introduce yourself, describe the recipe, and help the user with any questions "
-# #         "outside the predefined steps (like ingredient alternatives, mistakes, or clarifications)."
-# #     )
-
-# #     initial_messages = [
-# #         SystemMessage(content=instructions),
-# #         HumanMessage(content="Hi! Please start teaching me the recipe.")
-# #     ]
-
-# #     config = {"configurable": {"thread_id": cid}}
-# #     first_response = app.invoke({"messages": initial_messages}, config)
-
-# #     mp3_fp = io.BytesIO()
-# #     try:
-# #         tts = gTTS(first_response["messages"][-1].content, lang='en')
-# #         tts.write_to_fp(mp3_fp)
-# #     except Exception:
-# #         return jsonify({"message": "Speech could not be generated"}), 500
-
-# #     mp3_fp.seek(0)
-# #     return send_file(
-# #         mp3_fp,
-# #         mimetype='audio/mpeg',
-# #         as_attachment=True,
-# #         download_name='intro.mp3'
-# #     ), 200
-
-# # # -------------------- Full audio chat -------------------- #
-# # @chat_bp.route("/chat", methods=["POST"])
-# # def chat():
-# #     cid = request.form.get('cid')
-# #     if 'audio' not in request.files or not cid:
-# #         return jsonify({'message': 'Missing data: audio file or cid'}), 400
-
-# #     file = request.files['audio']
-# #     try:
-# #         userAudio = AudioSegment.from_file(file)
-# #         userAudio = userAudio.set_frame_rate(16000).set_channels(1)
-# #         buffer = io.BytesIO()
-# #         userAudio.export(buffer, format="raw")
-# #         userAudioBytes = buffer.getvalue()
-# #     except Exception:
-# #         return jsonify({'message': 'Could not process audio file.'}), 500
-
-# #     try:
-# #         userMessage = stt(userAudioBytes)
-# #     except Exception:
-# #         return jsonify({'message': 'Speech-to-text failed'}), 500
-
-# #     try:
-# #         chat_response = supabase.table('conversations').select('*').eq('chat_id', cid).single().execute()
-# #         chat = chat_response.data
-# #         rid = chat['recipe_id']
-# #         uid = chat['user_id']
-
-# #         recipes_response = supabase.table('recipes').select('*').eq('id', rid).single().execute()
-# #         recipe = recipes_response.data
-# #     except Exception as e:
-# #         return jsonify({'message': f'Database error: {str(e)}'}), 500
-
-# #     # Ensure state exists
-# #     chat_state = chat.get('state', 1)
-# #     chat_message = ""
-
-# #     if "next" in userMessage.lower():
-# #         if chat_state >= len(recipe['ai_instructions']['ai_steps']):
-# #             chat_message = "The recipe has been completed. Please feel free to restart or check other recipes."
-# #         else:
-# #             chat_message = recipe['ai_instructions']['ai_steps'][chat_state]['description']
-# #             supabase.table('conversations').update({'state': chat_state + 1}).eq('chat_id', cid).execute()
-# #     elif "previous" in userMessage.lower():
-# #         if chat_state <= 1:
-# #             chat_message = "You are on the first step. You cannot go back any further."
-# #         else:
-# #             chat_message = recipe['ai_instructions']['ai_steps'][chat_state - 2]['description']
-# #     elif "repeat" in userMessage.lower():
-# #         if chat_state <= 1:
-# #             chat_message = "We have not started yet, please say next to continue."
-# #         else:
-# #             chat_message = recipe['ai_instructions']['ai_steps'][chat_state - 1]['description']
-# #     else:
-# #         config = {"configurable": {"thread_id": cid}}
-# #         start_time = time.perf_counter()
-# #         response = app.invoke({"messages": [HumanMessage(content=userMessage)]}, config)
-# #         end_time = time.perf_counter()
-# #         print(f"Model response time: {end_time - start_time:.6f}s")
-# #         chat_message = response["messages"][-1].content
-
-# #     # Generate TTS
-# #     wav_fp = io.BytesIO()
-# #     try:
-# #         tts = gTTS(chat_message, lang='en')
-# #         tts.write_to_fp(wav_fp)
-# #     except Exception:
-# #         return jsonify({"message": "Speech could not be generated"}), 500
-
-# #     wav_fp.seek(0)
-# #     return send_file(
-# #         wav_fp,
-# #         mimetype='audio/mpeg',
-# #         as_attachment=True,
-# #         download_name='response.mp3'
-# #     ), 200
-
-# # # -------------------- Streaming audio chat -------------------- #
-# # @chat_bp.route("/chat_stream", methods=["POST"])
-# # def chat_stream():
-# #     cid = request.form.get('cid')
-# #     if 'audio' not in request.files or not cid:
-# #         return jsonify({'message': 'Missing data: audio file or cid'}), 400
-
-# #     file = request.files['audio']
-# #     try:
-# #         # Load audio, convert to mono 16kHz
-# #         userAudio = AudioSegment.from_file(file)
-# #         userAudio = userAudio.set_frame_rate(16000).set_channels(1)
-# #         buffer = io.BytesIO()
-# #         userAudio.export(buffer, format="raw")
-# #         audio_bytes = buffer.getvalue()
-
-# #         # Split audio into chunks (~100ms)
-# #         CHUNK_SIZE = 3200  # 16kHz mono, 16-bit PCM -> 2 bytes/sample
-# #         raw_chunks = [audio_bytes[i:i+CHUNK_SIZE] for i in range(0, len(audio_bytes), CHUNK_SIZE)]
-
-# #         # Only keep chunks with amplitude above threshold
-# #         threshold_db = -40  # dBFS threshold, adjust as needed
-# #         chunks_to_send = []
-# #         for chunk in raw_chunks:
-# #             segment = AudioSegment(
-# #                 chunk,
-# #                 sample_width=2,  # 16-bit PCM
-# #                 frame_rate=16000,
-# #                 channels=1
-# #             )
-# #             if segment.dBFS > threshold_db:
-# #                 chunks_to_send.append(chunk)
-
-# #         if not chunks_to_send:
-# #             return jsonify({'message': 'No speech detected above threshold'}), 200
-
-# #     except Exception as e:
-# #         return jsonify({'message': f'Could not process audio file: {str(e)}'}), 500
-
-# #     # Stream chunks to STT
-# #     transcript = stt_stream(chunks_to_send, rate=16000)
-
-# #     # Generate AI response
-# #     config = {"configurable": {"thread_id": cid}}
-# #     response = app.invoke({"messages": [HumanMessage(content=transcript)]}, config)
-
-# #     # TTS
-# #     wav_fp = io.BytesIO()
-# #     try:
-# #         tts = gTTS(response["messages"][-1].content, lang='en')
-# #         tts.write_to_fp(wav_fp)
-# #     except Exception:
-# #         return jsonify({"message": "Speech could not be generated"}), 500
-
-# #     wav_fp.seek(0)
-# #     return send_file(
-# #         wav_fp,
-# #         mimetype='audio/mpeg',
-# #         as_attachment=True,
-# #         download_name='response.mp3'
-# #     ), 200
-
-# # # -------------------- File upload -------------------- #
-# # @chat_bp.route('/upload', methods=['POST'])
-# # def upload_file():
-# #     if 'audio' not in request.files:
-# #         return jsonify({'error': 'No audio file'}), 400
-
-# #     file = request.files['audio']
-# #     if file.filename == '':
-# #         return jsonify({'error': 'No audio file selected'}), 400
-
-# #     save_path = os.path.join(current_app.config.get('UPLOAD_FOLDER', './uploads'), file.filename)
-# #     os.makedirs(os.path.dirname(save_path), exist_ok=True)
-
-# #     try:
-# #         file.save(save_path)
-# #         return jsonify({'message': 'File uploaded successfully', 'filename': file.filename}), 200
-# #     except Exception as e:
-# #         return jsonify({'error': f'Failed to save file: {str(e)}'}), 500
-
-
-
 import getpass
 import os
 from dotenv import load_dotenv
@@ -278,7 +28,8 @@ chat_bp = Blueprint('chat', __name__)
 model = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.7)
 workflow = StateGraph(state_schema=MessagesState)
 
-HARDCODED_RID = "47190fe1-d415-416b-abee-0016abd49555"
+
+
 HARDCODED_UID = "52f22f9b-0f7f-4f54-befa-629850b9019a"
 HARDCODED_CID = "test12345"
 def call_model(state: MessagesState):
@@ -300,14 +51,10 @@ HARDCODED_CID = "test12345"
 
 # -------------------- HTTP ROUTES -------------------- #
 
-@chat_bp.route("/create_chat", methods=["POST"])
-def create_chat():
-  data = request.get_json()
-  if not data or not all(key in data for key in ['rid', 'uid', 'recipe']):
-    return jsonify({'message': 'Missing data: recipe, uid, rid'}), 400
-  uid=data.get('uid')
-  rid=data.get('rid')
-  
+
+def create_chat(rid,uid):
+  print('heeeeeeeeelppppppppp')
+
 
   response = (
       supabase.table("conversations")
@@ -318,9 +65,8 @@ def create_chat():
       .execute()
   )
   
-  data=response.data[0]
-  cid=data['chat_id']
-  config = {"configurable": {"thread_id": cid}}
+
+  config = {"configurable": {"thread_id": rid}}
   recipes_response = (
       supabase.table('recipes')
       .select('*')
@@ -329,6 +75,7 @@ def create_chat():
       .execute()
   )
   recipe=recipes_response.data
+ 
   # print(str(recipe))
 
   instructions=(
@@ -340,7 +87,9 @@ def create_chat():
   "keywords to signify when to go to the next step, previous step, or to repeat a step"
   "your focus is outside of that where you are gonna help the user when they have issues"
   "like providing ingredient alternatives, when they mess up, confusion clarification, etc"
-  "you will be given the user step for context etc")
+  "you will be given the user step for context etc"
+  "PLEASE SHORT REPSONSE, 15 words or less"
+  "NO ASTERISK *")
   
   initial_messages = [
       SystemMessage(content=instructions),
@@ -348,28 +97,15 @@ def create_chat():
   ]
 
   first_response = app.invoke({"messages": initial_messages}, config)
-  mp3_fp = io.BytesIO()
-  try:
-    tts = gTTS(first_response["messages"][-1].content, lang='en')
-    tts.write_to_fp(mp3_fp)
-  except Exception as e:
-    return jsonify({"message":"Speech could not be generated"}), 500
   
-  mp3_fp.seek(0)
-  
-  return send_file(
-    mp3_fp,
-    mimetype='audio/mpeg',
-    as_attachment=True,
-    download_name='intro.mp3'
-  ), 200
 
 # @chat_bp.route("/chat", methods=["POST"])
-def chat(userMessage,socketio,sid):
+def chat(userMessage,socketio,sid,rid):
     next="next" in userMessage.lower()
     previous="previous" in userMessage.lower()
     repeat="repeat" in userMessage.lower()
     hey="hey" in userMessage.lower()
+    step_time=0
     if next or previous or repeat or hey:
         socketio.emit('thinking', {}, to=sid)
     else:
@@ -377,7 +113,6 @@ def chat(userMessage,socketio,sid):
 
     try:
         
-        rid = HARDCODED_RID
         # uid = HARDCODED_UID
         chat_response = supabase.table('conversations').select('*').eq('recipe_id', rid).single().execute()
         chat = chat_response.data
@@ -396,6 +131,14 @@ def chat(userMessage,socketio,sid):
             print("Chat Message: ", chat_message)
         else:
             chat_message = recipe['ai_instructions']['ai_steps'][chat_state]['description']
+            try:
+                step_time = recipe['instructions']['steps'][chat_state]['time']
+                if not step_time: 
+                    step_time = 0 
+            except (KeyError, IndexError, TypeError):
+                step_time = 0
+            print('fffffffffffffffffff')
+            print(step_time)
             print("Chat Message: ", chat_message)
             supabase.table('conversations').update({'state': chat_state + 1}).eq('recipe_id', rid).execute()
     elif previous:
@@ -422,7 +165,7 @@ def chat(userMessage,socketio,sid):
         print("Chat Message: ", chat_message)
     
 
-    return chat_message
+    return {"chatmsg":chat_message,"time":step_time}
     # try:
     #     audio_bytes = speaks(chat_message)  # returns raw audio bytes
     # except Exception as e:
@@ -572,7 +315,7 @@ def check_audio_loudness(audio_bytes):
         # If we can't check, assume it's valid to avoid dropping audio
         return True, 0.0
 
-def process_audio_chunk(socketio,audio_bytes, sid):
+def process_audio_chunk(socketio,audio_bytes, sid,rid):
     global finalText
     session = active_sessions.get(sid)
     if not session or not session.get("is_streaming", False):
@@ -595,7 +338,7 @@ def process_audio_chunk(socketio,audio_bytes, sid):
             print(f"[PROCESS_CHUNK] Session {sid}: {len(audio_bytes)} bytes | {amplitude:.1f} dBFS | {bar} (TOO QUIET - skipped)")
             if finalText != "":
                 print(finalText)
-                Thread(target=generate_and_emit_response, args=(socketio,sid, finalText)).start()
+                Thread(target=generate_and_emit_response, args=(socketio,sid, finalText,rid)).start()
                 # chat(finalText)
                 finalText = ""
             return
@@ -615,16 +358,19 @@ def process_audio_chunk(socketio,audio_bytes, sid):
     except Exception as e:
         print(f"[PROCESS_CHUNK] Error processing chunk for {sid}: {e}")
 
-def generate_and_emit_response(socketio,sid, phrase):
+def generate_and_emit_response(socketio,sid, phrase,rid):
     try:
-        chat_message = chat(phrase,socketio,sid)
+        chat_response=chat(phrase,socketio,sid,rid)
+        chat_message = chat_response['chatmsg']
+        step_time=chat_response['time']
+        print(chat_message)
         print(f"[CHAT] {phrase} -> {chat_message}")
 
         # TTS
         audio_bytes = speaks(chat_message)
         b64_audio = base64.b64encode(audio_bytes).decode('utf-8')
 
-        socketio.emit('audio_response', {'text': chat_message, 'audio': b64_audio}, to=sid)
+        socketio.emit('audio_response', {'text': chat_message, 'audio': b64_audio,"time":step_time}, to=sid)
         print(f"[EMIT] Sent response to {sid}")
         
     except Exception as e:
@@ -679,7 +425,7 @@ def register_socketio_handlers(socketio):
             print(f"[AUDIO_CHUNK] Size: {len(audio_bytes)} bytes, Complete: {is_complete}")
             
             # Process the complete 2-second chunk asynchronously
-            Thread(target=process_audio_chunk, args=(socketio,audio_bytes, request.sid)).start()
+            Thread(target=process_audio_chunk, args=(socketio,audio_bytes, request.sid,data['rid'])).start()
 
             emit('chunk_received', {'chunk_id': chunk_id, 'size': len(audio_bytes)})
         except Exception as e:

@@ -1,3 +1,4 @@
+import { Image } from "expo-image";
 import { Dispatch, SetStateAction } from "react";
 
 export const getRecipes=async(jwt:string|undefined, setRecipes:Dispatch<SetStateAction<any[] | undefined>>)=>{
@@ -10,6 +11,10 @@ export const getRecipes=async(jwt:string|undefined, setRecipes:Dispatch<SetState
           }
         });
         const data=await response.json()
+        for(const recipe of data.result){
+          console.log(recipe.image_url)
+          await Image.prefetch(recipe.image_url);
+        }
         //console.log(data.result)
         setRecipes(data.result)
       } catch (err) {
