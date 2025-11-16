@@ -1,6 +1,6 @@
 
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, ScrollView,  } from 'react-native';
 
 import LargeCard from "@/components/largeCard";
 import CornerIcon from "@/components/cornerIcon";
@@ -9,6 +9,7 @@ import MyCarousel from "@/components/carousel";
 import { useUser } from '../contexts/UserContext';
 import { useEffect, useState } from 'react';
 import { useSearchRecipes } from '../contexts/SearchRecipeContext';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
   const {recipes}=useRecipes();
@@ -18,9 +19,9 @@ export default function HomeScreen() {
   console.log('yyyyyyyyyyyyyyyyyyyyyyyyyy')
   console.log(user)
   return (
-    
-
-   <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+ 
+<SafeAreaView style={{flex: 1, backgroundColor: '#f5ebe6ff'}}>
+   <ScrollView style={styles.container}>
     <View style={styles.row}>
       <Text style={styles.title}>Hi {user?user.first_name:""}! </Text>
       <View style={styles.icons}>
@@ -62,6 +63,8 @@ export default function HomeScreen() {
           <StatusBar style="auto" />
           
          </ScrollView>
+         </SafeAreaView>
+        
   );
 }
 
@@ -69,10 +72,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5ebe6ff',
-   
-  },
-  content:{
-    top: 40,
+  
   },
   gridItem: {
     flex: 1, // Ensures items take equal space in a row

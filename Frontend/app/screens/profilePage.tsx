@@ -1,9 +1,11 @@
 import React, {useState} from 'react'
-import { StyleSheet, Text, View, ScrollView, Image, Button, TextInput, Modal, TouchableOpacity, KeyboardAvoidingView, Platform, } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, Button, TextInput, Modal, TouchableOpacity, KeyboardAvoidingView, Platform, } from 'react-native';
 import { router } from 'expo-router'
 import {ArrowLeft, Pencil, Plus} from 'lucide-react-native'
 import { useRecipes } from '../contexts/RecipeContext';
 import { useUser } from '../contexts/UserContext';
+import {Image} from 'expo-image';
+
 export default function profilePage() {
   const {user}=useUser();
   const[isEditing, setIsEditing] = useState(false);
