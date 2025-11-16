@@ -33,6 +33,7 @@ export default function SettingScreen() {
   const [recordingUri, setRecordingUri] = useState<string | null>(null);
   const [isTalking, setIsTalking] = useState(false);
   const [isThinking, setIsThinking]=useState(false);
+  const [progress, setProgress] = useState(0);
   
   // State for WebSocket streaming
   const [isStreaming, setIsStreaming] = useState(false);
@@ -121,9 +122,10 @@ export default function SettingScreen() {
       console.log('[audio length', data.audio.length);
       const base64Content=data.audio
       const step_time=data.time
+      const progress = data.progress
 
+      setProgress(progress);
 
-  
       const fileUri = `${FileSystem.cacheDirectory}response-audio.mp3`;
       await FileSystem.writeAsStringAsync(fileUri, base64Content, {
         encoding: FileSystem.EncodingType.Base64,
@@ -450,12 +452,22 @@ async function stopWebSocketStream() {
           <ArrowLeft  size={20} style={styles.arrow}/>
         </TouchableOpacity>
         
-        <View style={{backgroundColor: '#ffff', borderRadius: 100, width: '80%', marginLeft: 10, }}>
-          <View style={{backgroundColor: '#262e05ff', width: '30%', borderRadius: 100,}}>
-            <Text> </Text>
-          </View>
-        </View>
-      </View>
+         <View style={{ 
+              backgroundColor: '#ffffff',
+              borderRadius: 100,
+              width: '80%',
+              marginLeft: 10,
+              height: 12,
+              overflow: 'hidden'
+            }}>
+              <View style={{
+                backgroundColor: '#262e05ff',
+                width: `${progress * 100}%`,
+                height: "100%",
+                borderRadius: 100
+              }}/>
+            </View>
+            </View>
   
       <View style={{ marginTop: 80}}>
         {/* {(!isTalking&&!isThinking) && (

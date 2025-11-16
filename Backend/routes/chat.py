@@ -123,10 +123,11 @@ def chat(userMessage,socketio,sid,rid):
         return jsonify({'message': f'Database error: {str(e)}'}), 500
 
     chat_state = chat.get('state', 1)
+    total_steps = len(recipe['ai_instructions']['ai_steps'])
     chat_message = ""
 
     if next:
-        if chat_state >= len(recipe['ai_instructions']['ai_steps']):
+        if chat_state >= total_steps:
             chat_message = "The recipe has been completed. Please feel free to restart or check other recipes."
             print("Chat Message: ", chat_message)
         else:
@@ -164,8 +165,9 @@ def chat(userMessage,socketio,sid,rid):
         chat_message = response["messages"][-1].content
         print("Chat Message: ", chat_message)
     
+    progress = min((chat_state) / total_steps, 1.0)
 
-    return {"chatmsg":chat_message,"time":step_time}
+    return {"chatmsg":chat_message,"time":step_time, 'progress' : progress}
     # try:
     #     audio_bytes = speaks(chat_message)  # returns raw audio bytes
     # except Exception as e:
@@ -363,6 +365,7 @@ def generate_and_emit_response(socketio,sid, phrase,rid):
         chat_response=chat(phrase,socketio,sid,rid)
         chat_message = chat_response['chatmsg']
         step_time=chat_response['time']
+        progress = chat_response.get('progress' , 0)
         print(chat_message)
         print(f"[CHAT] {phrase} -> {chat_message}")
 
@@ -370,7 +373,7 @@ def generate_and_emit_response(socketio,sid, phrase,rid):
         audio_bytes = speaks(chat_message)
         b64_audio = base64.b64encode(audio_bytes).decode('utf-8')
 
-        socketio.emit('audio_response', {'text': chat_message, 'audio': b64_audio,"time":step_time}, to=sid)
+        socketio.emit('audio_response', {'text': chat_message, 'audio': b64_audio,"time":step_time, 'progress' : progress}, to=sid)
         print(f"[EMIT] Sent response to {sid}")
         
     except Exception as e:
