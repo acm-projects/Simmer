@@ -233,9 +233,9 @@ export default function ImportRecipe(){
                       <View style={{alignItems: 'center'}}>
 
                       <TouchableOpacity
-                  style={styles.closeButton}
+                  style={[styles.closeButton,]}
                   onPress={() => {importRecipeFromLink(); setIsLoading(true);}}>
-                    <Text style={styles.text}>OK</Text>
+                    <Text style={[styles.text, {alignSelf: 'center'}]}>OK</Text>
                   </TouchableOpacity>
                   </View>
                     </View>
@@ -346,9 +346,9 @@ export default function ImportRecipe(){
         {step.map((instruct, index) => (
           <View
             key={index}
-            style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 20 }}
+            style={{ flexDirection: 'row', alignItems: 'flex-start', paddingLeft: 20 }}
           >
-            <Text style={[styles.bullet,{}]}>{index + 1}.</Text>
+            <Text style={[styles.bullet,{bottom: -5}]}>{index + 1}.</Text>
              
          <TextInput
             style={[styles.recipe, { paddingLeft: 2 }]}
@@ -358,15 +358,16 @@ export default function ImportRecipe(){
             value={instruct.time?.toString() || ''} // <-- always string
             onChangeText={(text) => updateTime(index, text)}
               />
-          <Text style={[styles.recipe, ]}> min</Text>
+          <Text style={[styles.recipe, {padding: 3}]}> min</Text>
           
          
             
             <TextInput
-              style={[styles.recipe, { paddingLeft: 6, }]}
+              style={[styles.recipe, { paddingLeft: 6, flexWrap: 'wrap', width: '75%' }]}
               placeholder="Step"
               placeholderTextColor="#a1a1a1ff"
               value={instruct.description}
+              multiline={true}
               onChangeText={(text) => updateStep(index, text)}
             />
           </View>
@@ -484,8 +485,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     margin: 2,
     marginHorizontal: 15,
+    paddingHorizontal: 40,
     marginTop: 10,
-    width: 100,
+    //width: 50,
     justifyContent: 'center',
     
 

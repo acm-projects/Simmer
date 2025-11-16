@@ -2,10 +2,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, Button, View, TextInput, Text, KeyboardAvoidingView, Platform, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { Alert, Button, View, TextInput, Text, KeyboardAvoidingView, Platform, StyleSheet, ScrollView, TouchableOpacity} from 'react-native';
 import { useSupabase } from '../contexts/SupabaseContext';
 import {SafeAreaView} from 'react-native-safe-area-context'
 import {InputField} from '@/components/inputField'
+import {Image} from 'expo-image';
 
 
 export default function Login() {
@@ -157,7 +158,7 @@ const styles = StyleSheet.create({
     mascot: {
       height: 300,
       width: 300,
-      right: -20,
+      right: 0,
       shadowColor:'#000',
       shadowRadius: 4,
       shadowOpacity: 1,
