@@ -8,7 +8,7 @@ import {Timer} from 'react-native-flip-timer-fixed';
 //const Timer = require('react-native-flip-timer-fixed').default;
 //import {Timer} from 'react-native-flip-timer-fixed';
 import { Plus, Minus, Play, Pause } from 'lucide-react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import {Image} from 'expo-image';
 import VoiceAssistant from '../utils/voiceAssistant';
 import { Audio } from 'expo-av';
@@ -28,6 +28,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import io, { Socket } from 'socket.io-client';
 
 export default function SettingScreen() {
+  const {id} = useLocalSearchParams<any>();
   const [recordingStatus, setRecordingStatus] = useState(false);
   const [recordingUri, setRecordingUri] = useState<string | null>(null);
   const [isTalking, setIsTalking] = useState(false);
@@ -38,16 +39,19 @@ export default function SettingScreen() {
   const [transcript, setTranscript] = useState('');
   const [aiResponse, setAiResponse] = useState('');
   const [statusMessage, setStatusMessage] = useState('Ready');
+  const [timer,setTimer]=useState(false)
+  const [timerKey, setTimerKey] = useState(0);
   
   // Refs
   const socketRef = useRef<Socket | null>(null);
   const streamingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastPositionRef = useRef<number>(0);
   const animations = {
-      idle: require('../../assets/Simmy/Idle_Simmy.gif'),
-      thinking: require('../../assets/Simmy/Thinking_Simmy.gif'),
-      talking: require('../../assets/Simmy/Talking_Simmy.gif'),
+      idle: require('../../../assets/Simmy/Idle_Simmy.gif'),
+      thinking: require('../../../assets/Simmy/Thinking_Simmy.gif'),
+      talking: require('../../../assets/Simmy/Talking_Simmy.gif'),
     };
+    
     useEffect(() => {
       // FastImage.preload takes an array of source objects
       const sources = Object.values(animations).map(source => (
@@ -84,6 +88,18 @@ export default function SettingScreen() {
 );
   const state = useAudioRecorderState(audioRecorder, 100);
   const player = useAudioPlayer();
+  const resumeStreaming=async ()=>{
+    isStreamingLoopRef.current=true;
+      setIsStreamingLoop(true);
+      await setAudioModeAsync({
+        playsInSilentMode: true,
+        shouldPlayInBackground: true,
+        interruptionModeAndroid: 'duckOthers',
+        interruptionMode: 'mixWithOthers',
+        allowsRecording: true
+      });
+      await streamingLoop()
+  }
 
   // Initialize WebSocket connection
   useEffect(() => {
@@ -104,6 +120,7 @@ export default function SettingScreen() {
     socket.on('audio_response', async (data) => {
       console.log('[audio length', data.audio.length);
       const base64Content=data.audio
+      const step_time=data.time
 
 
   
@@ -114,14 +131,7 @@ export default function SettingScreen() {
       const info = await FileSystem.getInfoAsync(fileUri);
       console.log(info.exists);
       console.log(fileUri)
-      const file2 = {
-        uri: fileUri,
-        name: `recording-${Date.now()}2.mp3`, 
-        type: 'audio/mp3', 
-      };
-      const formData2 = new FormData();
-      formData2.append('audio', file2 as any);
-      console.log(fileUri)
+     
       await audioRecorder.stop();
       isStreamingLoopRef.current=false;
       setIsStreamingLoop(false);
@@ -132,23 +142,26 @@ export default function SettingScreen() {
           interruptionMode: 'mixWithOthers',
           allowsRecording: false
         });
+      
 
       const player = createAudioPlayer({uri:fileUri});
       player.addListener('playbackStatusUpdate',async (status)=>{
         if(status.didJustFinish){
           // setIsTalking(false);
           setAnimation(animations.idle)
-          
-          isStreamingLoopRef.current=true;
-          setIsStreamingLoop(true);
-          await setAudioModeAsync({
-            playsInSilentMode: true,
-            shouldPlayInBackground: true,
-            interruptionModeAndroid: 'duckOthers',
-            interruptionMode: 'mixWithOthers',
-            allowsRecording: true
-          });
-          await streamingLoop()
+          if(step_time&&step_time>=0){
+            setSeconds((Math.ceil(step_time * 60)))
+            setTimer(true)
+          }
+            
+          await resumeStreaming()
+
+          try {
+            await player.release();
+            console.log('Player released successfully.');
+          } catch (e) {
+            console.warn('Error releasing player:', e);
+          }
         
 
         }
@@ -345,7 +358,8 @@ async function streamingLoop() {
         socketRef.current?.emit('audio_chunk', {
           chunk: audioData,
           chunk_id: chunkCounter,
-          is_complete: true
+          is_complete: true,
+          rid:id
         });
 
         // ✨ CHANGED: Updated log message
@@ -422,7 +436,7 @@ async function stopWebSocketStream() {
         Orbitron_700Bold // Add all desired font styles here
       });
       const [play, setPlay] = useState(false);
-      const [seconds, setSeconds] = useState(120);
+      const [seconds, setSeconds] = useState(0);
       const [isVisible, setVisible] = useState(false);
 
       
@@ -508,11 +522,18 @@ async function stopWebSocketStream() {
        
 
         <Timer
+         key={timerKey}
           time={seconds}
-          play={play}
+          play={timer}
           wrapperStyle={{ 
             flexDirection: 'row', 
             backgroundColor: 'transparent',
+          }}
+          onTimerFinish={async()=>{
+            console.log('resumeeeeeeeeeeeeeeeeeeeeeeeeee')
+            setTimer(false);
+            setTimerKey(prevKey => prevKey + 1);
+            await resumeStreaming();
           }}
           showCircles={true}
           flipNumberProps={{

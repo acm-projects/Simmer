@@ -178,7 +178,6 @@ export default function ImportRecipe(){
     
     setIsLoading(false);
     if (response.ok) {
-      alert(`Recipe created successfully! ID: ${data.recipe_id}`);
       setIsLoading(false);
       setTitle('');
       setPrepMin('');

@@ -4,6 +4,7 @@ from utils.supabase import supabase
 from utils.auth import authorize_user
 from utils.createRecipe import generate_recipe, generate_ai_instructions, categorize_protein_types, upload_image
 from utils.import_videos import get_url_data
+from routes.chat import create_chat
 
 recipe_bp = Blueprint('recipe', __name__)
 
@@ -77,6 +78,12 @@ def add_recipe():
         'unit' : ing.get('unit'),
         'is_allergen' : False
       }).execute()
+    try:
+        print(f"Attempting to create chat for recipe {recipe_id}...")
+        create_chat(recipe_id, user_id)
+        print("Chat created successfully.")
+    except Exception as e:
+        print(f"CRITICAL: Failed to create chat for recipe {recipe_id}. Error: {e}")
 
     return jsonify({
       'message' : 'recipe created and saved',
