@@ -75,6 +75,7 @@ export default function RootLayout() {
     if (event === 'INITIAL_SESSION') {
       await authenticateUser(session?.access_token)
     } else if (event === 'SIGNED_IN') {
+      router.navigate("/screens/loading");
       await getUser(session?.access_token)
       await getRecipes(session?.access_token, setRecipes);
       await getCollections(session?.access_token, setCollections);
@@ -112,6 +113,7 @@ export default function RootLayout() {
           <Stack.Screen name="screens/recipeCollection/favoriteCollection" options={{ headerShown: false }} />
           <Stack.Screen name="screens/recipeCollection" options={{ headerShown: false }} />
           <Stack.Screen name="screens/profilePage" options={{ headerShown: false }} />
+          <Stack.Screen name="screens/loading" options={{ headerShown: false }} />
           <Stack.Screen name="userPreference" options={{ headerShown: false }} />
           <Stack.Screen name="voiceAssistant" options={{ headerShown: false }} />
           <Stack.Screen name="index" options={{ headerShown: false }} />

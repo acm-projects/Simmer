@@ -176,7 +176,6 @@ export default function ImportRecipe(){
     console.log('reqest sent')
     const data = await response.json();
     
-    setIsLoading(false);
     if (response.ok) {
       setIsLoading(false);
       setTitle('');
@@ -185,9 +184,11 @@ export default function ImportRecipe(){
       setIngredient([{ name: '', quantity: '', unit: '' }]);
       setStep(['']);
       await getRecipes(session.access_token,setRecipes)
+      router.back()
     } else {
       alert(`Error: ${data.error || 'Failed to create recipe'}`);
     }
+    setIsLoading(false);
   } catch (err) {
     console.error("Error creating recipe:", err);
     alert("Could not connect to server");

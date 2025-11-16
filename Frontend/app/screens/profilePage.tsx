@@ -1,19 +1,44 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import { StyleSheet, Text, View, ScrollView, Button, TextInput, Modal, TouchableOpacity, KeyboardAvoidingView, Platform, } from 'react-native';
 import { router } from 'expo-router'
 import {ArrowLeft, Pencil, Plus} from 'lucide-react-native'
 import { useRecipes } from '../contexts/RecipeContext';
 import { useUser } from '../contexts/UserContext';
 import {Image} from 'expo-image';
+import { useSupabase } from '../contexts/SupabaseContext';
 
-export default function profilePage() {
-  const {user}=useUser();
+export default function ProfilePage() {
+  const {user,refreshUser}=useUser();
   const[isEditing, setIsEditing] = useState(false);
    const[firstName, setFirstName] = useState(user?user.first_name:'');
    const[lastName, setLastName] = useState(user?user.last_name:'');
-   const[allergens, setAllergens] =useState(['Eggs', 'Peanuts', 'Tree Nuts', 'Milk', 'Sesame']);
-   const[allAllergens, setAllAllergens] = useState(['Eggs', 'Peanuts', 'Tree Nuts', 'Milk', 'Sesame', 'Wheat', 'Soy', 'Shellfish', 'Fish']);
+   const[allergens, setAllergens] =useState<string[]>([]);
+   const[allAllergens, setAllAllergens] = useState(['Wheat',
+  'Dairy',
+  'Tree Nuts',
+  'Peanuts',
+  'Soy',
+  'Sesame',
+  'Eggs',
+  'Shellfish',
+  'Fish',]);
    const[newAllergen, setNewAllergen] = useState('');
+   const supabase=useSupabase();
+   useEffect(()=>{
+      if(!user||!user.diet_restriction)
+        return;
+      setAllAllergens((currentDietRestrictionTags)=>{
+        const dietTags=[...currentDietRestrictionTags];
+        for(const diet of user.diet_restriction){
+          if(!currentDietRestrictionTags.includes(diet)){
+            dietTags.push(diet);         
+          }
+        }
+        return dietTags;
+      })
+      setAllergens(user.diet_restriction)
+      
+    },[user])
 
    const toggleAllergen = (item: string) => {
   setAllergens((prev) =>
@@ -22,6 +47,48 @@ export default function profilePage() {
       : [...prev, item] // add if not
   );
 };
+const handleEdit=async()=>{
+  setIsEditing(false)
+  try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+
+      if (error){ 
+        return;
+      }
+      if(!session){
+        return;
+      }
+
+      const response =  await fetch(`${process.env.EXPO_PUBLIC_API_URL}user/update-name`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({'first_name':firstName,'last_name':lastName})
+      });
+       await fetch(`${process.env.EXPO_PUBLIC_API_URL}/user/dietary-restrictions`, {
+          method: 'PUT', 
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.access_token}`
+          },
+          body: JSON.stringify({
+              "diet_restriction":[...allergens],
+
+          })
+      })
+      const data = await response.json();
+      if (response.ok) {
+        await refreshUser(session.access_token)
+      } else {
+        alert(`Error: ${data.error || 'Failed editing user'}`);
+      }
+    } catch (err) {
+      console.error("Error editing user:", err);
+      alert("Could not connect to server");
+    }
+}
 
 const handleAddAllergen = () => {
   const trimmed = newAllergen.trim();
@@ -76,7 +143,7 @@ const handleAddAllergen = () => {
     {isEditing && (
            <TouchableOpacity 
     style={styles.button}
-    onPress={() => setIsEditing(false)}>
+    onPress={() => handleEdit()}>
         <Text style={styles.buttonText}>Done</Text></TouchableOpacity> )}
 
 
@@ -140,7 +207,7 @@ const handleAddAllergen = () => {
     ) : (
     <View style={[{width:350,}, styles.allergenContainer]}>
         {allergens.map((item, index) => (
-            <View style={styles.allergen}>
+            <View style={styles.allergen} key={index}>
             <Text key={index} style={styles.allergenText}>{item}</Text>
             </View>
         ))}

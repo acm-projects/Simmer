@@ -94,6 +94,16 @@ const searchItems= ()=>{
     return false;
   })
   filterRecipes=filterRecipes?.filter(recipe=>{
+    if(!allergenAr||allergenAr?.length===0)
+      return true
+    for(const allergen of allergenAr)
+      if(recipe.dietary_tags.some(item => item.name.toLowerCase().includes(allergen.toLowerCase())))
+        return true;
+    return false;
+  })
+  
+  //user.diet_restriction
+  filterRecipes=filterRecipes?.filter(recipe=>{
     if(search==='')
       return true;
     if(recipe.title.toLowerCase().includes(search.toLowerCase()))
