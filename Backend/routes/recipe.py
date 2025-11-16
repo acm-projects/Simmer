@@ -33,10 +33,14 @@ def add_recipe():
     type = data.get('type')
     ingredients = data.get('ingredients', [])
 
-    try:
-      image_url = upload_image()
-    except Exception as e:
-        return jsonify({"error": f"other error:{e.message}"}), 500
+    upload_response = upload_image()
+    if isinstance(upload_response, tuple):
+        response_obj, status_code = upload_response
+    else:
+        response_obj, status_code = upload_response, 200
+    if status_code != 200:
+        return response_obj, status_code
+    image_url = response_obj.get_json().get("url")
 
     if not title or not instructions or not type:
       return jsonify({'error' : 'title, instructions, and type are required'}), 400

@@ -72,6 +72,7 @@ def generate_recipe(data: dict):
         Fill out the ingredients in the JSON solely based on the caption. Make sure the quantity and unit fields match what is in the caption, but infer is_allergen attributes.
         If caption is empty and/or doesn't list ingredients, infer ingredient list based on context of the transcript.
         Ingredient quantities MUST be strictly numerical, so if quantity is not explicity stated in the caption, infer the quantity and respective unit.
+        For the unit attribute of ingredient, if the recipe calls for an item with size or describes the item without a specific unit of measurement, use the size or the description (i.e. a sprinkle for a sprinkle of salt) for the unit. Unit must NOT be empty.
         "For the time in the instruction step, if it is needed include the time in minutes but only if it is specified in the instruction step." \
         "if no time is specified in the instruction, please do not assume how long it takes, just leave it as 0"
         The type attribute is limited to one of these 6 -> Desserts, Drinks, Entrees, Sides, Soups, and Salads.
@@ -288,28 +289,34 @@ def upload_image():
 
     thumbnail = request.files['thumbnail']
 
-
     if thumbnail.filename == '':
         return jsonify({"error": "No file selected"}), 400
-    
-    if thumbnail:
-      thumbnail_name= secure_filename(thumbnail.filename)
-      thumbnail_name=f"{uuid.uuid4()}-{thumbnail_name}"
-      thumbnail_bytes = thumbnail.read()
 
-      bucket_name = "recipe_images"
-      thumbnail_path = f"/{thumbnail_name}"
+    thumbnail_name = secure_filename(thumbnail.filename)
+    thumbnail_name = f"{uuid.uuid4()}-{thumbnail_name}"
+    thumbnail_bytes = thumbnail.read()
+
+    bucket_name = "recipe_images"
+    thumbnail_path = thumbnail_name  # ❗ NO LEADING SLASH
 
     try:
-      supabase.storage.from_(bucket_name).upload(
-          file=thumbnail_bytes,
-          path=thumbnail_path,
-          file_options={"content-type": 'image/png'} 
-      )
-      public_url = supabase.storage.from_(bucket_name).get_public_url(thumbnail_path)
+        # Upload the file
+        upload_result = supabase.storage.from_(bucket_name).upload(
+            path=thumbnail_path,
+            file=thumbnail_bytes,
+            file_options={"content-type": 'image/png'}
+        )
 
-      return public_url
+        # Check if upload_result contains an error
+        if hasattr(upload_result, "error") and upload_result.error:
+            return jsonify({"error": upload_result.error.message}), 500
+
+        # Get public URL
+        public_url = supabase.storage.from_(bucket_name).get_public_url(thumbnail_path)
+
+        return jsonify({"url": public_url}), 200
+
     except AuthApiError as e:
-            return jsonify({"error":  f"auth error:{e.message}"}), 500
+        return jsonify({"error": f"auth error: {e.message}"}), 500
     except Exception as e:
-        return jsonify({"error": f"other error:{e.message}"}), 500
+        return jsonify({"error": f"other error: {str(e)}"}), 500

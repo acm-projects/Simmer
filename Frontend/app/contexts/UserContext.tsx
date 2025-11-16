@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect , ReactNode, Dispatch, SetStateAction } from 'react';
-import { fetchUser } from '../api/userApi';
+import { fetchUser } from '../_api/userApi';
 
 interface UserContextType {
   user: any | undefined;
