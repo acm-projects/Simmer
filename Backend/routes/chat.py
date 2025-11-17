@@ -146,14 +146,22 @@ def chat(userMessage,socketio,sid,rid):
             chat_message = "You are on the first step. You cannot go back any further."
             print("Chat Message: ", chat_message)
         else:
-            chat_message = recipe['ai_instructions']['ai_steps'][chat_state - 2]['description']
+            config = {"configurable": {"thread_id": rid}}
+            prev_message = recipe['ai_instructions']['ai_steps'][chat_state - 2]['description']
+            user_prompt = f"I missed that, can you please repeat the previous step? For context, the step was: '{prev_message}'"
+            response=app.invoke({"messages": [HumanMessage(content={user_prompt})]}, config)
+            chat_message=response["messages"][-1].content
             print("Chat Message: ", chat_message)
     elif repeat:
         if chat_state <= 1:
             chat_message = "We have not started yet, please say next to continue."
             print("Chat Message: ", chat_message)
         else:
-            chat_message = recipe['ai_instructions']['ai_steps'][chat_state - 1]['description']
+            config = {"configurable": {"thread_id": rid}}
+            repeat_message = recipe['ai_instructions']['ai_steps'][chat_state - 1]['description']
+            user_prompt = f"I missed that, can you please repeat that step? For context, the step was: '{repeat_message}'"
+            response=app.invoke({"messages": [HumanMessage(content={user_prompt})]}, config)
+            chat_message=response["messages"][-1].content
             print("Chat Message: ", chat_message)
     elif hey:
         config = {"configurable": {"thread_id": rid}}
