@@ -37,7 +37,7 @@ export default function favoriteCollection() {
     
       </View>
         {
-          recipes?.map((recipe,index)=>(<LargeCard key={index} title={recipe.title} image={recipe.image} cook_time={recipe.cook_time} prep_time={recipe.prep_time} id={recipe.id} fav={true} />))
+          recipes?.map((recipe,index)=>(<LargeCard key={index} title={recipe.title} image={recipe.image_url} cook_time={recipe.cook_time} prep_time={recipe.prep_time} id={recipe.id} fav={true} />))
         }
 
       </View>
