@@ -451,7 +451,8 @@ def generate_and_emit_response(socketio, sid, phrase, rid):
         # Finish signal
         socketio.emit('audio_response_complete', {
             'full_text': chat_message,
-            'rid': rid
+            'rid': rid,
+            'progress': progress
         }, to=sid)
         print(f"[EMIT] Sent completion signal")
 

@@ -916,6 +916,9 @@ export default function SettingScreen() {
       console.log('[TTS] Text:', data.text);
       console.log('[TTS] Request ID:', data.rid);
 
+      const progress = data.progress
+      setProgress(progress);
+
       if (!data.audio) {
         console.error('[TTS] ✗ No audio data in chunk');
         return;
