@@ -77,62 +77,185 @@ export default function VoiceAssistant() {
       setStatusMessage('Connected to server');
     });
 
-    socket.on('audio_response', async (data) => {
-      console.log('[audio length', data.audio.length);
-      const base64Content=data.audio
+    // socket.on('audio_response', async (data) => {
+    //   console.log('[audio length', data.audio.length);
+    //   const base64Content=data.audio
 
 
   
-      const fileUri = `${FileSystem.cacheDirectory}response-audio.mp3`;
-      await FileSystem.writeAsStringAsync(fileUri, base64Content, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-      const info = await FileSystem.getInfoAsync(fileUri);
-      console.log(info.exists);
-      console.log(fileUri)
-      const file2 = {
-        uri: fileUri,
-        name: `recording-${Date.now()}2.mp3`, 
-        type: 'audio/mp3', 
-      };
-      const formData2 = new FormData();
-      formData2.append('audio', file2 as any);
-      console.log(fileUri)
-      await audioRecorder.stop();
-      isStreamingLoopRef.current=false;
-      setIsStreamingLoop(false);
-      await setAudioModeAsync({
+    //   const fileUri = `${FileSystem.cacheDirectory}response-audio.mp3`;
+    //   await FileSystem.writeAsStringAsync(fileUri, base64Content, {
+    //     encoding: FileSystem.EncodingType.Base64,
+    //   });
+    //   const info = await FileSystem.getInfoAsync(fileUri);
+    //   console.log(info.exists);
+    //   console.log(fileUri)
+    //   const file2 = {
+    //     uri: fileUri,
+    //     name: `recording-${Date.now()}2.mp3`, 
+    //     type: 'audio/mp3', 
+    //   };
+    //   const formData2 = new FormData();
+    //   formData2.append('audio', file2 as any);
+    //   console.log(fileUri)
+    //   await audioRecorder.stop();
+    //   isStreamingLoopRef.current=false;
+    //   setIsStreamingLoop(false);
+    //   await setAudioModeAsync({
+    //       playsInSilentMode: true,
+    //       shouldPlayInBackground: true,
+    //       interruptionModeAndroid: 'duckOthers',
+    //       interruptionMode: 'mixWithOthers',
+    //       allowsRecording: false
+    //     });
+
+    //   const player = createAudioPlayer({uri:fileUri});
+    //   player.addListener('playbackStatusUpdate',async (status)=>{
+    //     if(status.didJustFinish){
+    //       isStreamingLoopRef.current=true;
+    //       setIsStreamingLoop(true);
+    //       await setAudioModeAsync({
+    //         playsInSilentMode: true,
+    //         shouldPlayInBackground: true,
+    //         interruptionModeAndroid: 'duckOthers',
+    //         interruptionMode: 'mixWithOthers',
+    //         allowsRecording: true
+    //       });
+    //       await streamingLoop()
+        
+
+    //     }
+    //   })
+    //   console.log('about to play auido')
+    //   console.log(player.volume)
+
+    //   player.play();
+    //   console.log('audio')
+ 
+    // });
+    // let audioQueue: string[] = [];
+    // let isPlaying = false;
+    let audioQueue: string[] = [];
+    let isPlaying = false;
+
+    async function playNextAudioChunk() {
+      console.log(audioQueue)
+      if (audioQueue.length === 0) {
+        // Queue empty → resume recording
+        isPlaying = false;
+        console.log("All TTS finished, resuming recording...");
+
+        await audioRecorder.start?.(); // restart recording
+        await setAudioModeAsync({
           playsInSilentMode: true,
           shouldPlayInBackground: true,
           interruptionModeAndroid: 'duckOthers',
           interruptionMode: 'mixWithOthers',
-          allowsRecording: false
+          allowsRecording: true
         });
+        return;
+      }
 
-      const player = createAudioPlayer({uri:fileUri});
-      player.addListener('playbackStatusUpdate',async (status)=>{
-        if(status.didJustFinish){
-          isStreamingLoopRef.current=true;
-          setIsStreamingLoop(true);
-          await setAudioModeAsync({
-            playsInSilentMode: true,
-            shouldPlayInBackground: true,
-            interruptionModeAndroid: 'duckOthers',
-            interruptionMode: 'mixWithOthers',
-            allowsRecording: true
-          });
-          await streamingLoop()
-        
+      isPlaying = true;
+      const uri = audioQueue.shift();
+      const sound = new Audio.Sound();
 
-        }
-      })
-      console.log('about to play auido')
-      console.log(player.volume)
+      try {
+        await sound.loadAsync({ uri });
+        await sound.playAsync();
 
-      player.play();
-      console.log('audio')
- 
+        sound.setOnPlaybackStatusUpdate((status) => {
+          if (status.didJustFinish) {
+            sound.unloadAsync(); // free memory
+            playNextAudioChunk(); // play next chunk
+          }
+        });
+      } catch (err) {
+        console.log("Audio playback error:", err);
+        playNextAudioChunk(); // skip faulty chunk
+      }
+    }
+
+    socket.on('audio_response_chunk', async (data) => {
+      // console.log(data)
+      console.log('[audio length]', data.audio.length);
+
+      const base64Content = data.audio;
+      const fileUri = `${FileSystem.cacheDirectory}tts-${Date.now()}.mp3`;
+
+      // Save chunk to disk
+      await FileSystem.writeAsStringAsync(fileUri, base64Content, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      // Add to playback queue
+      audioQueue.push(fileUri);
+
+      // Pause recorder and start playback if not already playing
+      if (!isPlaying) {
+        await audioRecorder.pause?.(); // pause instead of stop
+        playNextAudioChunk();
+      }
     });
+    // async function playNextAudioChunk() {
+    //   if (audioQueue.length === 0) {
+    //     // Queue empty → resume recording
+    //     isPlaying = false;
+    //     console.log("All TTS finished, resuming recording...");
+
+    //     await audioRecorder.start?.();
+    //     await setAudioModeAsync({
+    //       playsInSilentMode: true,
+    //       shouldPlayInBackground: true,
+    //       interruptionModeAndroid: 'duckOthers',
+    //       interruptionMode: 'mixWithOthers',
+    //       allowsRecording: true
+    //     });
+
+    //     return;
+    //   }
+
+    //   isPlaying = true;
+    //   const uri = audioQueue.shift();
+    //   const player = createAudioPlayer({ uri });
+
+    //   player.addListener("playbackStatusUpdate", (status) => {
+    //     if (status.didJustFinish) {
+    //       playNextAudioChunk(); // Play next chunk
+    //     }
+    //   });
+
+    //   player.play();
+    // }
+
+    // socket.on('audio_response_chunk', async (data) => {
+    //   console.log('[audio length]', data.audio.length);
+
+    //   const base64Content = data.audio;
+    //   const fileUri = `${FileSystem.cacheDirectory}tts-${Date.now()}.mp3`;
+
+    //   // Save chunk to disk
+    //   await FileSystem.writeAsStringAsync(fileUri, base64Content, {
+    //     encoding: FileSystem.EncodingType.Base64,
+    //   });
+
+    //   // Add to playback queue
+    //   audioQueue.push(fileUri);
+
+    //   // If playback just started, stop recorder and play
+    //   if (!isPlaying) {
+    //     await audioRecorder.stop?.();
+    //     await setAudioModeAsync({
+    //       playsInSilentMode: true,
+    //       shouldPlayInBackground: true,
+    //       interruptionModeAndroid: 'duckOthers',
+    //       interruptionMode: 'mixWithOthers',
+    //       allowsRecording: false
+    //     });
+
+    //     playNextAudioChunk();
+    //   }
+    // });
 
 
     socket.on('disconnect', () => {
