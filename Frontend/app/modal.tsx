@@ -5,6 +5,8 @@ import { useRecipes } from './contexts/RecipeContext';
 import LargeCardModal from '@/components/largeCardModal';
 import { useSupabase } from './contexts/SupabaseContext';
 import { useUser } from './contexts/UserContext'
+import { useCollection } from './contexts/CollectionContext';
+
 
 type AddToCollectionModalProps = {
   open: boolean;
@@ -16,6 +18,7 @@ type AddToCollectionModalProps = {
 
 export default function AddToCollectionModal({ open, onClose, collectionId, setCollectionRecipe, recipeIds }: AddToCollectionModalProps) {
   const {recipes:recipesData}= useRecipes();
+  const { refreshCollections } = useCollection();
   const [recipes,setRecipes] = useState(recipesData? recipesData?.map((recipe)=>({title:recipe.title,image:recipe.image_url,id:recipe.id})):[])
   useEffect(()=>{
     if(!recipeIds)
@@ -47,6 +50,7 @@ export default function AddToCollectionModal({ open, onClose, collectionId, setC
       console.log(recipe)
       setCollectionRecipe((currentRecipes)=>([{title:recipe.title,image:recipe.image_url,cook_time:recipe.cook_time,prep_time:recipe.prep_time,id:recipe.id},...currentRecipes||[]]))
       setRecipes((currentRecipes:any)=>currentRecipes.filter((recipe:any)=>recipe.id!==id))
+      await refreshCollections(session.access_token)
     }catch(error){
       console.error('Fetch error:', error);
     }

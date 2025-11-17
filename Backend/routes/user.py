@@ -236,7 +236,7 @@ def create_collection():
     if not response:
       return jsonify({'error' : 'failed to create collection'}), 400
 
-    return jsonify({'message' : 'collection created successfully', 'collection_id' : response.data[0]}), 201
+    return jsonify({'message' : 'collection created successfully', 'collection_id' : response.data[0]}), 200
 
   except Exception as e:
     print('error creating collection', e)
