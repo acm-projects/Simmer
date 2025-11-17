@@ -283,6 +283,15 @@ export default function SettingScreen() {
 const [isStreamingLoop, setIsStreamingLoop] = useState(false);
 const isStreamingLoopRef = useRef(false);
 
+const isMounted = useRef(true);
+
+useEffect(() => {
+  isMounted.current = true;
+  return () => {
+    isMounted.current = false;
+    isStreamingLoopRef.current = false; 
+  };
+}, []);
 async function startWebSocketStream() {
   if (!socketRef.current) {
     Alert.alert('Socket not connected');
@@ -314,7 +323,7 @@ async function streamingLoop() {
   let chunkCounter = 0;
 
   try {
-    while (isStreamingLoopRef.current) {
+    while (isStreamingLoopRef.current && isMounted.current) {
       try {
         console.log(`[Streaming] Loop active: ${isStreamingLoopRef.current}`);
         
@@ -325,9 +334,11 @@ async function streamingLoop() {
         // Wait for chunk duration, but check frequently if we should stop
         const startTime = Date.now();
         while (Date.now() - startTime < CHUNK_DURATION_MS) {
-          if (!isStreamingLoopRef.current) {
+          if (!isStreamingLoopRef.current || !isMounted.current) {
             // Stop recording immediately if flag changed
-            await audioRecorder.stop();
+           try {
+             await audioRecorder.stop();
+           } catch (e) { /* Ignore stop error on unmount */ }
             console.log('[Streaming] Recording stopped mid-chunk');
             return; // Exit the entire loop
           }
@@ -448,7 +459,18 @@ async function stopWebSocketStream() {
   return (
     <ScrollView style={styles.container}>
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
-        <TouchableOpacity onPress={() => router.back()}>
+        <TouchableOpacity onPress={ () => {
+          isStreamingLoopRef.current = false;
+          isMounted.current = false; 
+
+          stopWebSocketStream();
+
+          setPlay(false);
+          audioRecorder.stop().catch(() => {}); 
+
+          // 5. Leave immediately
+          router.back();
+          }}>
           <ArrowLeft  size={20} style={styles.arrow}/>
         </TouchableOpacity>
         
