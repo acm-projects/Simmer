@@ -388,7 +388,7 @@ def process_audio_chunk(socketio,audio_bytes, sid,rid):
 #     except Exception as e:
 #         print(f"[GEN/EMIT] Error: {e}")
 
-def chunk_text_for_tts(text, max_words=8):
+def chunk_text_for_tts(text, max_words=30):
     words = text.split()
     for i in range(0, len(words), max_words):
         yield " ".join(words[i:i + max_words])
