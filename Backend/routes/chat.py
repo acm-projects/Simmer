@@ -442,7 +442,8 @@ def generate_and_emit_response(socketio, sid, phrase, rid):
             socketio.emit('audio_response_chunk', {
                 'audio': b64_audio,
                 'text': chunk_text,
-                'rid': rid
+                'rid': rid,
+                'progress': progress
             }, to=sid)
 
         print(f"[EMIT] Finished streaming {chunk_count} chunks")
