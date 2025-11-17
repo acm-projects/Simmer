@@ -378,11 +378,39 @@ def process_audio_chunk(socketio,audio_bytes, sid,rid):
 #     except Exception as e:
 #         print(f"[GEN/EMIT] Error: {e}")
 
-def chunk_text_for_tts(text, max_words=5):
+def chunk_text_for_tts(text, max_words=8):
     words = text.split()
     for i in range(0, len(words), max_words):
         yield " ".join(words[i:i + max_words])
         
+# def generate_and_emit_response(socketio, sid, phrase, rid):
+#     try:
+#         chat_response = chat(phrase, socketio, sid, rid)
+#         chat_message = chat_response['chatmsg']
+#         step_time = chat_response['time']
+
+#         print(f"[CHAT] {phrase} -> {chat_message}")
+
+#         # STREAM TTS HERE
+#         for chunk_text in chunk_text_for_tts(chat_message):
+#             audio_bytes = speaks(chunk_text)    # TTS per chunk
+#             b64_audio = base64.b64encode(audio_bytes).decode('utf-8')
+#             print("emitting")
+#             socketio.emit('audio_response_chunk', {
+#                 'audio': b64_audio,
+#                 'text': chunk_text,
+#                 'rid': rid
+#             }, to=sid)
+
+#         # Finish signal
+#         socketio.emit('audio_response_complete', {
+#             'full_text': chat_message,
+#             'rid': rid
+#         }, to=sid)
+
+#     except Exception as e:
+#         print(f"[GEN/EMIT] Error: {e}")
+
 def generate_and_emit_response(socketio, sid, phrase, rid):
     try:
         chat_response = chat(phrase, socketio, sid, rid)
@@ -390,26 +418,34 @@ def generate_and_emit_response(socketio, sid, phrase, rid):
         step_time = chat_response['time']
 
         print(f"[CHAT] {phrase} -> {chat_message}")
+        print(f"[EMIT] Starting TTS streaming for sid={sid}, rid={rid}")
 
         # STREAM TTS HERE
+        chunk_count = 0
         for chunk_text in chunk_text_for_tts(chat_message):
-            audio_bytes = speaks(chunk_text)    # TTS per chunk
+            audio_bytes = speaks(chunk_text)
             b64_audio = base64.b64encode(audio_bytes).decode('utf-8')
-
+            chunk_count += 1
+            print(f"[EMIT] Chunk {chunk_count}: {len(b64_audio)} chars, text='{chunk_text[:30]}...'")
+            
             socketio.emit('audio_response_chunk', {
                 'audio': b64_audio,
                 'text': chunk_text,
                 'rid': rid
             }, to=sid)
 
+        print(f"[EMIT] Finished streaming {chunk_count} chunks")
+        
         # Finish signal
         socketio.emit('audio_response_complete', {
             'full_text': chat_message,
             'rid': rid
         }, to=sid)
+        print(f"[EMIT] Sent completion signal")
 
     except Exception as e:
         print(f"[GEN/EMIT] Error: {e}")
+        traceback.print_exc()
 
 def register_socketio_handlers(socketio):
     """Register all WebSocket event handlers"""
