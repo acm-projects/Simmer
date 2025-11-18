@@ -1079,7 +1079,12 @@ useEffect(() => {
         console.log(`[Streaming] Loop active: ${isStreamingLoopRef.current}`);
         
         // Prepare and start recording
+        if(!isStreamingLoopRef.current || !isMounted.current)
+          return;
         await audioRecorder.prepareToRecordAsync();
+
+        if(!isStreamingLoopRef.current || !isMounted.current)
+          return;
         await audioRecorder.record();
 
         // Wait for chunk duration, but check frequently if we should stop
