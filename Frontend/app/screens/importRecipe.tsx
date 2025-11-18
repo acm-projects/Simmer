@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView,  Button, TextInput, Modal, TouchableOpacity, KeyboardAvoidingView, Platform} from 'react-native';
 import { ArrowLeft } from 'lucide-react-native';
@@ -30,6 +30,10 @@ export default function ImportRecipe(){
     undefined
   );
   const [imageRead, setImageRead] =useState(false);
+  useEffect(()=>{
+    setIsLoading(false);
+
+  },[])
 
   const importRecipeFromLink= async()=>{
     setIsVisible(false)
@@ -177,19 +181,18 @@ export default function ImportRecipe(){
     const data = await response.json();
     
     if (response.ok) {
-      setIsLoading(false);
       setTitle('');
       setPrepMin('');
       setCookMin('');
       setIngredient([{ name: '', quantity: '', unit: '' }]);
       setStep(['']);
       await getRecipes(session.access_token,setRecipes)
-      router.back()
     } else {
       alert(`Error: ${data.error || 'Failed to create recipe'}`);
     }
-    setIsLoading(false);
+    router.back()
   } catch (err) {
+    setIsLoading(false);
     console.error("Error creating recipe:", err);
     alert("Could not connect to server");
   }
