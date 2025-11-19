@@ -11,6 +11,7 @@ import { useFonts } from '@expo-google-fonts/nunito/useFonts';
 import { Nunito_400Regular } from '@expo-google-fonts/nunito/400Regular';
 import { Nunito_600SemiBold } from '@expo-google-fonts/nunito/600SemiBold';
 import { Nunito_700Bold } from '@expo-google-fonts/nunito/700Bold';
+import { Dimensions } from 'react-native';
 
 
 
@@ -27,6 +28,11 @@ export default function TabLayout() {
     if (!fontsLoaded) {
     return null; // 👈 waits quietly
   }
+  const screenWidth = Dimensions.get('window').width;
+  const navBarWidth = 350;
+
+  // Calculate the required left offset to center the bar
+  const horizontalOffset = (screenWidth - navBarWidth) / 2;
 
 
   return (
@@ -44,8 +50,10 @@ export default function TabLayout() {
           width: 350,
           borderTopWidth: 0,
           borderRadius: 15,
-          left: 25,
-          right: 25,
+          marginHorizontal: horizontalOffset,
+          // left: 80,
+          // right: 0,
+          // alignSelf: 'stretch',
           bottom: 40,
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 10 },
@@ -53,7 +61,7 @@ export default function TabLayout() {
           shadowRadius: 3.5,
           position: 'absolute',
           paddingBottom: 20,
-          marginLeft: 22,
+          // marginLeft: 22,
         
         },
       }}>
