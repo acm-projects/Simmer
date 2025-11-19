@@ -433,7 +433,14 @@ def editImage():
       if error_response:
         return error_response, status_code
       cid=request.form.get('cid')
-      image_url=upload_image()
+      upload_response = upload_image()
+      if isinstance(upload_response, tuple):
+        response_obj, status_code = upload_response
+      else:
+        response_obj, status_code = upload_response, 200
+      if status_code != 200:
+        return response_obj, status_code
+      image_url = response_obj.get_json().get("url")
 
       response = supabase.table("collections").update({
           "image_url": image_url
@@ -445,4 +452,5 @@ def editImage():
       return jsonify(image_url), 200
   
   except Exception as e:
-      return jsonify({"error": e.message}), 500
+      
+      return jsonify({"error": str(e)}), 500
