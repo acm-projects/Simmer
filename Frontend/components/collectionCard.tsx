@@ -96,7 +96,7 @@ const CollectionCard = ({title,cid, image}: CollectionCardProps) => {
               </TouchableOpacity>)}
               {imageRead && (
                 <>
-                <Image source={{uri: selectedImage} }
+                <Image source={typeof image === 'string' ? { uri: image } : image}
                 style={styles.image} onLoadStart={()=>setisLoading(true)} onLoadEnd={()=>setisLoading(false)}/>
                 {isLoading&&(<Text style={styles.text}>loading...</Text>)}
                 </>

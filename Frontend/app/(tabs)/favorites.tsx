@@ -91,7 +91,7 @@ export default function FavoritesScreen() {
         <Link href={{
           pathname: `../screens/recipeCollection/favoriteCollection`,
           params: {}}} style={{padding: 10}} >
-          <CollectionCard  title={'Favorites'} cid={'0'} image={''}/>
+          <CollectionCard  title={'Favorites'} cid={'0'} image={require('@/assets/images/IMG_8917.jpg')}/>
           </Link>
        
      </View>

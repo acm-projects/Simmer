@@ -36,8 +36,10 @@ export const getCollections=async(jwt:string|undefined, setCollections:Dispatch<
         console.log('ddddddddddg')
         console.log(data.collections)
         for(const collection of data.collections){
-          console.log(collection.image_url)
-          await Image.prefetch(collection.image_url);
+          if(collection.image_url) {
+            console.log(collection.image_url)
+            await Image.prefetch(collection.image_url);
+          }
         }
         setCollections(data.collections)
       } catch (err) {
