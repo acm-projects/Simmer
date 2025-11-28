@@ -636,7 +636,8 @@ import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Alert } from 'rea
 import { ArrowLeft } from 'lucide-react-native';
 import { useFonts, Orbitron_400Regular, Orbitron_700Bold } from '@expo-google-fonts/orbitron';
 //@ts-ignore
-import { Timer } from 'react-native-flip-timer-fixed';
+//import { Timer } from 'react-native-flip-timer-fixed';
+import CountDown from 'react-native-countdown-component'
 import { Plus, Minus, Play, Pause } from 'lucide-react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Image } from 'expo-image';
@@ -673,7 +674,6 @@ export default function SettingScreen() {
   const [timer, setTimer] = useState(false);
   const [timerKey, setTimerKey] = useState(0);
   const [isStreamingLoop, setIsStreamingLoop] = useState(false);
-  const [play, setPlay] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [isVisible, setVisible] = useState(false);
   
@@ -1181,7 +1181,7 @@ useEffect(() => {
 
           stopWebSocketStream();
 
-          setPlay(false);
+          setTimer(false);
           audioRecorder.stop().catch(() => {}); 
 
           // 5. Leave immediately
@@ -1227,7 +1227,7 @@ useEffect(() => {
           {isVisible && (
             <TouchableOpacity 
               onPress={() => setSeconds((prev) => prev + 3600)} 
-              style={[styles.timerButton, { position: 'relative', left: 11 }]}
+              style={[styles.timerButton, { position: 'relative', left: 40 }]}
             >
               <Plus color='white' />
             </TouchableOpacity>
@@ -1236,7 +1236,7 @@ useEffect(() => {
           {isVisible && (
             <TouchableOpacity 
               style={[styles.editButton, { position: 'relative', left: '66%' }]}
-              onPress={() => { setVisible(false); setPlay(true); }}
+              onPress={() => { setVisible(false); setTimer(true); }}
             >
               <Text style={styles.text}>Done</Text>
             </TouchableOpacity>
@@ -1244,24 +1244,24 @@ useEffect(() => {
         </View>
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 4, paddingTop: 10 }}>
-          {!play && !isVisible && (
+          {!timer && !isVisible && (
             <TouchableOpacity
               style={styles.timerButton}
               onPress={() => {
                 startWebSocketStream();
-                setPlay(true);
+                setTimer(true);
               }}
             >
               <Play color={'white'} size={18} />
             </TouchableOpacity>
           )}
           
-          {play && !isVisible && (
+          {timer && !isVisible && (
             <TouchableOpacity
               style={styles.timerButton}
               onPress={() => {
                 stopWebSocketStream();
-                setPlay(false);
+                setTimer(false);
               }}
             >
               <Pause color={'white'} size={18} />
@@ -1271,34 +1271,29 @@ useEffect(() => {
           {!isVisible && (
             <TouchableOpacity 
               style={styles.editButton}
-              onPress={() => { setVisible(true); setPlay(false); }}
+              onPress={() => { setVisible(true); setTimer(false); }}
             >
               <Text style={styles.text}>Edit</Text>
             </TouchableOpacity>
           )}
         </View>
 
-        <Timer
-          key={timerKey}
-          time={seconds}
-          play={timer}
-          wrapperStyle={{ 
-            flexDirection: 'row', 
-            backgroundColor: 'transparent',
-          }}
-          onTimerFinish={async () => {
-            console.log('[Timer] Timer finished, resuming streaming...');
-            setTimer(false);
-            setTimerKey(prevKey => prevKey + 1);
-            await resumeStreaming();
-          }}
-          showCircles={true}
-          flipNumberProps={{
-            numberStyle: { color: '#ffffff', fontSize: 36 },
-            flipCardStyle: { backgroundColor: '#262e05ff' },
-            cardStyle: { backgroundColor: '#262e05ff', borderRadius: 0 }
-          }}
-        />
+      <CountDown
+        until={seconds}
+        onFinish={async () => {
+          console.log("resume");
+          setTimer(false);
+          setTimerKey(prev => prev + 1);
+          await resumeStreaming();
+        }}
+        size={35}
+        showSeparator
+        timeToShow={['H', 'M', 'S']}
+        timeLabels={{ h: null, m: null, s: null }}
+        digitStyle={{ backgroundColor: '#262e05ff' }}
+        digitTxtStyle={{ color: '#fff' }}
+        running={timer}
+      />
         
         <View style={{ flexDirection: 'row' }}>
           {isVisible && (
@@ -1313,7 +1308,7 @@ useEffect(() => {
           {isVisible && (
             <TouchableOpacity 
               onPress={() => setSeconds((prev) => prev - 3600)} 
-              style={[styles.timerButton, { position: 'relative', left: 11 }]}
+              style={[styles.timerButton, { position: 'relative', left: 40 }]}
             >
               <Minus color='white' />
             </TouchableOpacity>
