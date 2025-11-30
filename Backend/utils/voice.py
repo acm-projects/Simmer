@@ -571,7 +571,7 @@ def stt_stream_realtime(audio_chunks, rate=RATE):
 
 clientSpeaker = texttospeech.TextToSpeechClient(credentials=credentials)
 voice = texttospeech.VoiceSelectionParams(
-    language_code="en-US", name="Achernar", model_name = "gemini-2.5-flash-tts"
+    language_code="en-US", name="Fenrir", model_name = "gemini-2.5-flash-tts"
 )
 audio_config = texttospeech.AudioConfig(
     audio_encoding=texttospeech.AudioEncoding.MP3
