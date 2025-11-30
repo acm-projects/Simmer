@@ -289,7 +289,7 @@ active_sessions = {}
 HARDCODED_CID = "test12345"
 
 # ✨ NEW: Loudness threshold configuration
-AMPLITUDE_THRESHOLD = -30  # dBFS - adjust based on your needs
+AMPLITUDE_THRESHOLD = -24  # dBFS - adjust based on your needs
 # Typical values:
 # -60 dBFS = very quiet (might catch whispers)
 # -50 dBFS = moderate threshold (good default)

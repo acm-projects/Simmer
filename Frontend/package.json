@@ -48,6 +48,7 @@
     "react-dom": "19.1.0",
     "react-native": "0.81.4",
     "react-native-countdown-component": "^2.7.1",
+    "react-native-countdown-fixed": "^2.7.1",
     "react-native-flip-clock": "^1.0.1",
     "react-native-flip-countdown-timer": "^0.0.3",
     "react-native-flip-timer-fixed": "^1.0.33",
