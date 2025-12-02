@@ -24,7 +24,7 @@ interface stepsProp {
 export default function ImportRecipe(){
   const supabase=useSupabase();
   const {setRecipes}=useRecipes();
-  const [link, setLink]=useState<string|undefined>('');
+  const [link, setLink]=useState<string|undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedImage, setSelectedImage]= useState<ImagePicker.ImagePickerAsset | undefined>(
     undefined
@@ -58,16 +58,19 @@ export default function ImportRecipe(){
         body: JSON.stringify({'content':link})
       });
       const data = await response.json();
-      if (response.ok) {
-        setIsLoading(false);
-        setTitle(data.title);
-        setPrepMin(""+data.prep_time);
-        setCookMin(""+data.cook_time);
-        setIngredient(data.ingredients);
-        setStep(data.instructions.steps);
-      } else {
-        alert(`Error: ${data.error || 'Failed to create recipe'}`);
-      }
+      setTimeout(() => {
+        if (response.ok) {
+          setIsLoading(false);
+          setTitle(data.title);
+          setPrepMin(""+data.prep_time);
+          setCookMin(""+data.cook_time);
+          setIngredient(data.ingredients);
+          setStep(data.instructions.steps);
+        } else {
+          alert(`Error: ${data.error || 'Failed to create recipe'}`);
+        }
+      }, 5000);
+      
     } catch (err) {
       console.error("Error creating recipe:", err);
       alert("Could not connect to server");
@@ -143,7 +146,8 @@ export default function ImportRecipe(){
     cook_time: parseInt(cookMin) || 0,
     dietary_tags: [],
     ingredients: ingredient,
-    type:'dinner'
+    type:'dinner',
+    link:link&&link.length>0?link:undefined
   };
   const image = {
     uri: selectedImage?.uri,
@@ -232,7 +236,7 @@ export default function ImportRecipe(){
                   >
                   <View style={styles.overlay}>
                     <View style={styles.popup}>
-                      <LinkPopup link={link} setLink={setLink}/>
+                      <LinkPopup link={link??''} setLink={setLink}/>
                       <View style={{alignItems: 'center'}}>
 
                       <TouchableOpacity

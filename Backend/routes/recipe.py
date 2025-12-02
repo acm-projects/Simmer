@@ -5,6 +5,7 @@ from utils.auth import authorize_user
 from utils.createRecipe import generate_recipe, generate_ai_instructions, categorize_protein_types, upload_image
 from utils.import_videos import get_url_data
 from routes.chat import create_chat
+import time
 
 recipe_bp = Blueprint('recipe', __name__)
 
@@ -25,6 +26,7 @@ def add_recipe():
     user_id = request.form.get('id')
     data = json.loads(data_string)
     title = data.get('title')
+    link=data.get('link')
     description = data.get('description', '')
     instructions = data.get('instructions')
     prep_time = data.get('prep_time', 0)
@@ -45,10 +47,26 @@ def add_recipe():
     if not title or not instructions or not type:
       return jsonify({'error' : 'title, instructions, and type are required'}), 400
     
-    ai_instructions = generate_ai_instructions(instructions)
+    ai_response=(supabase.table('recipes')
+    .select('ai_instructions')
+    .eq('link', link)
+    .execute())
+    start_time = time.perf_counter()
+    if ai_response.data and len(ai_response.data) > 0:
+      ai_instructions = ai_response.data[0]['ai_instructions']
+      print('no aiiiiiiiiiiii')
+      end_time = time.perf_counter()
+      elapsed_time = end_time - start_time
+    else:
+      ai_instructions = generate_ai_instructions(instructions)
+      print('aiiiiiiiiiiii')
+      end_time = time.perf_counter()
+      elapsed_time = end_time - start_time
+    print(elapsed_time)
+
+    print(elapsed_time)
     print(str(instructions))
-    if not ai_instructions:
-      return jsonify({'error' : 'failed to generate AI instructions'}), 400
+    
     
     print(ingredients)
     # protein = categorize_protein_types(ingredients)
@@ -66,7 +84,8 @@ def add_recipe():
         'protein' : [],
         'type' : type,
         'image_url' : image_url,
-        'created_by' : user_id
+        'created_by' : user_id,
+        'link':link if link else None
     }).execute()
 
     if not recipe.data:
@@ -108,14 +127,32 @@ def import_recipe():
     data = request.get_json()
     if not data or not all(key in data for key in ['content']):
       return jsonify({'error': 'missing data: content.'}), 400
-    
-    content = data.get('content')
-    recipe_info = get_url_data(content)
-    if not recipe_info:
-      return jsonify ({'error' : 'failed to extract data from content'}), 400
+    recipe_str=""
+    recipeJson=None
 
-    recipe_str = generate_recipe(recipe_info)
-    recipeJson = json.loads(recipe_str)
+    content = data.get('content')
+    response=(supabase.table('recipes')
+    .select('*, ingredients(name, quantity,unit,is_allergen)')
+    .eq('link', content)
+    .execute())
+    start_time = time.perf_counter()
+    if(response.data and len(response.data) > 0):
+      print('hiiiiiiiiiiiiiiiiiiii')
+      recipeJson=response.data[0]
+      del recipeJson['id']
+      del recipeJson['created_by']
+      end_time = time.perf_counter()
+      elapsed_time = end_time - start_time
+    else:
+      print('byeeeeeeeeeeeeeeeeeeeeeeee')
+      recipe_info = get_url_data(content)
+      if not recipe_info:
+        return jsonify ({'error' : 'failed to extract data from content'}), 400
+      recipe_str = generate_recipe(recipe_info)
+      recipeJson = json.loads(recipe_str)
+      end_time = time.perf_counter()
+      elapsed_time = end_time - start_time
+    print(elapsed_time)
 
     if not recipeJson:
       return jsonify({'error': 'failed to create recipe'}), 400
