@@ -194,7 +194,11 @@ export default function ImportRecipe(){
     } else {
       alert(`Error: ${data.error || 'Failed to create recipe'}`);
     }
-    router.back()
+    console.log('doneeeeeeeeeeee')
+    setTimeout(()=>{
+      router.back()
+
+    },5000)
   } catch (err) {
     setIsLoading(false);
     console.error("Error creating recipe:", err);
