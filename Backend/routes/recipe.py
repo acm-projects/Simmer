@@ -139,6 +139,12 @@ def import_recipe():
     if(response.data and len(response.data) > 0):
       print('hiiiiiiiiiiiiiiiiiiii')
       recipeJson=response.data[0]
+
+      if "ingredients" in recipeJson:
+        for ing in recipeJson["ingredients"]:
+            if isinstance(ing.get("quantity"), (int, float)):  
+                ing["quantity"] = str(ing["quantity"])
+
       del recipeJson['id']
       del recipeJson['created_by']
       end_time = time.perf_counter()
